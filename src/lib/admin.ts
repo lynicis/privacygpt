@@ -7,6 +7,7 @@ import { companies, changelogs } from "./db/schema"
 import type { Company } from "./db/schema"
 import { eq } from "drizzle-orm"
 import { coerceFieldChanges } from "./company-fields"
+import type { CompanyField } from "./company-fields"
 
 export function checkAdminAuth(headers: Headers) {
   const authHeader = headers.get("authorization")
@@ -70,15 +71,42 @@ export const reviewChangelogFn = createServerFn({ method: "POST" })
 
       // 2. Apply proposed changes to companies table
       if (changelog.proposedChanges) {
-        const { updates, skipped } = coerceFieldChanges(
-          JSON.parse(changelog.proposedChanges)
-        )
+        const proposed: unknown = JSON.parse(changelog.proposedChanges)
+        const { updates, skipped } = coerceFieldChanges(proposed)
         if (skipped.length) {
           console.warn(
             `[admin] Skipped AI fields for changelog ${data.id}: ${skipped.join(", ")}`
           )
         }
-        if (Object.keys(updates).length > 0) {
+        const fields = Object.keys(updates) as CompanyField[]
+        if (fields.length > 0) {
+          const [company] = await db
+            .select()
+            .from(companies)
+            .where(eq(companies.id, changelog.companyId))
+            .limit(1)
+
+          const changes = Array.isArray(proposed) ? proposed : []
+          const stale = fields.filter((field) => {
+            const change = changes.find(
+              (item) =>
+                typeof item === "object" &&
+                item !== null &&
+                "field" in item &&
+                item.field === field
+            )
+            return (
+              change &&
+              typeof change === "object" &&
+              "oldValue" in change &&
+              typeof change.oldValue === "string" &&
+              String(company[field] ?? "") !== change.oldValue
+            )
+          })
+          if (stale.length > 0) {
+            throw new Error(`Stale proposal for fields: ${stale.join(", ")}`)
+          }
+
           // coerceFieldChanges narrowed every entry to the column's runtime type
           await db
             .update(companies)
