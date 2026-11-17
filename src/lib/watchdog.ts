@@ -141,6 +141,7 @@ export async function checkCompany(
   } else if (latestSnapshot.contentHash !== contentHash) {
     console.log(`[watchdog] ⚠ CHANGE DETECTED for ${company.companyName}!`)
 
+    // shortcut: a DB failure between the two inserts can duplicate a changelog on retry; D1 has no interactive transaction here.
     const [inserted] = await db
       .insert(changelogs)
       .values({
@@ -151,11 +152,6 @@ export async function checkCompany(
         status: "pending_review",
       })
       .returning({ id: changelogs.id })
-
-    if (env?.AI_REVIEW_QUEUE) {
-      await env.AI_REVIEW_QUEUE.send({ changelogId: inserted.id })
-      console.log(`[watchdog] Enqueued AI review for changelog ${inserted.id}`)
-    }
 
     await db.insert(snapshots).values({
       companyId: company.id,
@@ -168,6 +164,17 @@ export async function checkCompany(
       .update(companies)
       .set({ lastChangedDate: now.split("T")[0] })
       .where(eq(companies.id, company.id))
+
+    if (env?.AI_REVIEW_QUEUE) {
+      try {
+        await env.AI_REVIEW_QUEUE.send({ changelogId: inserted.id })
+        console.log(
+          `[watchdog] Enqueued AI review for changelog ${inserted.id}`
+        )
+      } catch (e) {
+        console.error("[watchdog] Failed to enqueue AI review:", e)
+      }
+    }
     return "change"
   } else {
     console.log(`[watchdog] No changes for ${company.companyName}`)
