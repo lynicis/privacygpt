@@ -11,13 +11,14 @@ import { ThemeToggle } from "../components/ThemeToggle"
 
 import appCss from "../styles.css?url"
 
+import type { AnyRouter } from "@tanstack/react-router"
 import type { QueryClient } from "@tanstack/react-query"
-
-const APP_URL = process.env.APP_URL || "https://privacygpt.lynicis.dev"
+import { APP_URL } from "../lib/site"
 
 interface RouterContext {
-  router?: any
-  queryClient?: QueryClient
+  /** Attached right after router creation; absent during the constructor. */
+  router?: AnyRouter
+  queryClient: QueryClient
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -119,15 +120,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         rel: "stylesheet",
         href: appCss,
       },
-      {
-        rel: "canonical",
-        href: APP_URL,
-      },
     ],
     scripts: [
       {
         type: "application/ld+json",
-        innerHTML: JSON.stringify({
+        children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: "PrivacyGPT",
@@ -136,14 +133,14 @@ export const Route = createRootRouteWithContext<RouterContext>()({
             "Compare how major AI companies handle your data. See who trains on your chats, who deletes on request, and who shares with third parties.",
           potentialAction: {
             "@type": "SearchAction",
-            target: `${APP_URL}/?q={search_term_string}`,
+            target: `${APP_URL}/?search={search_term_string}`,
             "query-input": "required name=search_term_string",
           },
         }),
       },
       {
         type: "application/ld+json",
-        innerHTML: JSON.stringify({
+        children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
           name: "PrivacyGPT",
@@ -151,50 +148,8 @@ export const Route = createRootRouteWithContext<RouterContext>()({
           logo: `${APP_URL}/og-image.png`,
         }),
       },
-      {
-        type: "application/ld+json",
-        innerHTML: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          mainEntity: [
-            {
-              "@type": "Question",
-              name: "Which AI companies train on your conversations by default?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "OpenAI (ChatGPT), Google (Gemini), Anthropic (Claude), Meta (Llama), and Perplexity all have opt-out mechanisms but train on your data unless you turn them off. Apple and Mistral do not train on user data by default.",
-              },
-            },
-            {
-              "@type": "Question",
-              name: "Can you delete your AI conversation history?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "Most major AI companies let you request deletion. OpenAI, Anthropic, Google, and Meta all offer deletion options. How long they keep your data before deleting varies, though, from about 30 days to 3 years depending on the company.",
-              },
-            },
-            {
-              "@type": "Question",
-              name: "Which AI chatbots share data with third parties?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "We track third-party sharing across 30+ AI platforms. OpenAI, Google, and Microsoft all share data with service providers, while Mistral and Apple have stricter policies around who gets access to your conversations.",
-              },
-            },
-            {
-              "@type": "Question",
-              name: "What is PrivacyGPT and how does it work?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "PrivacyGPT monitors how major AI companies handle your conversations. It covers training defaults, opt-out options, data retention, deletion rights, and third-party sharing, all pulled from the companies' own privacy policies and documentation.",
-              },
-            },
-          ],
-        }),
-      },
     ],
   }),
-  loader: async () => {},
   notFoundComponent: () => (
     <main className="container mx-auto p-4 pt-16">
       <h1>404</h1>

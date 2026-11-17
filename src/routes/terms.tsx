@@ -10,6 +10,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardTitle, CardDescription } from "@/components/ui/card"
+import { APP_URL } from "../lib/site"
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/terms")({
           "PrivacyGPT terms of usage. Informational comparison tool — not legal advice. Read our terms before using the service.",
       },
     ],
+    links: [{ rel: "canonical", href: `${APP_URL}/terms` }],
   }),
   component: TermsPage,
 })

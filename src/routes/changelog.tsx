@@ -9,6 +9,7 @@ import {
 import { useState, useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { formatDateTime, positiveInt } from "../lib/utils"
+import { APP_URL } from "../lib/site"
 import {
   ArrowLeft,
   History,
@@ -72,7 +73,7 @@ export const Route = createFileRoute("/changelog")({
   loader: async ({ deps, context }) => {
     const pageIndex = (deps.page ?? 1) - 1
     await Promise.all([
-      context.queryClient!.ensureQueryData(
+      context.queryClient.ensureQueryData(
         changelogsQueryOptions({
           page: pageIndex,
           pageSize: deps.pageSize,
@@ -82,12 +83,12 @@ export const Route = createFileRoute("/changelog")({
           statusFilter: deps.statusFilter,
         })
       ),
-      context.queryClient!.ensureQueryData(snapshotCountsQueryOptions()),
-      context.queryClient!.ensureQueryData(
+      context.queryClient.ensureQueryData(snapshotCountsQueryOptions()),
+      context.queryClient.ensureQueryData(
         companiesQueryOptions({ limit: 1000 })
       ),
-      context.queryClient!.ensureQueryData(snapshotTotalCountQueryOptions()),
-      context.queryClient!.ensureQueryData(pendingReviewsCountQueryOptions()),
+      context.queryClient.ensureQueryData(snapshotTotalCountQueryOptions()),
+      context.queryClient.ensureQueryData(pendingReviewsCountQueryOptions()),
     ])
   },
   head: () => ({
@@ -109,11 +110,11 @@ export const Route = createFileRoute("/changelog")({
       },
       {
         property: "og:url",
-        content: "https://privacygpt.lynicis.dev/changelog",
+        content: `${APP_URL}/changelog`,
       },
       {
         property: "og:image",
-        content: "https://privacygpt.lynicis.dev/og-image.png",
+        content: `${APP_URL}/og-image.png`,
       },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Change Log — PrivacyGPT" },
@@ -124,9 +125,10 @@ export const Route = createFileRoute("/changelog")({
       },
       {
         name: "twitter:image",
-        content: "https://privacygpt.lynicis.dev/og-image.png",
+        content: `${APP_URL}/og-image.png`,
       },
     ],
+    links: [{ rel: "canonical", href: `${APP_URL}/changelog` }],
   }),
 })
 

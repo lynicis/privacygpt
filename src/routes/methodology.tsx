@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { DEFAULT_WEIGHTS } from "../lib/scoring"
+import { APP_URL } from "../lib/site"
 
 export const Route = createFileRoute("/methodology")({
   head: () => ({
@@ -34,11 +35,11 @@ export const Route = createFileRoute("/methodology")({
       },
       {
         property: "og:url",
-        content: "https://privacygpt.lynicis.dev/methodology",
+        content: `${APP_URL}/methodology`,
       },
       {
         property: "og:image",
-        content: "https://privacygpt.lynicis.dev/og-image.png",
+        content: `${APP_URL}/og-image.png`,
       },
       { name: "twitter:card", content: "summary_large_image" },
       {
@@ -52,9 +53,10 @@ export const Route = createFileRoute("/methodology")({
       },
       {
         name: "twitter:image",
-        content: "https://privacygpt.lynicis.dev/og-image.png",
+        content: `${APP_URL}/og-image.png`,
       },
     ],
+    links: [{ rel: "canonical", href: `${APP_URL}/methodology` }],
   }),
   component: MethodologyPage,
 })

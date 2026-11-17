@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { checkAdminAuthFn } from "../lib/admin"
+import { setResponseStatus } from "@tanstack/react-start/server"
 import {
   useReviewChangelog,
   changelogsQueryOptions,
@@ -38,15 +39,13 @@ import {
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async () => {
     try {
       await checkAdminAuthFn()
       return { auth: { success: true } }
     } catch (error) {
       if (error instanceof Response) {
-        if (context.router) {
-          context.router.stores.statusCode.set(error.status)
-        }
+        setResponseStatus(error.status)
         return { auth: { success: false } }
       }
       throw error
@@ -57,11 +56,11 @@ export const Route = createFileRoute("/admin")({
       return { unauthorized: true }
     }
     await Promise.all([
-      context.queryClient!.ensureQueryData(
+      context.queryClient.ensureQueryData(
         changelogsQueryOptions({ page: 0, pageSize: 1000 })
       ),
-      context.queryClient!.ensureQueryData(snapshotCountsQueryOptions()),
-      context.queryClient!.ensureQueryData(snapshotTotalCountQueryOptions()),
+      context.queryClient.ensureQueryData(snapshotCountsQueryOptions()),
+      context.queryClient.ensureQueryData(snapshotTotalCountQueryOptions()),
     ])
     return { unauthorized: false }
   },

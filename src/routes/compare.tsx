@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { companiesQueryOptions, companyByKeyQueryOptions } from "@/lib/queries"
+import { APP_URL } from "@/lib/site"
 import {
   calculateSubScores,
   calculateTotalScore,
@@ -33,7 +34,7 @@ export const Route = createFileRoute("/compare")({
     companyB: search.companyB as string | undefined,
   }),
   loader: async ({ context }) => {
-    await context.queryClient!.ensureQueryData(
+    await context.queryClient.ensureQueryData(
       companiesQueryOptions({ limit: 1000 })
     )
   },
@@ -57,10 +58,10 @@ export const Route = createFileRoute("/compare")({
         content:
           "Compare how two AI companies handle your conversational data side-by-side. Analyze training defaults, opt-out mechanisms, retention policies, and more.",
       },
-      { property: "og:url", content: "https://privacygpt.lynicis.dev/compare" },
+      { property: "og:url", content: `${APP_URL}/compare` },
       {
         property: "og:image",
-        content: "https://privacygpt.lynicis.dev/og-image.png",
+        content: `${APP_URL}/og-image.png`,
       },
       { name: "twitter:card", content: "summary_large_image" },
       {
@@ -74,9 +75,10 @@ export const Route = createFileRoute("/compare")({
       },
       {
         name: "twitter:image",
-        content: "https://privacygpt.lynicis.dev/og-image.png",
+        content: `${APP_URL}/og-image.png`,
       },
     ],
+    links: [{ rel: "canonical", href: `${APP_URL}/compare` }],
   }),
   component: ComparePage,
 })

@@ -10,6 +10,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardTitle, CardDescription } from "@/components/ui/card"
+import { APP_URL } from "../lib/site"
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/privacy")({
           "PrivacyGPT's privacy policy. We collect no cookies, no analytics, no personally identifiable information. Open, transparent, privacy-first.",
       },
     ],
+    links: [{ rel: "canonical", href: `${APP_URL}/privacy` }],
   }),
   component: PrivacyPage,
 })

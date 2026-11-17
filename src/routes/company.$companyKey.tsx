@@ -6,6 +6,7 @@ import {
   mapScoreToGrade,
   DEFAULT_WEIGHTS,
 } from "../lib/scoring"
+import { APP_URL } from "../lib/site"
 import {
   ArrowLeft,
   ExternalLink,
@@ -65,11 +66,11 @@ export const Route = createFileRoute("/company/$companyKey")({
         { property: "og:description", content: description },
         {
           property: "og:url",
-          content: `https://privacygpt.lynicis.dev/company/${company.companyKey}`,
+          content: `${APP_URL}/company/${company.companyKey}`,
         },
         {
           property: "og:image",
-          content: "https://privacygpt.lynicis.dev/og-image.png",
+          content: `${APP_URL}/og-image.png`,
         },
         { name: "twitter:card", content: "summary_large_image" },
         {
@@ -79,7 +80,13 @@ export const Route = createFileRoute("/company/$companyKey")({
         { name: "twitter:description", content: description },
         {
           name: "twitter:image",
-          content: "https://privacygpt.lynicis.dev/og-image.png",
+          content: `${APP_URL}/og-image.png`,
+        },
+      ],
+      links: [
+        {
+          rel: "canonical",
+          href: `${APP_URL}/company/${company.companyKey}`,
         },
       ],
     }

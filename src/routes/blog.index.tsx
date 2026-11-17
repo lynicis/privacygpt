@@ -1,13 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { Calendar, Clock, ArrowRight } from "lucide-react"
 import { getBlogPostsFn } from "../lib/blog"
-
-const APP_URL = process.env.APP_URL || "https://privacygpt.lynicis.dev"
+import { APP_URL } from "../lib/site"
 
 export const Route = createFileRoute("/blog/")({
   head: () => ({
-    title: "Blog - PrivacyGPT",
     meta: [
+      { title: "Blog - PrivacyGPT" },
       {
         name: "description",
         content:
@@ -31,7 +30,7 @@ export const Route = createFileRoute("/blog/")({
     scripts: [
       {
         type: "application/ld+json",
-        innerHTML: JSON.stringify({
+        children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "CollectionPage",
           name: "Blog - PrivacyGPT",

@@ -8,6 +8,7 @@ import {
   Info,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { APP_URL } from "../lib/site"
 import {
   Card,
   CardHeader,
@@ -74,11 +75,11 @@ export const Route = createFileRoute("/faq")({
       },
       {
         property: "og:url",
-        content: "https://privacygpt.lynicis.dev/faq",
+        content: `${APP_URL}/faq`,
       },
       {
         property: "og:image",
-        content: "https://privacygpt.lynicis.dev/og-image.png",
+        content: `${APP_URL}/og-image.png`,
       },
       { name: "twitter:card", content: "summary_large_image" },
       {
@@ -92,7 +93,22 @@ export const Route = createFileRoute("/faq")({
       },
       {
         name: "twitter:image",
-        content: "https://privacygpt.lynicis.dev/og-image.png",
+        content: `${APP_URL}/og-image.png`,
+      },
+    ],
+    links: [{ rel: "canonical", href: `${APP_URL}/faq` }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqs.map((f) => ({
+            "@type": "Question",
+            name: f.question,
+            acceptedAnswer: { "@type": "Answer", text: f.answer },
+          })),
+        }),
       },
     ],
   }),

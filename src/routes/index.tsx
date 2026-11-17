@@ -46,6 +46,7 @@ import { Switch } from "@/components/ui/switch"
 import { mapScoreToGrade, DEFAULT_WEIGHTS, parseWeights } from "../lib/scoring"
 import type { Weights } from "../lib/scoring"
 import { positiveInt } from "../lib/utils"
+import { APP_URL } from "../lib/site"
 
 const SORT_BY = [
   "score-desc",
@@ -99,7 +100,7 @@ export const Route = createFileRoute("/")({
       const limit = 9
       const offset = (page - 1) * limit
 
-      await context.queryClient!.ensureQueryData(
+      await context.queryClient.ensureQueryData(
         companiesQueryOptions({
           limit,
           offset,
@@ -137,10 +138,10 @@ export const Route = createFileRoute("/")({
         content:
           "Compare how major AI companies handle your conversational data. See who trains on your chats, who deletes on request, and who shares with third parties.",
       },
-      { property: "og:url", content: "https://privacygpt.lynicis.dev" },
+      { property: "og:url", content: APP_URL },
       {
         property: "og:image",
-        content: "https://privacygpt.lynicis.dev/og-image.png",
+        content: `${APP_URL}/og-image.png`,
       },
       { name: "twitter:card", content: "summary_large_image" },
       {
@@ -155,9 +156,10 @@ export const Route = createFileRoute("/")({
       },
       {
         name: "twitter:image",
-        content: "https://privacygpt.lynicis.dev/og-image.png",
+        content: `${APP_URL}/og-image.png`,
       },
     ],
+    links: [{ rel: "canonical", href: APP_URL }],
   }),
   component: App,
 })
