@@ -151,8 +151,8 @@ export async function getCompanies(
     })
 
     const totalCount = scored.length
-    const limit = data.limit ?? 9
-    const offset = data.offset ?? 0
+    const limit = Math.min(Math.max(1, data.limit ?? 9), 1000)
+    const offset = Math.max(0, data.offset ?? 0)
     const sliced = scored.slice(offset, offset + limit)
 
     const stats = {
@@ -197,8 +197,8 @@ export async function getChangelogs(
 ): Promise<{ changelogs: ChangelogWithCompany[]; totalCount: number }> {
   try {
     const db = await getDb()
-    const page = data.page ?? 0
-    const pageSize = data.pageSize ?? 20
+    const pageSize = Math.min(Math.max(1, data.pageSize ?? 20), 1000)
+    const page = Math.max(0, Math.floor(data.page ?? 0))
     const sortBy = data.sortBy ?? "detectedAt"
     const sortOrder = data.sortOrder ?? "desc"
     const companyFilter = data.companyFilter ?? "all"

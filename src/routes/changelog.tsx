@@ -8,7 +8,7 @@ import {
 } from "../lib/queries"
 import { useState, useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { formatDateTime } from "../lib/utils"
+import { formatDateTime, positiveInt } from "../lib/utils"
 import {
   ArrowLeft,
   History,
@@ -54,8 +54,8 @@ interface ChangelogSearch {
 export const Route = createFileRoute("/changelog")({
   component: ChangelogPage,
   validateSearch: (search: Record<string, unknown>): ChangelogSearch => ({
-    page: Number(search.page || 1),
-    pageSize: Number(search.pageSize || 20),
+    page: positiveInt(search.page, 1),
+    pageSize: positiveInt(search.pageSize, 20, 1000),
     sortBy: (search.sortBy as ChangelogSearch["sortBy"]) || "detectedAt",
     sortOrder: (search.sortOrder as ChangelogSearch["sortOrder"]) || "desc",
     companyFilter: (search.companyFilter as string) || "all",

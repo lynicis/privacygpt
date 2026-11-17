@@ -41,3 +41,18 @@ export function formatTime(dateStr: string): string {
 export function formatDateTime(dateStr: string): string {
   return `${formatDate(dateStr)} at ${formatTime(dateStr)}`
 }
+
+export function positiveInt(
+  value: unknown,
+  fallback: number,
+  max = Number.MAX_SAFE_INTEGER
+): number {
+  const parsed =
+    typeof value === "number"
+      ? value
+      : typeof value === "string" && value.trim() !== ""
+        ? Number(value)
+        : Number.NaN
+  if (!Number.isInteger(parsed) || parsed < 1) return fallback
+  return Math.min(parsed, max)
+}

@@ -45,6 +45,18 @@ import {
 import { Switch } from "@/components/ui/switch"
 import { mapScoreToGrade, DEFAULT_WEIGHTS, parseWeights } from "../lib/scoring"
 import type { Weights } from "../lib/scoring"
+import { positiveInt } from "../lib/utils"
+
+const SORT_BY = [
+  "score-desc",
+  "score-asc",
+  "name-asc",
+  "name-desc",
+  "training-first",
+  "confidence-first",
+] as const
+
+type DashboardSort = (typeof SORT_BY)[number]
 
 interface DashboardSearch {
   page?: number
@@ -52,18 +64,12 @@ interface DashboardSearch {
   noTraining?: boolean
   optOut?: boolean
   noHumanReview?: boolean
-  sortBy?:
-    | "score-desc"
-    | "score-asc"
-    | "name-asc"
-    | "name-desc"
-    | "training-first"
-    | "confidence-first"
+  sortBy?: DashboardSort
   weights?: string
 }
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>): DashboardSearch => ({
-    page: Number(search.page || 1),
+    page: positiveInt(search.page, 1),
     search: (search.search as string) || undefined,
     noTraining:
       search.noTraining === true || search.noTraining === "true" || undefined,
@@ -72,7 +78,9 @@ export const Route = createFileRoute("/")({
       search.noHumanReview === true ||
       search.noHumanReview === "true" ||
       undefined,
-    sortBy: (search.sortBy as DashboardSearch["sortBy"]) || "score-desc",
+    sortBy: SORT_BY.includes(search.sortBy as DashboardSort)
+      ? (search.sortBy as DashboardSort)
+      : "score-desc",
     weights: (search.weights as string) || undefined,
   }),
   loaderDeps: ({ search }) => ({
