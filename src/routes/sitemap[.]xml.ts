@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { getDb, companies } from "../lib/db"
-import { getBlogPostsFn } from "../lib/blog"
+import { getBlogPosts } from "../lib/blog"
+import { escapeXml } from "../lib/feeds"
+import { APP_URL } from "../lib/site"
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
@@ -15,58 +17,56 @@ export const Route = createFileRoute("/sitemap.xml")({
                 lastVerifiedDate: companies.lastVerifiedDate,
               })
               .from(companies),
-            getBlogPostsFn(),
+            getBlogPosts(),
           ])
 
-          const siteUrl =
-            process.env.APP_URL || "https://privacygpt.lynicis.dev"
           const now = new Date().toISOString()
 
           const urls = [
             {
-              loc: siteUrl,
+              loc: APP_URL,
               lastmod: now,
               changefreq: "weekly",
               priority: "1.0",
             },
             {
-              loc: `${siteUrl}/methodology`,
+              loc: `${APP_URL}/methodology`,
               lastmod: now,
               changefreq: "monthly",
               priority: "0.8",
             },
             {
-              loc: `${siteUrl}/compare`,
+              loc: `${APP_URL}/compare`,
               lastmod: now,
               changefreq: "monthly",
               priority: "0.8",
             },
             {
-              loc: `${siteUrl}/changelog`,
+              loc: `${APP_URL}/changelog`,
               lastmod: now,
               changefreq: "daily",
               priority: "0.7",
             },
             {
-              loc: `${siteUrl}/faq`,
+              loc: `${APP_URL}/faq`,
               lastmod: now,
               changefreq: "monthly",
               priority: "0.8",
             },
             {
-              loc: `${siteUrl}/blog`,
+              loc: `${APP_URL}/blog`,
               lastmod: now,
               changefreq: "weekly",
               priority: "0.8",
             },
             ...rows.map((row) => ({
-              loc: `${siteUrl}/company/${row.companyKey}`,
+              loc: `${APP_URL}/company/${row.companyKey}`,
               lastmod: row.lastVerifiedDate || now,
               changefreq: "weekly" as const,
               priority: "0.9",
             })),
             ...blogPosts.map((post) => ({
-              loc: `${siteUrl}/blog/${post.slug}`,
+              loc: `${APP_URL}/blog/${post.slug}`,
               lastmod: post.publishDate
                 ? new Date(post.publishDate).toISOString()
                 : now,
@@ -80,10 +80,10 @@ export const Route = createFileRoute("/sitemap.xml")({
 ${urls
   .map(
     (u) => `  <url>
-    <loc>${u.loc}</loc>
-    <lastmod>${u.lastmod}</lastmod>
-    <changefreq>${u.changefreq}</changefreq>
-    <priority>${u.priority}</priority>
+    <loc>${escapeXml(u.loc)}</loc>
+    <lastmod>${escapeXml(u.lastmod)}</lastmod>
+    <changefreq>${escapeXml(u.changefreq)}</changefreq>
+    <priority>${escapeXml(u.priority)}</priority>
   </url>`
   )
   .join("\n")}

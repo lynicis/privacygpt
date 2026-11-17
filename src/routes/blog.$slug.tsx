@@ -1,25 +1,59 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, notFound } from "@tanstack/react-router"
 import { ArrowLeft, Calendar, Clock, User, Tag } from "lucide-react"
 import { getBlogPostBySlugFn } from "../lib/blog"
-import { lazy, Suspense, useEffect, useMemo } from "react"
+import { lazy, Suspense, useMemo } from "react"
+import type { ComponentType } from "react"
+import { APP_URL } from "../lib/site"
 
-const APP_URL = process.env.APP_URL || "https://privacygpt.lynicis.dev"
-
-const postModules = import.meta.glob<{ default: React.ComponentType<any> }>(
+const postModules = import.meta.glob<{ default: ComponentType }>(
   "../content/blog/*.mdx"
 )
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: async ({ params }) => {
     const post = await getBlogPostBySlugFn({ data: params.slug })
-    if (!post) {
-      throw new Error("Post not found")
-    }
-
+    if (!post) throw notFound()
     return { post }
   },
+  head: ({ loaderData }) => {
+    const post = loaderData?.post
+    if (!post) {
+      return { meta: [{ title: "Post not found — PrivacyGPT" }] }
+    }
+    const url = post.canonicalUrl || `${APP_URL}/blog/${post.slug}`
+    return {
+      meta: [
+        { title: `${post.title} — PrivacyGPT` },
+        { name: "description", content: post.description },
+        { property: "og:type", content: post.type },
+        { property: "og:title", content: post.title },
+        { property: "og:description", content: post.description },
+        { property: "og:url", content: url },
+        { property: "og:image", content: `${APP_URL}/og-image.png` },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: post.title },
+        { name: "twitter:description", content: post.description },
+        { name: "twitter:image", content: `${APP_URL}/og-image.png` },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": post.type,
+            headline: post.title,
+            description: post.description,
+            author: { "@type": "Organization", name: post.author },
+            datePublished: post.publishDate,
+            url,
+          }),
+        },
+      ],
+    }
+  },
   component: BlogPost,
-  errorComponent: () => (
+  notFoundComponent: () => (
     <div className="container mx-auto max-w-4xl px-4 py-12 text-center">
       <h1 className="text-4xl font-bold">Post not found</h1>
       <Link
@@ -36,39 +70,16 @@ export const Route = createFileRoute("/blog/$slug")({
 function BlogPost() {
   const { post } = Route.useLoaderData()
 
-  useEffect(() => {
-    document.title = `${post.title} - PrivacyGPT`
-  }, [post.title])
-
   const PostComponent = useMemo(() => {
     const matchKey = `../content/blog/${post.slug}.mdx`
     const loadPost = postModules[matchKey] as
-      (() => Promise<{ default: React.ComponentType<any> }>) | undefined
+      (() => Promise<{ default: ComponentType }>) | undefined
     if (!loadPost) return null
     return lazy(loadPost)
   }, [post.slug])
 
   return (
     <article className="mx-auto max-w-[680px] px-4 py-12">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BlogPosting",
-            headline: post.title,
-            description: post.description,
-            author: { "@type": "Organization", name: post.author },
-            datePublished: post.publishDate,
-            url: post.canonicalUrl || `${APP_URL}/blog/${post.slug}`,
-          }),
-        }}
-      />
-      <link
-        rel="canonical"
-        href={post.canonicalUrl || `${APP_URL}/blog/${post.slug}`}
-      />
-
       {/* Back link */}
       <Link
         to="/blog"
@@ -94,6 +105,7 @@ function BlogPost() {
               year: "numeric",
               month: "long",
               day: "numeric",
+              timeZone: "UTC",
             })}
           </span>
           <span className="flex items-center gap-1">

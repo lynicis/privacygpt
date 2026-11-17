@@ -4,6 +4,7 @@ import { createServerFn } from "@tanstack/react-start"
 import { getDb } from "./db"
 import { companies, changelogs } from "./db/schema"
 import { desc, eq } from "drizzle-orm"
+import { APP_URL } from "./site"
 
 export function escapeXml(str: string): string {
   return str
@@ -31,7 +32,7 @@ export const getRssFeedFn = createServerFn({ method: "GET" }).handler(
         .limit(50)
 
       const now = new Date().toUTCString()
-      const siteUrl = "https://privacygpt.lynicis.dev"
+      const siteUrl = APP_URL
 
       const items = rows
         .map((entry) => {

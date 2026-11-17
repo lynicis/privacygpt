@@ -81,6 +81,7 @@ function BlogIndex() {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
+                    timeZone: "UTC",
                   })}
                 </span>
                 <span className="flex items-center gap-1">

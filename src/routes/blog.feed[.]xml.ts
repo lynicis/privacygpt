@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { getBlogPostsFn } from "../lib/blog"
+import { escapeXml } from "../lib/feeds"
+import { APP_URL } from "../lib/site"
 
 export const Route = createFileRoute("/blog/feed.xml")({
   server: {
@@ -12,21 +14,21 @@ export const Route = createFileRoute("/blog/feed.xml")({
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>PrivacyGPT Blog</title>
-    <link>https://privacygpt.app/blog</link>
+    <link>${APP_URL}/blog</link>
     <description>Privacy insights and guides for AI-conscious users</description>
     <language>en-us</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
-    <atom:link href="https://privacygpt.app/blog/feed.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="${APP_URL}/blog/feed.xml" rel="self" type="application/rss+xml" />
     ${posts
       .map(
         (post) => `
     <item>
-      <title><![CDATA[${post.title}]]></title>
-      <link>https://privacygpt.app/blog/${post.slug}</link>
-      <description><![CDATA[${post.description}]]></description>
+      <title>${escapeXml(post.title)}</title>
+      <link>${APP_URL}/blog/${post.slug}</link>
+      <description>${escapeXml(post.description)}</description>
       <pubDate>${new Date(post.publishDate).toUTCString()}</pubDate>
-      <guid>https://privacygpt.app/blog/${post.slug}</guid>
-      <author>${post.author}</author>
+      <guid>${APP_URL}/blog/${post.slug}</guid>
+      <author>${escapeXml(post.author)}</author>
     </item>`
       )
       .join("")}
