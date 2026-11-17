@@ -162,7 +162,9 @@ function AdminPage() {
   const totalSnapshots = totalSnapshotsData ?? 0
   const [companyFilter, setCompanyFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("pending_review") // Default to pending review
-  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set())
+  const [expandedOverrides, setExpandedOverrides] = useState<
+    Record<number, boolean>
+  >({})
 
   if (unauthorized) {
     return (
@@ -210,14 +212,10 @@ function AdminPage() {
   })
 
   const toggleExpand = (id: number) => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) {
-        next.delete(id)
-      } else {
-        next.add(id)
-      }
-      return next
+    setExpandedOverrides((prev) => {
+      const statusDefault =
+        changelogs.find((c) => c.id === id)?.status === "pending_review"
+      return { ...prev, [id]: !(prev[id] ?? statusDefault) }
     })
   }
 
@@ -390,7 +388,7 @@ function AdminPage() {
           <div className="space-y-4">
             {filteredChangelogs.map((entry) => {
               const isExpanded =
-                expandedIds.has(entry.id) || entry.status === "pending_review" // auto-expand pending items for convenience
+                expandedOverrides[entry.id] ?? entry.status === "pending_review"
               const detectedDate = new Date(entry.detectedAt)
               const isPending = entry.status === "pending_review"
 

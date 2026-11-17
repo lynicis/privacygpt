@@ -38,6 +38,7 @@ interface DataTableProps<TData, TValue> {
   expanded: ExpandedState
   onExpandedChange: OnChangeFn<ExpandedState>
   getRowCanExpand?: (row: Row<TData>) => boolean
+  getRowId?: (row: TData) => string
   renderSubComponent?: (props: { row: Row<TData> }) => React.ReactNode
 }
 
@@ -52,12 +53,14 @@ export function DataTable<TData, TValue>({
   expanded,
   onExpandedChange,
   getRowCanExpand,
+  getRowId,
   renderSubComponent,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
     pageCount,
+    getRowId,
     state: {
       pagination,
       sorting,

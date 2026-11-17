@@ -29,7 +29,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { ConfidenceBadge } from "@/components/ConfidenceBadge"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -319,57 +319,6 @@ function App() {
 
   const currentPage = search.page || 1
   const totalPages = Math.ceil(totalCount / 9)
-
-  const companyRanks = useMemo(() => {
-    const sorted = [...allCompanies].sort((a, b) => b.totalScore - a.totalScore)
-    const ranks: Record<string, number> = {}
-    let currentRank = 1
-    sorted.forEach((c, idx) => {
-      if (idx > 0 && c.totalScore < sorted[idx - 1].totalScore) {
-        currentRank = idx + 1
-      }
-      ranks[c.companyKey] = currentRank
-    })
-    return ranks
-  }, [allCompanies])
-
-  const renderConfidenceBadge = (confidence: string) => {
-    switch (confidence) {
-      case "verified_from_policy_text":
-        return (
-          <Badge
-            variant="outline"
-            className="border-emerald-500/20 bg-emerald-500/5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400"
-          >
-            Verified
-          </Badge>
-        )
-      case "inferred":
-        return (
-          <Badge variant="secondary" className="text-[10px] font-semibold">
-            Inferred
-          </Badge>
-        )
-      case "unverified":
-        return (
-          <Badge
-            variant="outline"
-            className="border-amber-500/20 bg-amber-500/5 text-[10px] font-semibold text-amber-600 dark:text-amber-400"
-          >
-            Unverified
-          </Badge>
-        )
-      default:
-        return (
-          <Badge
-            variant="outline"
-            className="border-amber-500/20 bg-amber-500/5 text-[10px] font-semibold text-amber-600 dark:text-amber-400"
-          >
-            Review Needed
-          </Badge>
-        )
-    }
-  }
 
   if (isLoading) {
     return (
@@ -696,9 +645,11 @@ function App() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex h-5 min-w-[28px] items-center justify-center bg-muted px-1.5 font-mono text-[11px] font-bold text-muted-foreground">
-                        #{companyRanks[company.companyKey]}
-                      </span>
+                      {company.rank !== undefined && (
+                        <span className="inline-flex h-5 min-w-[28px] items-center justify-center bg-muted px-1.5 font-mono text-[11px] font-bold text-muted-foreground">
+                          #{company.rank}
+                        </span>
+                      )}
                       <CardTitle className="truncate text-base font-bold">
                         {company.companyName}
                       </CardTitle>
@@ -722,7 +673,7 @@ function App() {
                         {company.totalScore}
                       </span>
                     </div>
-                    {renderConfidenceBadge(company.confidence)}
+                    <ConfidenceBadge value={company.confidence} />
                   </div>
                 </div>
               </CardHeader>

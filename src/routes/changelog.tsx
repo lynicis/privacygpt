@@ -496,7 +496,7 @@ function ChangelogPage() {
             <Card className="p-4">
               <div className="text-2xl font-bold">{totalCount}</div>
               <div className="text-xs text-muted-foreground">
-                Changes Detected
+                Matching Changes
               </div>
             </Card>
             <Card className="p-4">
@@ -591,6 +591,7 @@ function ChangelogPage() {
             expanded={expanded}
             onExpandedChange={setExpanded}
             getRowCanExpand={() => true}
+            getRowId={(row) => String(row.id)}
             renderSubComponent={renderSubComponent}
           />
         )}

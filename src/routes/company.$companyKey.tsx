@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, notFound } from "@tanstack/react-router"
 import { getCompanyByKeyFn } from "../lib/api"
 import {
   calculateSubScores,
@@ -31,22 +31,18 @@ import {
   CardContent,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { ConfidenceBadge } from "@/components/ConfidenceBadge"
 
 export const Route = createFileRoute("/company/$companyKey")({
   loader: async ({ params }) => {
-    try {
-      return await getCompanyByKeyFn({ data: params.companyKey })
-    } catch (error) {
-      console.error(`Failed to load company ${params.companyKey}:`, error)
-      return null
-    }
+    const company = await getCompanyByKeyFn({ data: params.companyKey })
+    if (!company) throw notFound()
+    return company
   },
   head: ({ loaderData }) => {
     const company = loaderData
     if (!company) {
-      return {
-        meta: [{ title: "Company Not Found | PrivacyGPT" }],
-      }
+      return { meta: [{ title: "Company Not Found | PrivacyGPT" }] }
     }
     const companyName = `${company.companyName} ${company.productName}`
     const description = `Detailed privacy analysis for ${companyName}. See how they handle data training, opt-out, data retention, deletion rights, third-party sharing, and human review — verified from official policy documents.`
@@ -92,37 +88,32 @@ export const Route = createFileRoute("/company/$companyKey")({
       ],
     }
   },
+  notFoundComponent: () => (
+    <div className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground">
+      <Card className="max-w-md p-8 text-center">
+        <CardHeader>
+          <div className="mx-auto mb-2 w-fit rounded-full bg-destructive/10 p-3 text-destructive">
+            <AlertTriangle className="h-6 w-6" />
+          </div>
+          <CardTitle className="text-xl font-bold">Company Not Found</CardTitle>
+          <CardDescription>
+            The requested company privacy profile could not be found or has not
+            been seeded yet.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-2">
+          <Button asChild>
+            <Link to="/">Back to Dashboard</Link>
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  ),
   component: CompanyDetailPage,
 })
 
 function CompanyDetailPage() {
   const company = Route.useLoaderData()
-
-  if (!company) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground">
-        <Card className="max-w-md p-8 text-center">
-          <CardHeader>
-            <div className="mx-auto mb-2 w-fit rounded-full bg-destructive/10 p-3 text-destructive">
-              <AlertTriangle className="h-6 w-6" />
-            </div>
-            <CardTitle className="text-xl font-bold">
-              Company Not Found
-            </CardTitle>
-            <CardDescription>
-              The requested company privacy profile could not be found or has
-              not been seeded yet.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-2">
-            <Link to="/">
-              <Button>Back to Dashboard</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
 
   // Calculate scores
   const subScores = calculateSubScores(company)
@@ -145,45 +136,6 @@ function CompanyDetailPage() {
           No
         </Badge>
       )
-    }
-  }
-
-  // Helper for confidence badges
-  const renderConfidenceBadge = (confidence: string) => {
-    switch (confidence) {
-      case "verified_from_policy_text":
-        return (
-          <Badge
-            variant="outline"
-            className="border-border bg-muted/40 text-xs font-semibold"
-          >
-            Verified
-          </Badge>
-        )
-      case "inferred":
-        return (
-          <Badge variant="secondary" className="text-xs font-semibold">
-            Inferred
-          </Badge>
-        )
-      case "unverified":
-        return (
-          <Badge
-            variant="outline"
-            className="border-amber-500/30 bg-amber-500/5 text-xs font-semibold text-amber-600 dark:text-amber-400"
-          >
-            Unverified
-          </Badge>
-        )
-      default:
-        return (
-          <Badge
-            variant="outline"
-            className="border-destructive/30 bg-destructive/5 text-xs font-semibold text-destructive"
-          >
-            Needs Review
-          </Badge>
-        )
     }
   }
 
@@ -263,7 +215,7 @@ function CompanyDetailPage() {
                   </span>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  {renderConfidenceBadge(company.confidence)}
+                  <ConfidenceBadge value={company.confidence} size="md" />
                   <a
                     href={company.sourceUrl}
                     target="_blank"

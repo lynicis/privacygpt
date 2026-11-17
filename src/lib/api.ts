@@ -3,7 +3,7 @@
 import { createServerFn } from "@tanstack/react-start"
 import { getDb } from "./db"
 import { companies, changelogs, snapshots } from "./db/schema"
-import type { Changelog, Company } from "./db/schema"
+import type { Changelog, Company, Confidence } from "./db/schema"
 import { eq, desc, and, asc, sql } from "drizzle-orm"
 import type { SQL } from "drizzle-orm"
 import {
@@ -21,6 +21,13 @@ export type CompanySort =
   | "name-desc"
   | "training-first"
   | "confidence-first"
+
+const CONFIDENCE_PRIORITY: Record<Confidence, number> = {
+  verified_from_policy_text: 0,
+  inferred: 1,
+  needs_review: 2,
+  unverified: 3,
+}
 
 export interface CompanyFilters {
   limit?: number
@@ -142,18 +149,19 @@ export async function getCompanies(
           (a.trainsOnDataByDefault ? 1 : 0) - (b.trainsOnDataByDefault ? 1 : 0)
         )
       }
-      const priority: Record<string, number> = {
-        verified_from_policy_text: 0,
-        inferred: 1,
-        needs_review: 2,
-      }
-      return (priority[a.confidence] ?? 9) - (priority[b.confidence] ?? 9)
+      return (
+        CONFIDENCE_PRIORITY[a.confidence] - CONFIDENCE_PRIORITY[b.confidence]
+      )
     })
 
     const totalCount = scored.length
     const limit = Math.min(Math.max(1, data.limit ?? 9), 1000)
     const offset = Math.max(0, data.offset ?? 0)
-    const sliced = scored.slice(offset, offset + limit)
+    const ranked = scored.map((c, i) => ({
+      ...c,
+      rank: sortBy === "score-desc" ? i + 1 : undefined,
+    }))
+    const sliced = ranked.slice(offset, offset + limit)
 
     const stats = {
       total: totalCount,
