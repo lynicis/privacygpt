@@ -6,7 +6,6 @@ import tailwindcss from "@tailwindcss/vite"
 import { cloudflare } from "@cloudflare/vite-plugin"
 import { VitePWA } from "vite-plugin-pwa"
 import mdx from "@mdx-js/rollup"
-import remarkFrontmatter from "remark-frontmatter"
 import remarkGfm from "remark-gfm"
 import path from "node:path"
 
@@ -35,7 +34,7 @@ const config = defineConfig(({ command }) => {
       {
         enforce: "pre",
         ...mdx({
-          remarkPlugins: [remarkFrontmatter, remarkGfm],
+          remarkPlugins: [remarkGfm],
         }),
       },
       ...(isBuild && !process.env.VITEST

@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { checkAdminAuthFn } from "../lib/admin"
-import { setResponseStatus } from "@tanstack/react-start/server"
 import {
   useReviewChangelog,
   changelogsQueryOptions,
@@ -39,13 +38,17 @@ import {
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
-  beforeLoad: async () => {
+  beforeLoad: async ({ context }) => {
     try {
       await checkAdminAuthFn()
       return { auth: { success: true } }
     } catch (error) {
       if (error instanceof Response) {
-        setResponseStatus(error.status)
+        // The router exposes no public status setter; this store drives the SSR status.
+        const store = context.router as unknown as {
+          stores?: { statusCode?: { set: (status: number) => void } }
+        }
+        store.stores?.statusCode?.set(error.status)
         return { auth: { success: false } }
       }
       throw error
