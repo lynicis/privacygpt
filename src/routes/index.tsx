@@ -15,14 +15,10 @@ import {
   ChevronsRight,
   Settings2,
   Undo2,
-  ShieldCheck,
   ShieldAlert,
   ShieldX,
+  ShieldCheck,
   Eye,
-  Trash2,
-  Lock,
-  Share2,
-  UserCheck,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -47,6 +43,12 @@ import { mapScoreToGrade, DEFAULT_WEIGHTS, parseWeights } from "../lib/scoring"
 import type { Weights } from "../lib/scoring"
 import { positiveInt } from "../lib/utils"
 import { APP_URL } from "../lib/site"
+import { SUB_SCORE_UI } from "../components/score-meta"
+import {
+  getGradeBadgeStyle,
+  getGradeBorderColor,
+  getSubScoreColor,
+} from "../lib/score-style"
 
 const SORT_BY = [
   "score-desc",
@@ -331,29 +333,6 @@ function App() {
     return ranks
   }, [allCompanies])
 
-  const getGradeBadgeStyle = (grade: string) => {
-    if (grade.startsWith("A"))
-      return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-    if (grade.startsWith("B"))
-      return "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20"
-    if (grade === "C")
-      return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-    return "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20"
-  }
-
-  const getGradeBorderColor = (grade: string) => {
-    if (grade.startsWith("A")) return "border-l-emerald-500"
-    if (grade.startsWith("B")) return "border-l-sky-500"
-    if (grade === "C") return "border-l-amber-500"
-    return "border-l-red-500"
-  }
-
-  const getSubScoreColor = (score: number) => {
-    if (score >= 80) return "bg-emerald-500"
-    if (score >= 50) return "bg-amber-500"
-    return "bg-red-500"
-  }
-
   const renderConfidenceBadge = (confidence: string) => {
     switch (confidence) {
       case "verified_from_policy_text":
@@ -391,15 +370,6 @@ function App() {
         )
     }
   }
-
-  const subScoreLabels = [
-    { key: "trainingScore" as const, label: "Training", icon: Lock },
-    { key: "optOutScore" as const, label: "Opt-Out", icon: ShieldCheck },
-    { key: "retentionScore" as const, label: "Retention", icon: Trash2 },
-    { key: "deletionScore" as const, label: "Deletion", icon: Trash2 },
-    { key: "sharingScore" as const, label: "Sharing", icon: Share2 },
-    { key: "humanReviewScore" as const, label: "Review", icon: UserCheck },
-  ]
 
   if (isLoading) {
     return (
@@ -760,7 +730,7 @@ function App() {
               <CardContent className="flex-1 space-y-3 pt-0">
                 {/* Sub-score bars */}
                 <div className="space-y-2">
-                  {subScoreLabels.map(({ key, label, icon: Icon }) => (
+                  {SUB_SCORE_UI.map(({ key, label, icon: Icon }) => (
                     <div key={key} className="flex items-center gap-2">
                       <Icon className="h-3 w-3 shrink-0 text-muted-foreground/60" />
                       <span className="w-16 shrink-0 text-[10px] font-medium text-muted-foreground">

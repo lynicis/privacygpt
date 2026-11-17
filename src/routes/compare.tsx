@@ -141,64 +141,6 @@ function ComparePage() {
   const totalA = { letter: mapScoreToGrade(totalScoreA), points: totalScoreA }
   const totalB = { letter: mapScoreToGrade(totalScoreB), points: totalScoreB }
 
-  const subScoresA = scoresA
-    ? {
-        training: {
-          letter: mapScoreToGrade(scoresA.trainingScore),
-          points: scoresA.trainingScore,
-        },
-        optOut: {
-          letter: mapScoreToGrade(scoresA.optOutScore),
-          points: scoresA.optOutScore,
-        },
-        retention: {
-          letter: mapScoreToGrade(scoresA.retentionScore),
-          points: scoresA.retentionScore,
-        },
-        deletion: {
-          letter: mapScoreToGrade(scoresA.deletionScore),
-          points: scoresA.deletionScore,
-        },
-        sharing: {
-          letter: mapScoreToGrade(scoresA.sharingScore),
-          points: scoresA.sharingScore,
-        },
-        humanReview: {
-          letter: mapScoreToGrade(scoresA.humanReviewScore),
-          points: scoresA.humanReviewScore,
-        },
-      }
-    : ({} as Record<string, { letter: string; points: number }>)
-
-  const subScoresB = scoresB
-    ? {
-        training: {
-          letter: mapScoreToGrade(scoresB.trainingScore),
-          points: scoresB.trainingScore,
-        },
-        optOut: {
-          letter: mapScoreToGrade(scoresB.optOutScore),
-          points: scoresB.optOutScore,
-        },
-        retention: {
-          letter: mapScoreToGrade(scoresB.retentionScore),
-          points: scoresB.retentionScore,
-        },
-        deletion: {
-          letter: mapScoreToGrade(scoresB.deletionScore),
-          points: scoresB.deletionScore,
-        },
-        sharing: {
-          letter: mapScoreToGrade(scoresB.sharingScore),
-          points: scoresB.sharingScore,
-        },
-        humanReview: {
-          letter: mapScoreToGrade(scoresB.humanReviewScore),
-          points: scoresB.humanReviewScore,
-        },
-      }
-    : ({} as Record<string, { letter: string; points: number }>)
-
   return (
     <>
       {/* Hero Section */}
@@ -341,8 +283,8 @@ function ComparePage() {
                 Score Breakdown
               </h2>
               <CompareScores
-                scoresA={subScoresA}
-                scoresB={subScoresB}
+                scoresA={scoresA!}
+                scoresB={scoresB!}
                 totalA={totalA}
                 totalB={totalB}
                 nameA={companyA.companyName}

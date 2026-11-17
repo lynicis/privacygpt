@@ -7,6 +7,7 @@ import {
   DEFAULT_WEIGHTS,
 } from "../lib/scoring"
 import { APP_URL } from "../lib/site"
+import { SUB_SCORE_UI } from "../components/score-meta"
 import {
   ArrowLeft,
   ExternalLink,
@@ -186,11 +187,6 @@ function CompanyDetailPage() {
     }
   }
 
-  // Helper to render letter grade for individual sub-scores
-  const getSubScoreGrade = (score: number) => {
-    return mapScoreToGrade(score)
-  }
-
   return (
     <>
       {/* Main content wrapper */}
@@ -294,84 +290,24 @@ function CompanyDetailPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4 p-0 sm:grid-cols-3 lg:grid-cols-6">
-            <div className="flex flex-col justify-between border border-border bg-muted/10 p-3">
-              <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                Default Training
-              </span>
-              <div className="mt-2 flex items-baseline justify-between">
-                <span className="font-mono text-lg font-bold">
-                  {getSubScoreGrade(subScores.trainingScore)}
+            {SUB_SCORE_UI.map(({ key, longLabel }) => (
+              <div
+                key={key}
+                className="flex flex-col justify-between border border-border bg-muted/10 p-3"
+              >
+                <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
+                  {longLabel}
                 </span>
-                <span className="text-xs text-muted-foreground">
-                  {subScores.trainingScore}/100
-                </span>
+                <div className="mt-2 flex items-baseline justify-between">
+                  <span className="font-mono text-lg font-bold">
+                    {mapScoreToGrade(subScores[key])}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {subScores[key]}/100
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="flex flex-col justify-between border border-border bg-muted/10 p-3">
-              <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                Opt-Out Ease
-              </span>
-              <div className="mt-2 flex items-baseline justify-between">
-                <span className="font-mono text-lg font-bold">
-                  {getSubScoreGrade(subScores.optOutScore)}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {subScores.optOutScore}/100
-                </span>
-              </div>
-            </div>
-            <div className="flex flex-col justify-between border border-border bg-muted/10 p-3">
-              <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                Data Retention
-              </span>
-              <div className="mt-2 flex items-baseline justify-between">
-                <span className="font-mono text-lg font-bold">
-                  {getSubScoreGrade(subScores.retentionScore)}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {subScores.retentionScore}/100
-                </span>
-              </div>
-            </div>
-            <div className="flex flex-col justify-between border border-border bg-muted/10 p-3">
-              <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                Deletion Rights
-              </span>
-              <div className="mt-2 flex items-baseline justify-between">
-                <span className="font-mono text-lg font-bold">
-                  {getSubScoreGrade(subScores.deletionScore)}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {subScores.deletionScore}/100
-                </span>
-              </div>
-            </div>
-            <div className="flex flex-col justify-between border border-border bg-muted/10 p-3">
-              <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                Third-Party Sharing
-              </span>
-              <div className="mt-2 flex items-baseline justify-between">
-                <span className="font-mono text-lg font-bold">
-                  {getSubScoreGrade(subScores.sharingScore)}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {subScores.sharingScore}/100
-                </span>
-              </div>
-            </div>
-            <div className="flex flex-col justify-between border border-border bg-muted/10 p-3">
-              <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                Human Review
-              </span>
-              <div className="mt-2 flex items-baseline justify-between">
-                <span className="font-mono text-lg font-bold">
-                  {getSubScoreGrade(subScores.humanReviewScore)}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {subScores.humanReviewScore}/100
-                </span>
-              </div>
-            </div>
+            ))}
           </CardContent>
         </Card>
 

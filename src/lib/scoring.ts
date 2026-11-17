@@ -20,6 +20,15 @@ export interface Weights {
 
 export type Grade = "A+" | "A" | "A-" | "B+" | "B" | "B-" | "C" | "D" | "F"
 
+export const SUB_SCORE_META = [
+  { key: "trainingScore", label: "Training", longLabel: "Default Training" },
+  { key: "optOutScore", label: "Opt-Out", longLabel: "Opt-Out Ease" },
+  { key: "retentionScore", label: "Retention", longLabel: "Data Retention" },
+  { key: "deletionScore", label: "Deletion", longLabel: "Deletion Rights" },
+  { key: "sharingScore", label: "Sharing", longLabel: "Third-Party Sharing" },
+  { key: "humanReviewScore", label: "Review", longLabel: "Human Review" },
+] as const
+
 export const DEFAULT_WEIGHTS: Weights = {
   trainingWeight: 30,
   optOutWeight: 20,

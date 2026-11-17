@@ -1,51 +1,22 @@
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  Lock,
-  ShieldCheck,
-  Trash2,
-  Share2,
-  UserCheck,
-  Trophy,
-  Minus,
-} from "lucide-react"
+import { Trophy, Minus } from "lucide-react"
+import { SUB_SCORE_UI } from "@/components/score-meta"
+import { getGradeBadgeStyle, getSubScoreColor } from "../lib/score-style"
+import { mapScoreToGrade } from "../lib/scoring"
+import type { Grade, SubScores } from "../lib/scoring"
 
 interface Score {
-  letter: string
+  letter: Grade
   points: number
 }
 
 interface CompareScoresProps {
-  scoresA: Record<string, Score | undefined>
-  scoresB: Record<string, Score | undefined>
+  scoresA: SubScores
+  scoresB: SubScores
   totalA: Score
   totalB: Score
   nameA: string
   nameB: string
-}
-
-const CATEGORIES = [
-  { key: "training", label: "Model Training", icon: Lock },
-  { key: "optOut", label: "Opt-Out Mechanism", icon: ShieldCheck },
-  { key: "retention", label: "Data Retention", icon: Trash2 },
-  { key: "deletion", label: "Data Deletion", icon: Trash2 },
-  { key: "sharing", label: "Third-Party Sharing", icon: Share2 },
-  { key: "humanReview", label: "Human Review", icon: UserCheck },
-]
-
-function getGradeBadgeStyle(grade: string) {
-  if (grade.startsWith("A"))
-    return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-  if (grade.startsWith("B"))
-    return "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20"
-  if (grade === "C")
-    return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-  return "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20"
-}
-
-function getSubScoreColor(score: number) {
-  if (score >= 80) return "bg-emerald-500"
-  if (score >= 50) return "bg-amber-500"
-  return "bg-red-500"
 }
 
 export function CompareScores({
@@ -133,11 +104,11 @@ export function CompareScores({
 
       {/* Sub-scores Breakdown */}
       <div className="space-y-3">
-        {CATEGORIES.map(({ key, label, icon: Icon }) => {
-          const scoreA = scoresA[key]
-          const scoreB = scoresB[key]
-
-          if (scoreA === undefined || scoreB === undefined) return null
+        {SUB_SCORE_UI.map(({ key, longLabel, icon: Icon }) => {
+          const pointsA = scoresA[key]
+          const pointsB = scoresB[key]
+          const scoreA = { letter: mapScoreToGrade(pointsA), points: pointsA }
+          const scoreB = { letter: mapScoreToGrade(pointsB), points: pointsB }
 
           const isABetter = scoreA.points > scoreB.points
           const isBBetter = scoreB.points > scoreA.points
@@ -152,7 +123,7 @@ export function CompareScores({
               <div className="flex items-center gap-2 border-b border-border/50 bg-muted/20 px-4 py-2">
                 <Icon className="h-3.5 w-3.5 text-muted-foreground" />
                 <span className="text-xs font-bold tracking-wide text-foreground uppercase">
-                  {label}
+                  {longLabel}
                 </span>
               </div>
 
