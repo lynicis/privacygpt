@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { ArrowLeft, Calendar, Clock, User, Tag } from "lucide-react"
 import { getBlogPostBySlugFn } from "../lib/blog"
 import { lazy, Suspense, useEffect, useMemo } from "react"
-import { getProp } from "../lib/utils"
 
 const APP_URL = process.env.APP_URL || "https://privacygpt.lynicis.dev"
 
@@ -43,7 +42,7 @@ function BlogPost() {
 
   const PostComponent = useMemo(() => {
     const matchKey = `../content/blog/${post.slug}.mdx`
-    const loadPost = getProp(postModules, matchKey) as
+    const loadPost = postModules[matchKey] as
       (() => Promise<{ default: React.ComponentType<any> }>) | undefined
     if (!loadPost) return null
     return lazy(loadPost)

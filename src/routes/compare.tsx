@@ -1,10 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useState } from "react"
-import {
-  useCompanies,
-  useCompanyByKey,
-  companiesQueryOptions,
-} from "@/lib/queries"
+import { useQuery } from "@tanstack/react-query"
+import { companiesQueryOptions, companyByKeyQueryOptions } from "@/lib/queries"
 import {
   calculateSubScores,
   calculateTotalScore,
@@ -99,11 +96,17 @@ function ComparePage() {
   const [selectedB, setSelectedB] = useState(search.companyB || "")
   const [activeTab, setActiveTab] = useState<"a" | "b">("a")
 
-  const { data: companiesData } = useCompanies({ limit: 1000 })
+  const { data: companiesData } = useQuery(
+    companiesQueryOptions({ limit: 1000 })
+  )
   const companies = companiesData?.companies ?? []
 
-  const { data: companyA, isLoading: loadingA } = useCompanyByKey(selectedA)
-  const { data: companyB, isLoading: loadingB } = useCompanyByKey(selectedB)
+  const { data: companyA, isLoading: loadingA } = useQuery(
+    companyByKeyQueryOptions(selectedA)
+  )
+  const { data: companyB, isLoading: loadingB } = useQuery(
+    companyByKeyQueryOptions(selectedB)
+  )
 
   const updateSearch = (key: "companyA" | "companyB", value: string) => {
     if (key === "companyA") setSelectedA(value)

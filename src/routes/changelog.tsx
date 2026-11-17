@@ -1,10 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import {
-  useChangelogs,
-  useCompanies,
-  useSnapshotCounts,
-  useSnapshotTotalCount,
-  usePendingReviewsCount,
   changelogsQueryOptions,
   companiesQueryOptions,
   snapshotCountsQueryOptions,
@@ -12,6 +7,7 @@ import {
   pendingReviewsCountQueryOptions,
 } from "../lib/queries"
 import { useState, useMemo } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { formatDateTime } from "../lib/utils"
 import {
   ArrowLeft,
@@ -163,11 +159,15 @@ function ChangelogPage() {
     isError,
     error,
     refetch,
-  } = useChangelogs(changelogFilters)
-  const { data: companiesData } = useCompanies({ limit: 1000 })
-  const { data: snapshotsData } = useSnapshotCounts()
-  const { data: totalSnapshots } = useSnapshotTotalCount()
-  const { data: pendingReviewsCount } = usePendingReviewsCount()
+  } = useQuery(changelogsQueryOptions(changelogFilters))
+  const { data: companiesData } = useQuery(
+    companiesQueryOptions({ limit: 1000 })
+  )
+  const { data: snapshotsData } = useQuery(snapshotCountsQueryOptions())
+  const { data: totalSnapshots } = useQuery(snapshotTotalCountQueryOptions())
+  const { data: pendingReviewsCount } = useQuery(
+    pendingReviewsCountQueryOptions()
+  )
 
   const changelogs = changelogsData?.changelogs ?? []
   const totalCount = changelogsData?.totalCount ?? 0

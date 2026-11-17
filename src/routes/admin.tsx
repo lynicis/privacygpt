@@ -1,15 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { checkAdminAuthFn } from "../lib/admin"
 import {
-  useChangelogs,
-  useSnapshotCounts,
-  useSnapshotTotalCount,
   useReviewChangelog,
   changelogsQueryOptions,
   snapshotCountsQueryOptions,
   snapshotTotalCountQueryOptions,
 } from "../lib/queries"
 import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 import {
   ArrowLeft,
   ShieldCheck,
@@ -155,9 +153,11 @@ function AdminPage() {
     isError,
     error,
     refetch,
-  } = useChangelogs({ page: 0, pageSize: 1000 })
-  const { data: snapshotsData } = useSnapshotCounts()
-  const { data: totalSnapshotsData } = useSnapshotTotalCount()
+  } = useQuery(changelogsQueryOptions({ page: 0, pageSize: 1000 }))
+  const { data: snapshotsData } = useQuery(snapshotCountsQueryOptions())
+  const { data: totalSnapshotsData } = useQuery(
+    snapshotTotalCountQueryOptions()
+  )
   const changelogs = changelogsData?.changelogs ?? []
   const snapshots = snapshotsData ?? []
   const totalSnapshots = totalSnapshotsData ?? 0

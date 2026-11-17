@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { useState, useMemo } from "react"
-import { useCompanies, companiesQueryOptions } from "../lib/queries"
+import { useQuery } from "@tanstack/react-query"
+import { companiesQueryOptions } from "../lib/queries"
 import {
   Search,
   AlertTriangle,
@@ -43,7 +44,6 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { mapScoreToGrade } from "../lib/scoring"
-import { getProp, setProp } from "../lib/utils"
 
 interface Weights {
   trainingWeight: number
@@ -213,7 +213,9 @@ function App() {
     ]
   )
 
-  const { data, isLoading, isError, error, refetch } = useCompanies(filters)
+  const { data, isLoading, isError, error, refetch } = useQuery(
+    companiesQueryOptions(filters)
+  )
   const allCompanies = data?.companies ?? []
   const totalCount = data?.totalCount ?? 0
   const overallStats = data?.overallStats ?? {
@@ -615,12 +617,9 @@ function App() {
                       {label}
                     </label>
                     <span className="bg-muted px-1.5 py-0.5 font-mono text-[11px] font-semibold text-muted-foreground">
-                      {getProp(weights, key)}{" "}
+                      {weights[key]}{" "}
                       <span className="text-[9px] font-normal">
-                        (
-                        {Math.round(
-                          (getProp(weights, key) / totalWeightSum) * 100
-                        )}
+                        ({Math.round((weights[key] / totalWeightSum) * 100)}
                         %)
                       </span>
                     </span>
@@ -630,11 +629,12 @@ function App() {
                     min="0"
                     max="100"
                     step="5"
-                    value={getProp(weights, key)}
+                    value={weights[key]}
                     onChange={(e) =>
-                      setWeights(
-                        setProp(weights, key, parseInt(e.target.value))
-                      )
+                      setWeights({
+                        ...weights,
+                        [key]: parseInt(e.target.value),
+                      })
                     }
                     className="h-1.5 w-full cursor-pointer bg-border accent-primary"
                   />
@@ -783,14 +783,14 @@ function App() {
                       </span>
                       <div className="h-1.5 flex-1 overflow-hidden bg-border/60">
                         <div
-                          className={`h-full ${getSubScoreColor(getProp(company.subScores, key))}`}
+                          className={`h-full ${getSubScoreColor(company.subScores[key])}`}
                           style={{
-                            width: `${getProp(company.subScores, key)}%`,
+                            width: `${company.subScores[key]}%`,
                           }}
                         />
                       </div>
                       <span className="w-6 shrink-0 text-right font-mono text-[10px] font-semibold text-muted-foreground tabular-nums">
-                        {mapScoreToGrade(getProp(company.subScores, key))}
+                        {mapScoreToGrade(company.subScores[key])}
                       </span>
                     </div>
                   ))}

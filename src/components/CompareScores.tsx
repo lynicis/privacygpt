@@ -1,5 +1,4 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { getProp } from "../lib/utils"
 import {
   Lock,
   ShieldCheck,
@@ -135,8 +134,8 @@ export function CompareScores({
       {/* Sub-scores Breakdown */}
       <div className="space-y-3">
         {CATEGORIES.map(({ key, label, icon: Icon }) => {
-          const scoreA = getProp(scoresA, key)
-          const scoreB = getProp(scoresB, key)
+          const scoreA = scoresA[key]
+          const scoreB = scoresB[key]
 
           if (scoreA === undefined || scoreB === undefined) return null
 

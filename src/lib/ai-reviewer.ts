@@ -1,4 +1,3 @@
-import { getProp } from "./utils"
 import { getDb } from "./db"
 import { companies, changelogs } from "./db/schema"
 import { eq } from "drizzle-orm"
@@ -41,7 +40,7 @@ export function buildAIPrompt(
   afterText: string
 ): string {
   const currentProfile = COMPANY_FIELDS.map(
-    (f) => `- ${f}: ${String(getProp(company, f) ?? "N/A")}`
+    (f) => `- ${f}: ${String(company[f] ?? "N/A")}`
   ).join("\n")
 
   return `Analyze the changes between the BEFORE and AFTER texts. Determine:

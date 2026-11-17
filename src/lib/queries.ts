@@ -1,6 +1,5 @@
 import {
   queryOptions,
-  useQuery,
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query"
@@ -44,20 +43,12 @@ export function companiesQueryOptions(filters: CompanyFilters = {}) {
   })
 }
 
-export function useCompanies(filters: CompanyFilters = {}) {
-  return useQuery(companiesQueryOptions(filters))
-}
-
 export function companyByKeyQueryOptions(key: string) {
   return queryOptions({
     queryKey: queryKeys.companies.byKey(key),
     queryFn: () => getCompanyByKeyFn({ data: key }),
     enabled: !!key,
   })
-}
-
-export function useCompanyByKey(key: string) {
-  return useQuery(companyByKeyQueryOptions(key))
 }
 
 export function changelogsQueryOptions(filters: ChangelogFilters = {}) {
@@ -67,19 +58,11 @@ export function changelogsQueryOptions(filters: ChangelogFilters = {}) {
   })
 }
 
-export function useChangelogs(filters: ChangelogFilters = {}) {
-  return useQuery(changelogsQueryOptions(filters))
-}
-
 export function snapshotCountsQueryOptions() {
   return queryOptions({
     queryKey: queryKeys.snapshots.counts(),
     queryFn: () => getSnapshotCountsFn(),
   })
-}
-
-export function useSnapshotCounts() {
-  return useQuery(snapshotCountsQueryOptions())
 }
 
 export function snapshotTotalCountQueryOptions() {
@@ -89,19 +72,11 @@ export function snapshotTotalCountQueryOptions() {
   })
 }
 
-export function useSnapshotTotalCount() {
-  return useQuery(snapshotTotalCountQueryOptions())
-}
-
 export function pendingReviewsCountQueryOptions() {
   return queryOptions({
     queryKey: queryKeys.admin.pendingReviews(),
     queryFn: () => getPendingReviewsCountFn(),
   })
-}
-
-export function usePendingReviewsCount() {
-  return useQuery(pendingReviewsCountQueryOptions())
 }
 
 export function useReviewChangelog() {
