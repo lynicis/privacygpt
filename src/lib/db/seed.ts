@@ -1,5 +1,5 @@
 import { getDb } from "./index"
-import { companies } from "./schema"
+import { companies, parseConfidence } from "./schema"
 import { eq } from "drizzle-orm"
 import seedData from "./seedData.json"
 
@@ -8,7 +8,35 @@ async function main() {
   console.log("Seeding database with AI companies privacy data...")
 
   for (const data of seedData) {
-    // Check if company already exists
+    const values = {
+      companyKey: data.companyKey,
+      companyName: data.companyName,
+      productName: data.productName,
+      trainsOnDataByDefault: data.trainsOnDataByDefault,
+      trainsOnDataNuance: data.trainsOnDataNuance,
+      optOutAvailable: data.optOutAvailable,
+      optOutHow: data.optOutHow,
+      optOutUrl: data.optOutUrl ?? null,
+      retentionPeriod: data.retentionPeriod,
+      dataDeletedOnRequest: data.dataDeletedOnRequest,
+      dataDeletedOnRequestTimeframe: data.dataDeletedOnRequestTimeframe,
+      thirdPartySharing: data.thirdPartySharing,
+      humanReviewOfChats: data.humanReviewOfChats,
+      humanReviewConditions: data.humanReviewConditions,
+      regionalVariation: data.regionalVariation,
+      childrenDataPolicy: data.childrenDataPolicy,
+      enterpriseVsConsumerDifference: data.enterpriseVsConsumerDifference,
+      enterpriseVsConsumerSummary: data.enterpriseVsConsumerSummary,
+      sourceUrl: data.sourceUrl,
+      lastVerifiedDate: data.lastVerifiedDate,
+      lastChangedDate: data.lastChangedDate,
+      confidence: parseConfidence(data.confidence),
+      hasValidPrivacyPolicy:
+        "hasValidPrivacyPolicy" in data
+          ? Boolean(data.hasValidPrivacyPolicy)
+          : true,
+    }
+
     const existing = await db
       .select()
       .from(companies)
@@ -19,58 +47,11 @@ async function main() {
       console.log(`Updating existing entry for ${data.companyName}...`)
       await db
         .update(companies)
-        .set({
-          companyName: data.companyName,
-          productName: data.productName,
-          trainsOnDataByDefault: data.trainsOnDataByDefault,
-          trainsOnDataNuance: data.trainsOnDataNuance,
-          optOutAvailable: data.optOutAvailable,
-          optOutHow: data.optOutHow,
-          optOutUrl: data.optOutUrl ?? null,
-          retentionPeriod: data.retentionPeriod,
-          dataDeletedOnRequest: data.dataDeletedOnRequest,
-          dataDeletedOnRequestTimeframe: data.dataDeletedOnRequestTimeframe,
-          thirdPartySharing: data.thirdPartySharing,
-          humanReviewOfChats: data.humanReviewOfChats,
-          humanReviewConditions: data.humanReviewConditions,
-          regionalVariation: data.regionalVariation,
-          childrenDataPolicy: data.childrenDataPolicy,
-          enterpriseVsConsumerDifference: data.enterpriseVsConsumerDifference,
-          enterpriseVsConsumerSummary: data.enterpriseVsConsumerSummary,
-          sourceUrl: data.sourceUrl,
-          lastVerifiedDate: data.lastVerifiedDate,
-          lastChangedDate: data.lastChangedDate,
-          confidence: data.confidence,
-          hasValidPrivacyPolicy: (data as any).hasValidPrivacyPolicy ?? true,
-        })
+        .set(values)
         .where(eq(companies.companyKey, data.companyKey))
     } else {
       console.log(`Inserting new entry for ${data.companyName}...`)
-      await db.insert(companies).values({
-        companyKey: data.companyKey,
-        companyName: data.companyName,
-        productName: data.productName,
-        trainsOnDataByDefault: data.trainsOnDataByDefault,
-        trainsOnDataNuance: data.trainsOnDataNuance,
-        optOutAvailable: data.optOutAvailable,
-        optOutHow: data.optOutHow,
-        optOutUrl: data.optOutUrl ?? null,
-        retentionPeriod: data.retentionPeriod,
-        dataDeletedOnRequest: data.dataDeletedOnRequest,
-        dataDeletedOnRequestTimeframe: data.dataDeletedOnRequestTimeframe,
-        thirdPartySharing: data.thirdPartySharing,
-        humanReviewOfChats: data.humanReviewOfChats,
-        humanReviewConditions: data.humanReviewConditions,
-        regionalVariation: data.regionalVariation,
-        childrenDataPolicy: data.childrenDataPolicy,
-        enterpriseVsConsumerDifference: data.enterpriseVsConsumerDifference,
-        enterpriseVsConsumerSummary: data.enterpriseVsConsumerSummary,
-        sourceUrl: data.sourceUrl,
-        lastVerifiedDate: data.lastVerifiedDate,
-        lastChangedDate: data.lastChangedDate,
-        confidence: data.confidence as any,
-        hasValidPrivacyPolicy: (data as any).hasValidPrivacyPolicy ?? true,
-      })
+      await db.insert(companies).values(values)
     }
   }
 

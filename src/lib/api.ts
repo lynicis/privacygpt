@@ -3,6 +3,7 @@
 import { createServerFn } from "@tanstack/react-start"
 import { getDb } from "./db"
 import { companies, changelogs, snapshots } from "./db/schema"
+import type { Changelog, Company } from "./db/schema"
 import { eq, desc, and, asc, sql } from "drizzle-orm"
 import type { SQL } from "drizzle-orm"
 import {
@@ -10,41 +11,75 @@ import {
   calculateTotalScore,
   mapScoreToGrade,
 } from "./scoring"
+import type { Grade, SubScores, Weights } from "./scoring"
+
+export type CompanySort =
+  | "score-desc"
+  | "score-asc"
+  | "name-asc"
+  | "name-desc"
+  | "training-first"
+  | "confidence-first"
+
+export interface CompanyFilters {
+  limit?: number
+  offset?: number
+  searchQuery?: string
+  filterNoTraining?: boolean
+  filterOptOut?: boolean
+  filterNoHumanReview?: boolean
+  sortBy?: CompanySort
+  weights?: Weights
+}
+
+export interface CompanyWithScore extends Company {
+  subScores: SubScores
+  totalScore: number
+  grade: Grade
+  rank?: number
+}
+
+export interface CompanyStats {
+  total: number
+  trainsDefault: number
+  hasOptOut: number
+  hasHumanReview: number
+}
+
+export interface CompanyListResult {
+  companies: CompanyWithScore[]
+  totalCount: number
+  stats: CompanyStats
+  overallStats: CompanyStats
+}
+
+export interface ChangelogFilters {
+  page?: number
+  pageSize?: number
+  sortBy?: "detectedAt" | "companyName" | "status"
+  sortOrder?: "asc" | "desc"
+  companyFilter?: string
+  statusFilter?: string
+}
+
+export type ChangelogWithCompany = Pick<
+  Changelog,
+  | "id"
+  | "companyId"
+  | "detectedAt"
+  | "beforeText"
+  | "afterText"
+  | "status"
+  | "reviewNotes"
+  | "reviewedAt"
+> & {
+  companyName: string | null
+  companyKey: string | null
+}
 
 export async function getCompanies(
-  data: {
-    limit?: number
-    offset?: number
-    searchQuery?: string
-    filterNoTraining?: boolean
-    filterOptOut?: boolean
-    filterNoHumanReview?: boolean
-    sortBy?: string
-    weights?: {
-      trainingWeight: number
-      optOutWeight: number
-      retentionWeight: number
-      deletionWeight: number
-      sharingWeight: number
-      humanReviewWeight: number
-    }
-  } = {}
-): Promise<{
-  companies: any[]
-  totalCount: number
-  stats: {
-    total: number
-    trainsDefault: number
-    hasOptOut: number
-    hasHumanReview: number
-  }
-  overallStats: {
-    total: number
-    trainsDefault: number
-    hasOptOut: number
-    hasHumanReview: number
-  }
-}> {
+  data: CompanyFilters = {}
+): Promise<CompanyListResult> {
   try {
     const db = await getDb()
     const allRows = await db.select().from(companies)
@@ -141,36 +176,14 @@ export async function getCompanies(
 }
 
 export const getCompaniesFn = createServerFn({ method: "GET" })
-  .validator(
-    (
-      input:
-        | {
-            limit?: number
-            offset?: number
-            searchQuery?: string
-            filterNoTraining?: boolean
-            filterOptOut?: boolean
-            filterNoHumanReview?: boolean
-            sortBy?: string
-            weights?: {
-              trainingWeight: number
-              optOutWeight: number
-              retentionWeight: number
-              deletionWeight: number
-              sharingWeight: number
-              humanReviewWeight: number
-            }
-          }
-        | undefined
-    ) => input || {}
-  )
+  .validator((input: CompanyFilters | undefined) => input || {})
   .handler(async ({ data }) => {
     return getCompanies(data)
   })
 
 export const getCompanyByKeyFn = createServerFn({ method: "GET" })
   .validator((key: string) => key)
-  .handler(async ({ data: key }) => {
+  .handler(async ({ data: key }): Promise<Company | null> => {
     try {
       const db = await getDb()
       const rows = await db
@@ -186,15 +199,8 @@ export const getCompanyByKeyFn = createServerFn({ method: "GET" })
   })
 
 export async function getChangelogs(
-  data: {
-    page?: number
-    pageSize?: number
-    sortBy?: "detectedAt" | "companyName" | "status"
-    sortOrder?: "asc" | "desc"
-    companyFilter?: string
-    statusFilter?: string
-  } = {}
-): Promise<{ changelogs: any[]; totalCount: number }> {
+  data: ChangelogFilters = {}
+): Promise<{ changelogs: ChangelogWithCompany[]; totalCount: number }> {
   try {
     const db = await getDb()
     const page = data.page ?? 0
@@ -269,20 +275,7 @@ export async function getChangelogs(
 }
 
 export const getChangelogsFn = createServerFn({ method: "GET" })
-  .validator(
-    (
-      input:
-        | {
-            page?: number
-            pageSize?: number
-            sortBy?: "detectedAt" | "companyName" | "status"
-            sortOrder?: "asc" | "desc"
-            companyFilter?: string
-            statusFilter?: string
-          }
-        | undefined
-    ) => input || {}
-  )
+  .validator((input: ChangelogFilters | undefined) => input || {})
   .handler(async ({ data }) => {
     return getChangelogs(data)
   })

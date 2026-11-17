@@ -12,18 +12,18 @@ import {
   getSnapshotTotalCountFn,
   getPendingReviewsCountFn,
 } from "./api"
+import type { ChangelogFilters, CompanyFilters } from "./api"
 import { reviewChangelogFn } from "./admin"
 
 export const queryKeys = {
   companies: {
     all: ["companies"] as const,
-    list: (filters: Record<string, unknown>) =>
-      ["companies", "list", filters] as const,
+    list: (filters: CompanyFilters) => ["companies", "list", filters] as const,
     byKey: (key: string) => ["companies", key] as const,
   },
   changelogs: {
     all: ["changelogs"] as const,
-    list: (filters: Record<string, unknown>) =>
+    list: (filters: ChangelogFilters) =>
       ["changelogs", "list", filters] as const,
   },
   snapshots: {
@@ -37,21 +37,21 @@ export const queryKeys = {
   },
 }
 
-export function companiesQueryOptions(filters: Record<string, any> = {}) {
+export function companiesQueryOptions(filters: CompanyFilters = {}) {
   return queryOptions({
     queryKey: queryKeys.companies.list(filters),
-    queryFn: () => getCompaniesFn({ data: filters } as any),
+    queryFn: () => getCompaniesFn({ data: filters }),
   })
 }
 
-export function useCompanies(filters: Record<string, any> = {}) {
+export function useCompanies(filters: CompanyFilters = {}) {
   return useQuery(companiesQueryOptions(filters))
 }
 
 export function companyByKeyQueryOptions(key: string) {
   return queryOptions({
     queryKey: queryKeys.companies.byKey(key),
-    queryFn: () => getCompanyByKeyFn({ data: key } as any),
+    queryFn: () => getCompanyByKeyFn({ data: key }),
     enabled: !!key,
   })
 }
@@ -60,14 +60,14 @@ export function useCompanyByKey(key: string) {
   return useQuery(companyByKeyQueryOptions(key))
 }
 
-export function changelogsQueryOptions(filters: Record<string, any> = {}) {
+export function changelogsQueryOptions(filters: ChangelogFilters = {}) {
   return queryOptions({
     queryKey: queryKeys.changelogs.list(filters),
-    queryFn: () => getChangelogsFn({ data: filters } as any),
+    queryFn: () => getChangelogsFn({ data: filters }),
   })
 }
 
-export function useChangelogs(filters: Record<string, any> = {}) {
+export function useChangelogs(filters: ChangelogFilters = {}) {
   return useQuery(changelogsQueryOptions(filters))
 }
 
@@ -108,7 +108,7 @@ export function useReviewChangelog() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (vars: { id: number; reviewNotes: string }) =>
-      reviewChangelogFn({ data: vars } as any),
+      reviewChangelogFn({ data: vars }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.changelogs.all })
       queryClient.invalidateQueries({

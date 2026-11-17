@@ -1,5 +1,20 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core"
 
+export const CONFIDENCE_VALUES = [
+  "verified_from_policy_text",
+  "inferred",
+  "needs_review",
+  "unverified",
+] as const
+
+export type Confidence = (typeof CONFIDENCE_VALUES)[number]
+
+export function parseConfidence(value: string): Confidence {
+  return (CONFIDENCE_VALUES as readonly string[]).includes(value)
+    ? (value as Confidence)
+    : "needs_review"
+}
+
 export const companies = sqliteTable("companies", {
   id: integer("id").primaryKey({ autoIncrement: true }),
 
@@ -51,7 +66,7 @@ export const companies = sqliteTable("companies", {
   sourceUrl: text("source_url").notNull(), // Primary privacy policy link
   lastVerifiedDate: text("last_verified_date").notNull(), // YYYY-MM-DD
   lastChangedDate: text("last_changed_date"), // YYYY-MM-DD (null if no known changes since last_verified_date)
-  confidence: text("confidence").notNull(), // 'verified_from_policy_text' | 'inferred' | 'needs_review'
+  confidence: text("confidence").$type<Confidence>().notNull(), // 'verified_from_policy_text' | 'inferred' | 'needs_review' | 'unverified'
 
   // Privacy Policy Validation
   hasValidPrivacyPolicy: integer("has_valid_privacy_policy", {
@@ -84,3 +99,7 @@ export const changelogs = sqliteTable("changelogs", {
   proposedChanges: text("proposed_changes"), // JSON string of proposed field updates
   reviewedAt: text("reviewed_at"), // ISO Timestamp
 })
+
+export type Company = typeof companies.$inferSelect
+export type Changelog = typeof changelogs.$inferSelect
+export type Snapshot = typeof snapshots.$inferSelect

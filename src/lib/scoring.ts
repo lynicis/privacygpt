@@ -1,25 +1,43 @@
-/**
- * Calculates individual points (0-100) for the six sub-categories
- */
-export function calculateSubScores(company: {
-  trainsOnDataByDefault: boolean
-  trainsOnDataNuance: string
-  optOutAvailable: boolean
-  optOutHow: string
-  retentionPeriod: string
-  dataDeletedOnRequest: boolean
-  dataDeletedOnRequestTimeframe: string
-  thirdPartySharing: string
-  humanReviewOfChats: boolean
-  humanReviewConditions: string
-}): {
+import type { Company } from "./db/schema"
+
+export interface SubScores {
   trainingScore: number
   optOutScore: number
   retentionScore: number
   deletionScore: number
   sharingScore: number
   humanReviewScore: number
-} {
+}
+
+export interface Weights {
+  trainingWeight: number
+  optOutWeight: number
+  retentionWeight: number
+  deletionWeight: number
+  sharingWeight: number
+  humanReviewWeight: number
+}
+
+export type Grade = "A+" | "A" | "A-" | "B+" | "B" | "B-" | "C" | "D" | "F"
+
+/**
+ * Calculates individual points (0-100) for the six sub-categories
+ */
+export function calculateSubScores(
+  company: Pick<
+    Company,
+    | "trainsOnDataByDefault"
+    | "trainsOnDataNuance"
+    | "optOutAvailable"
+    | "optOutHow"
+    | "retentionPeriod"
+    | "dataDeletedOnRequest"
+    | "dataDeletedOnRequestTimeframe"
+    | "thirdPartySharing"
+    | "humanReviewOfChats"
+    | "humanReviewConditions"
+  >
+): SubScores {
   // 1. Model Training
   const trainingScore = company.trainsOnDataByDefault ? 0 : 100
 
@@ -142,22 +160,8 @@ export function calculateSubScores(company: {
  * Calculates total weighted score (0-100)
  */
 export function calculateTotalScore(
-  subScores: {
-    trainingScore: number
-    optOutScore: number
-    retentionScore: number
-    deletionScore: number
-    sharingScore: number
-    humanReviewScore: number
-  },
-  weights: {
-    trainingWeight: number
-    optOutWeight: number
-    retentionWeight: number
-    deletionWeight: number
-    sharingWeight: number
-    humanReviewWeight: number
-  }
+  subScores: SubScores,
+  weights: Weights
 ): number {
   const totalWeight =
     weights.trainingWeight +
@@ -183,7 +187,7 @@ export function calculateTotalScore(
 /**
  * Maps numerical score (0-100) to a letter grade
  */
-export function mapScoreToGrade(score: number): string {
+export function mapScoreToGrade(score: number): Grade {
   if (score >= 97) return "A+"
   if (score >= 93) return "A"
   if (score >= 90) return "A-"
