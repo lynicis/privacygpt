@@ -1,5 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
-import { useState } from "react"
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
 import { companiesQueryOptions, companyByKeyQueryOptions } from "@/lib/queries"
 import { APP_URL } from "@/lib/site"
@@ -12,7 +11,6 @@ import {
 import { CompanySelect } from "@/components/CompanySelect"
 import { CompareScores } from "@/components/CompareScores"
 import { CompareSection } from "@/components/CompareSection"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -85,10 +83,10 @@ export const Route = createFileRoute("/compare")({
 
 function ComparePage() {
   const search = Route.useSearch()
+  const navigate = useNavigate({ from: "/compare" })
 
-  const [selectedA, setSelectedA] = useState(search.companyA || "")
-  const [selectedB, setSelectedB] = useState(search.companyB || "")
-  const [activeTab, setActiveTab] = useState<"a" | "b">("a")
+  const selectedA = search.companyA ?? ""
+  const selectedB = search.companyB ?? ""
 
   const { data: companiesData } = useQuery(
     companiesQueryOptions({ limit: 1000 })
@@ -102,30 +100,31 @@ function ComparePage() {
     companyByKeyQueryOptions(selectedB)
   )
 
-  const updateSearch = (key: "companyA" | "companyB", value: string) => {
-    if (key === "companyA") setSelectedA(value)
-    else setSelectedB(value)
-
-    const newSearch = new URLSearchParams(window.location.search)
-    if (value) {
-      newSearch.set(key, value)
-    } else {
-      newSearch.delete(key)
-    }
-    window.history.replaceState(null, "", `?${newSearch.toString()}`)
-  }
+  const updateSearch = (
+    next: Partial<Pick<CompareSearch, "companyA" | "companyB">>
+  ) =>
+    navigate({
+      to: "/compare",
+      search: (prev) => ({ ...prev, ...next }),
+      replace: true,
+    })
 
   const handleSwap = () => {
-    const tempA = selectedA
-    const tempB = selectedB
-    updateSearch("companyA", tempB)
-    updateSearch("companyB", tempA)
+    updateSearch({
+      companyA: selectedB || undefined,
+      companyB: selectedA || undefined,
+    })
   }
 
   const handleReset = () => {
-    updateSearch("companyA", "")
-    updateSearch("companyB", "")
+    updateSearch({ companyA: undefined, companyB: undefined })
   }
+
+  const invalidSelection =
+    Boolean(selectedA && selectedB) &&
+    !loadingA &&
+    !loadingB &&
+    (!companyA || !companyB)
 
   const hasSelection = selectedA && selectedB
 
@@ -182,7 +181,7 @@ function ComparePage() {
                 <CompanySelect
                   companies={companies}
                   value={selectedA}
-                  onChange={(v) => updateSearch("companyA", v)}
+                  onChange={(v) => updateSearch({ companyA: v || undefined })}
                   disabledCompany={selectedB}
                   label="First Company"
                 />
@@ -205,7 +204,7 @@ function ComparePage() {
                 <CompanySelect
                   companies={companies}
                   value={selectedB}
-                  onChange={(v) => updateSearch("companyB", v)}
+                  onChange={(v) => updateSearch({ companyB: v || undefined })}
                   disabledCompany={selectedA}
                   label="Second Company"
                 />
@@ -257,26 +256,23 @@ function ComparePage() {
           </Card>
         )}
 
+        {/* Invalid selection */}
+        {invalidSelection && (
+          <Card className="mb-5 border-amber-500/30 bg-amber-500/5 p-6 text-center">
+            <CardContent>
+              <h2 className="text-lg font-bold text-foreground">
+                Company not found
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Pick another company to compare.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Comparison Content */}
         {hasSelection && companyA && companyB && (
           <>
-            {/* Mobile Tabs */}
-            <div className="mb-5 md:hidden">
-              <Tabs
-                value={activeTab}
-                onValueChange={(v) => setActiveTab(v as "a" | "b")}
-              >
-                <TabsList className="w-full">
-                  <TabsTrigger value="a" className="flex-1 text-xs">
-                    {companyA.companyName}
-                  </TabsTrigger>
-                  <TabsTrigger value="b" className="flex-1 text-xs">
-                    {companyB.companyName}
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
-
             {/* Scores Section */}
             <div className="mb-8">
               <h2 className="mb-4 text-xs font-bold tracking-wide text-muted-foreground uppercase">
