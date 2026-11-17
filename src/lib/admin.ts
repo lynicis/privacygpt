@@ -4,13 +4,21 @@ import { createServerFn } from "@tanstack/react-start"
 import { getRequestHeaders } from "@tanstack/react-start/server"
 import { getDb } from "./db"
 import { companies, changelogs } from "./db/schema"
+import type { Company } from "./db/schema"
 import { eq } from "drizzle-orm"
+import { coerceFieldChanges } from "./company-fields"
 
 export function checkAdminAuth(headers: Headers) {
   const authHeader = headers.get("authorization")
 
-  const username = process.env.ADMIN_USERNAME || "admin"
-  const password = process.env.ADMIN_PASSWORD || "adminpassword"
+  const username = process.env.ADMIN_USERNAME
+  const password = process.env.ADMIN_PASSWORD
+
+  if (!username || !password) {
+    throw new Response("Admin credentials are not configured", {
+      status: 500,
+    })
+  }
 
   const expectedAuth =
     "Basic " + Buffer.from(`${username}:${password}`).toString("base64")
@@ -46,7 +54,7 @@ export const reviewChangelogFn = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     try {
       // Check auth
-      await checkAdminAuthFn()
+      checkAdminAuth(getRequestHeaders())
 
       const db = await getDb()
 
@@ -62,20 +70,20 @@ export const reviewChangelogFn = createServerFn({ method: "POST" })
 
       // 2. Apply proposed changes to companies table
       if (changelog.proposedChanges) {
-        try {
-          const fieldChanges = JSON.parse(changelog.proposedChanges)
-          const updateData: Record<string, any> = {}
-          for (const change of fieldChanges) {
-            updateData[change.field] = change.newValue
-          }
-          if (Object.keys(updateData).length > 0) {
-            await db
-              .update(companies)
-              .set(updateData)
-              .where(eq(companies.id, changelog.companyId))
-          }
-        } catch (e) {
-          console.error("Failed to apply proposed changes", e)
+        const { updates, skipped } = coerceFieldChanges(
+          JSON.parse(changelog.proposedChanges)
+        )
+        if (skipped.length) {
+          console.warn(
+            `[admin] Skipped AI fields for changelog ${data.id}: ${skipped.join(", ")}`
+          )
+        }
+        if (Object.keys(updates).length > 0) {
+          // coerceFieldChanges narrowed every entry to the column's runtime type
+          await db
+            .update(companies)
+            .set(updates as Partial<Company>)
+            .where(eq(companies.id, changelog.companyId))
         }
       }
 
@@ -91,6 +99,7 @@ export const reviewChangelogFn = createServerFn({ method: "POST" })
 
       return { success: true }
     } catch (error) {
+      if (error instanceof Response) throw error
       console.error(`Failed to review changelog ${data.id}:`, error)
       throw new Error(`Failed to review changelog: ${data.id}`)
     }

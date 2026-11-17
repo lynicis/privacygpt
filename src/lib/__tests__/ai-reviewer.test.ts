@@ -16,15 +16,18 @@ const mockChain = {
   resolveValue: [] as any[],
 }
 
+const mockWhere = vi.fn().mockResolvedValue({})
+const mockSet = vi.fn<(values: Record<string, unknown>) => unknown>(() => ({
+  where: mockWhere,
+}))
+
 const mockDb = {
   select: vi.fn().mockReturnValue(mockChain),
   insert: vi.fn().mockReturnValue({
     values: vi.fn().mockResolvedValue({}),
   }),
   update: vi.fn().mockReturnValue({
-    set: vi.fn().mockReturnValue({
-      where: vi.fn().mockResolvedValue({}),
-    }),
+    set: mockSet,
   }),
 }
 
@@ -124,7 +127,7 @@ describe("reviewChangelogWithAI", () => {
     vi.restoreAllMocks()
   })
 
-  it("updates company fields for non-breaking change", async () => {
+  it("keeps proposed field changes pending for non-breaking change", async () => {
     mockChain.then.mockImplementation((onfulfilled) => {
       // First call returns changelog, second returns company
       const callCount = mockDb.select.mock.calls.length
@@ -163,7 +166,10 @@ describe("reviewChangelogWithAI", () => {
       AI: { run: mockAiRun } as unknown as Env["AI"],
     })
     expect(result.isBreaking).toBe(false)
-    expect(mockDb.update).toHaveBeenCalled()
+    expect(mockDb.update).toHaveBeenCalledTimes(1)
+    const updateValues = mockSet.mock.calls[0][0]
+    expect(updateValues.status).toBe("pending_review")
+    expect(updateValues.proposedChanges).toContain("trainsOnDataByDefault")
   })
 
   it("leaves changelog pending for breaking change", async () => {

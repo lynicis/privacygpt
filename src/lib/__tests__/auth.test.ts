@@ -60,6 +60,24 @@ describe("basic authentication", () => {
     expect(result).toEqual({ success: true })
   })
 
+  it("should throw 500 when ADMIN_USERNAME or ADMIN_PASSWORD is unset", () => {
+    delete process.env.ADMIN_PASSWORD
+    const headers = new Headers()
+    headers.set(
+      "Authorization",
+      "Basic " + Buffer.from("admin:adminpassword").toString("base64")
+    )
+
+    expect(() => checkAdminAuth(headers)).toThrow(Response)
+
+    try {
+      checkAdminAuth(headers)
+    } catch (error) {
+      if (!(error instanceof Response)) throw error
+      expect(error.status).toBe(500)
+    }
+  })
+
   it("should respect custom ADMIN_USERNAME and ADMIN_PASSWORD env variables", () => {
     process.env.ADMIN_USERNAME = "super_admin"
     process.env.ADMIN_PASSWORD = "secure_password_99"

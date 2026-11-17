@@ -1,6 +1,7 @@
 import { getDb } from "./db"
 import { companies, changelogs } from "./db/schema"
 import { eq } from "drizzle-orm"
+import { COMPANY_FIELDS } from "./company-fields"
 
 type AiEnv = Pick<Env, "AI">
 
@@ -16,25 +17,6 @@ interface AIReviewResult {
   fieldChanges: FieldChange[]
   reviewNotes: string
 }
-
-const COMPANY_FIELDS = [
-  "trainsOnDataByDefault",
-  "trainsOnDataNuance",
-  "optOutAvailable",
-  "optOutHow",
-  "optOutUrl",
-  "retentionPeriod",
-  "dataDeletedOnRequest",
-  "dataDeletedOnRequestTimeframe",
-  "thirdPartySharing",
-  "humanReviewOfChats",
-  "humanReviewConditions",
-  "regionalVariation",
-  "childrenDataPolicy",
-  "enterpriseVsConsumerDifference",
-  "enterpriseVsConsumerSummary",
-  "sourceUrl",
-] as const
 
 export function buildAIPrompt(
   company: Record<string, any>,
@@ -98,6 +80,18 @@ export function parseAIResponse(raw: string): AIReviewResult {
   if (typeof parsed.reviewNotes !== "string") {
     throw new Error("Invalid AI response: reviewNotes must be string")
   }
+  for (const change of parsed.fieldChanges) {
+    if (
+      typeof change !== "object" ||
+      change === null ||
+      typeof change.field !== "string" ||
+      typeof change.oldValue !== "string" ||
+      typeof change.newValue !== "string" ||
+      typeof change.reasoning !== "string"
+    ) {
+      throw new Error("Invalid AI response: invalid fieldChanges entry")
+    }
+  }
 
   return parsed as AIReviewResult
 }
@@ -150,10 +144,11 @@ export async function reviewChangelogWithAI(
     ],
   })
 
+  const raw: unknown = response
   const aiOutput =
-    typeof response === "string"
-      ? response
-      : response?.response || JSON.stringify(response)
+    typeof raw === "string"
+      ? raw
+      : (response.response ?? JSON.stringify(response))
 
   let result: AIReviewResult
   try {
@@ -171,45 +166,25 @@ export async function reviewChangelogWithAI(
     return { success: true, isBreaking: true }
   }
 
-  if (result.isBreaking) {
-    // Leave it as pending_review but attach AI notes
+  if (result.fieldChanges.length > 0) {
+    const prefix = result.isBreaking ? "BREAKING" : "PROPOSED"
     await db
       .update(changelogs)
       .set({
         status: "pending_review",
-        reviewNotes: `AI Review [BREAKING]: ${result.reviewNotes}`,
+        reviewNotes: `AI Review [${prefix}]: ${result.reviewNotes}`,
         proposedChanges: JSON.stringify(result.fieldChanges),
+        reviewedAt: new Date().toISOString(),
       })
       .where(eq(changelogs.id, changelogId))
-    return { success: true, isBreaking: true }
+    return { success: true, isBreaking: result.isBreaking }
   }
-
-  // Non-breaking → update company fields
-  const updateData: Record<string, any> = {}
-  for (const change of result.fieldChanges) {
-    if (change.field in company) {
-      updateData[change.field] = change.newValue
-    }
-  }
-
-  if (Object.keys(updateData).length > 0) {
-    await db
-      .update(companies)
-      .set(updateData)
-      .where(eq(companies.id, company.id))
-  }
-
-  // Mark changelog as reviewed
-  const notesSummary =
-    result.fieldChanges.length > 0
-      ? `AI Review: Updated ${result.fieldChanges.map((c) => c.field).join(", ")}. ${result.reviewNotes}`
-      : `AI Review: No field changes needed. ${result.reviewNotes}`
 
   await db
     .update(changelogs)
     .set({
       status: "reviewed",
-      reviewNotes: notesSummary,
+      reviewNotes: `AI Review: No field changes needed. ${result.reviewNotes}`,
       reviewedAt: new Date().toISOString(),
     })
     .where(eq(changelogs.id, changelogId))
