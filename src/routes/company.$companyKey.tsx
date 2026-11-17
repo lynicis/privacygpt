@@ -144,14 +144,15 @@ function CompanyDetailPage() {
       {/* Main content wrapper */}
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
         <div className="mb-6">
-          <Link to="/">
-            <Button
-              variant="ghost"
-              className="-ml-3 gap-2 text-muted-foreground hover:text-foreground"
-            >
+          <Button
+            asChild
+            variant="ghost"
+            className="-ml-3 gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <Link to="/">
               <ArrowLeft className="h-4 w-4" /> Back to Dashboard
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
 
         {/* Company Jumbotron Card */}
@@ -192,15 +193,15 @@ function CompanyDetailPage() {
 
               {company.optOutAvailable && company.optOutUrl && (
                 <div className="mt-3">
-                  <a
-                    href={company.optOutUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button className="gap-2">
+                  <Button asChild className="gap-2">
+                    <a
+                      href={company.optOutUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       Opt Out of Training <ExternalLink className="h-4 w-4" />
-                    </Button>
-                  </a>
+                    </a>
+                  </Button>
                 </div>
               )}
 

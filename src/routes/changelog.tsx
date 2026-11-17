@@ -237,6 +237,11 @@ function ChangelogPage() {
           <Button
             variant="ghost"
             size="icon-xs"
+            aria-label={
+              row.getIsExpanded()
+                ? "Collapse change details"
+                : "Expand change details"
+            }
             onClick={() => row.toggleExpanded()}
           >
             {row.getIsExpanded() ? (
@@ -529,7 +534,7 @@ function ChangelogPage() {
               })
             }}
           >
-            <SelectTrigger className="w-48">
+            <SelectTrigger aria-label="Filter by company" className="w-48">
               <SelectValue placeholder="All Companies" />
             </SelectTrigger>
             <SelectContent>
@@ -553,7 +558,7 @@ function ChangelogPage() {
               })
             }}
           >
-            <SelectTrigger className="w-48">
+            <SelectTrigger aria-label="Filter by status" className="w-48">
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
             <SelectContent>

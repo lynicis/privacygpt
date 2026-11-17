@@ -187,11 +187,9 @@ function AdminPage() {
             >
               Log In / Refresh Page
             </Button>
-            <Link to="/">
-              <Button variant="outline" className="w-full rounded-none">
-                Back to Dashboard
-              </Button>
-            </Link>
+            <Button asChild variant="outline" className="w-full rounded-none">
+              <Link to="/">Back to Dashboard</Link>
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -335,7 +333,7 @@ function AdminPage() {
               <span className="text-sm font-medium">Filters:</span>
             </div>
             <Select value={companyFilter} onValueChange={setCompanyFilter}>
-              <SelectTrigger className="w-48">
+              <SelectTrigger aria-label="Filter by company" className="w-48">
                 <SelectValue placeholder="All Companies" />
               </SelectTrigger>
               <SelectContent>
@@ -348,7 +346,7 @@ function AdminPage() {
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-48">
+              <SelectTrigger aria-label="Filter by status" className="w-48">
                 <SelectValue placeholder="Pending Review" />
               </SelectTrigger>
               <SelectContent>
@@ -358,11 +356,9 @@ function AdminPage() {
               </SelectContent>
             </Select>
           </div>
-          <Link to="/changelog">
-            <Button variant="outline" size="sm" className="text-xs">
-              View Public Changelog
-            </Button>
-          </Link>
+          <Button asChild variant="outline" size="sm" className="text-xs">
+            <Link to="/changelog">View Public Changelog</Link>
+          </Button>
         </div>
 
         {/* Timeline */}

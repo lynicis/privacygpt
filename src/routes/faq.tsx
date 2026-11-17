@@ -119,14 +119,15 @@ function FAQPage() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
       <div className="mb-8">
-        <Link to="/">
-          <Button
-            variant="ghost"
-            className="-ml-3 gap-2 text-muted-foreground hover:text-foreground"
-          >
+        <Button
+          asChild
+          variant="ghost"
+          className="-ml-3 gap-2 text-muted-foreground hover:text-foreground"
+        >
+          <Link to="/">
             <ArrowLeft className="h-4 w-4" /> Back to Tracker
-          </Button>
-        </Link>
+          </Link>
+        </Button>
         <div className="mt-4 flex items-center gap-3">
           <HelpCircle className="h-8 w-8 text-primary" />
           <div>
@@ -155,11 +156,13 @@ function FAQPage() {
                 <CardDescription className="text-base leading-relaxed text-muted-foreground">
                   {faq.answer}
                 </CardDescription>
-                <Link to={faq.link}>
-                  <Button variant="link" className="h-auto p-0 text-primary">
-                    {faq.linkText} →
-                  </Button>
-                </Link>
+                <Button
+                  asChild
+                  variant="link"
+                  className="h-auto p-0 text-primary"
+                >
+                  <Link to={faq.link}>{faq.linkText} →</Link>
+                </Button>
               </CardContent>
             </Card>
           )

@@ -288,19 +288,14 @@ function App() {
     })
   }
 
-  const setSortBy = (
-    value:
-      | "score-desc"
-      | "score-asc"
-      | "name-asc"
-      | "name-desc"
-      | "training-first"
-      | "confidence-first"
-  ) => {
+  const setSortBy = (value: string) => {
+    const sortBy = SORT_BY.includes(value as DashboardSort)
+      ? (value as DashboardSort)
+      : "score-desc"
     navigate({
       search: (prev) => ({
         ...prev,
-        sortBy: value,
+        sortBy,
         page: 1,
       }),
       resetScroll: false,
@@ -402,11 +397,11 @@ function App() {
               mechanisms, and retention timelines directly from source policies.
             </p>
             <div className="mt-8 flex justify-center gap-3">
-              <Link to="/methodology">
-                <Button variant="outline" className="gap-2">
+              <Button asChild variant="outline" className="gap-2">
+                <Link to="/methodology">
                   <BookOpen className="h-4 w-4" /> Our Methodology
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           </div>
 
@@ -517,7 +512,10 @@ function App() {
               ).map(({ key, label }) => (
                 <div key={key} className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-medium text-foreground">
+                    <label
+                      htmlFor={`weight-${key}`}
+                      className="text-xs font-medium text-foreground"
+                    >
                       {label}
                     </label>
                     <span className="bg-muted px-1.5 py-0.5 font-mono text-[11px] font-semibold text-muted-foreground">
@@ -529,6 +527,7 @@ function App() {
                     </span>
                   </div>
                   <input
+                    id={`weight-${key}`}
                     type="range"
                     min="0"
                     max="100"
@@ -555,9 +554,10 @@ function App() {
               <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 type="text"
+                aria-label="Search companies"
                 placeholder="Search by company, product..."
                 value={search.search || ""}
-                onChange={(e: any) => setSearchQuery(e.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="h-9 pl-9 text-sm"
               />
             </div>
@@ -566,9 +566,12 @@ function App() {
               <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
               <Select
                 value={search.sortBy || "score-desc"}
-                onValueChange={(val: any) => setSortBy(val)}
+                onValueChange={(val) => setSortBy(val)}
               >
-                <SelectTrigger className="h-9 w-[180px] text-xs">
+                <SelectTrigger
+                  aria-label="Sort companies"
+                  className="h-9 w-[180px] text-xs"
+                >
                   <SelectValue placeholder="Sort order" />
                 </SelectTrigger>
                 <SelectContent>
@@ -773,6 +776,7 @@ function App() {
               disabled={currentPage <= 1}
               onClick={() => setPage(1)}
               className="h-8 gap-1 px-2"
+              aria-label="First page"
             >
               <ChevronsLeft className="h-3.5 w-3.5" />
             </Button>
@@ -782,6 +786,7 @@ function App() {
               disabled={currentPage <= 1}
               onClick={() => setPage(currentPage - 1)}
               className="h-8 gap-1 px-2"
+              aria-label="Previous page"
             >
               <ChevronLeft className="h-3.5 w-3.5" />
             </Button>
@@ -825,6 +830,7 @@ function App() {
               disabled={currentPage >= totalPages}
               onClick={() => setPage(currentPage + 1)}
               className="h-8 gap-1 px-2"
+              aria-label="Next page"
             >
               <ChevronRight className="h-3.5 w-3.5" />
             </Button>
@@ -834,6 +840,7 @@ function App() {
               disabled={currentPage >= totalPages}
               onClick={() => setPage(totalPages)}
               className="h-8 gap-1 px-2"
+              aria-label="Last page"
             >
               <ChevronsRight className="h-3.5 w-3.5" />
             </Button>

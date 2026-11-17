@@ -161,11 +161,11 @@ function ComparePage() {
               side-by-side, powered by verified policy data.
             </p>
             <div className="mt-5 flex justify-center gap-3">
-              <Link to="/methodology">
-                <Button variant="outline" size="sm" className="gap-2">
+              <Button asChild variant="outline" size="sm" className="gap-2">
+                <Link to="/methodology">
                   <BookOpen className="h-3.5 w-3.5" /> Our Methodology
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           </div>
         </div>

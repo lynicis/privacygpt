@@ -34,14 +34,15 @@ function PrivacyPage() {
     <>
       <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
         <div className="mb-8">
-          <Link to="/">
-            <Button
-              variant="ghost"
-              className="-ml-3 gap-2 text-muted-foreground hover:text-foreground"
-            >
+          <Button
+            asChild
+            variant="ghost"
+            className="-ml-3 gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <Link to="/">
               <ArrowLeft className="h-4 w-4" /> Back to Tracker
-            </Button>
-          </Link>
+            </Link>
+          </Button>
           <h1 className="mt-4 mb-2 text-4xl font-extrabold tracking-tight text-foreground">
             Privacy Policy
           </h1>

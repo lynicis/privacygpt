@@ -6,6 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { ShieldCheck, ShieldX } from "lucide-react"
+import { useId } from "react"
 import type { companies } from "@/lib/db/schema"
 
 type Company = typeof companies.$inferSelect
@@ -28,14 +29,19 @@ export function CompanySelect({
   placeholder = "Select a company",
 }: CompanySelectProps) {
   const selectedCompany = companies.find((c) => c.companyKey === value)
+  const labelId = useId()
 
   return (
     <div className="space-y-2.5">
-      <label className="text-xs font-bold tracking-wide text-muted-foreground uppercase">
+      <label
+        id={labelId}
+        className="text-xs font-bold tracking-wide text-muted-foreground uppercase"
+      >
         {label}
       </label>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger
+          aria-labelledby={labelId}
           className={`h-11 ${!value ? "border-dashed border-destructive/50" : ""}`}
         >
           <SelectValue placeholder={placeholder} />
