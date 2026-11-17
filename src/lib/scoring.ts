@@ -20,6 +20,50 @@ export interface Weights {
 
 export type Grade = "A+" | "A" | "A-" | "B+" | "B" | "B-" | "C" | "D" | "F"
 
+export const DEFAULT_WEIGHTS: Weights = {
+  trainingWeight: 30,
+  optOutWeight: 20,
+  retentionWeight: 15,
+  deletionWeight: 15,
+  sharingWeight: 10,
+  humanReviewWeight: 10,
+}
+
+const WEIGHT_KEYS = [
+  "trainingWeight",
+  "optOutWeight",
+  "retentionWeight",
+  "deletionWeight",
+  "sharingWeight",
+  "humanReviewWeight",
+] as const
+
+export function parseWeights(raw: unknown): Weights {
+  if (typeof raw !== "string" || raw.trim() === "") {
+    return { ...DEFAULT_WEIGHTS }
+  }
+
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(raw)
+  } catch {
+    return { ...DEFAULT_WEIGHTS }
+  }
+
+  if (typeof parsed !== "object" || parsed === null) {
+    return { ...DEFAULT_WEIGHTS }
+  }
+
+  const weights: Weights = { ...DEFAULT_WEIGHTS }
+  for (const key of WEIGHT_KEYS) {
+    const value = (parsed as Record<string, unknown>)[key]
+    if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
+      weights[key] = Math.min(value, 100)
+    }
+  }
+  return weights
+}
+
 /**
  * Calculates individual points (0-100) for the six sub-categories
  */
@@ -43,7 +87,9 @@ export function calculateSubScores(
 
   // 2. Opt-Out Ease
   let optOutScore = 0
-  if (company.optOutAvailable) {
+  if (!company.trainsOnDataByDefault) {
+    optOutScore = 100
+  } else if (company.optOutAvailable) {
     const optOutText = company.optOutHow.toLowerCase()
     if (
       optOutText.includes("form") ||
@@ -69,25 +115,36 @@ export function calculateSubScores(
     retentionText.includes("zero data retention") ||
     retentionText.includes("no data retention") ||
     retentionText.includes("not retained") ||
-    retentionText.includes("7 days") ||
     retentionText.startsWith("0 ")
   ) {
     retentionScore = 100
-  } else if (
-    retentionText.includes("30 days") ||
-    retentionText.includes("30-day") ||
-    retentionText.includes("1 month")
-  ) {
-    retentionScore = 80
-  } else if (
-    retentionText.includes("18 months") ||
-    retentionText.includes("3 months") ||
-    retentionText.includes("36 months") ||
-    retentionText.includes("user-specified") ||
-    retentionText.includes("adjustable") ||
-    retentionText.includes("activity")
-  ) {
-    retentionScore = 50
+  } else {
+    const match = retentionText.match(/(\d+)\s*(hour|day|week|month|year)s?/i)
+    if (match) {
+      const amount = parseInt(match[1], 10)
+      const unit = match[2]
+      const unitDays: Record<string, number> = {
+        hour: 1 / 24,
+        day: 1,
+        week: 7,
+        month: 30,
+        year: 365,
+      }
+      const days = amount * unitDays[unit]
+      if (days > 0 && days < 30) {
+        retentionScore = 80
+      } else if (days >= 30 && days <= 548) {
+        retentionScore = 50
+      } else {
+        retentionScore = 0
+      }
+    } else if (
+      retentionText.includes("user-specified") ||
+      retentionText.includes("adjustable") ||
+      retentionText.includes("activity")
+    ) {
+      retentionScore = 50
+    }
   }
 
   // 4. Deletion rights

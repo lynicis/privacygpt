@@ -4,6 +4,7 @@ import {
   calculateSubScores,
   calculateTotalScore,
   mapScoreToGrade,
+  DEFAULT_WEIGHTS,
 } from "../lib/scoring"
 import {
   ArrowLeft,
@@ -28,15 +29,6 @@ import {
   CardContent,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-
-const defaultWeights = {
-  trainingWeight: 30,
-  optOutWeight: 20,
-  retentionWeight: 15,
-  deletionWeight: 15,
-  sharingWeight: 10,
-  humanReviewWeight: 10,
-}
 
 export const Route = createFileRoute("/company/$companyKey")({
   loader: async ({ params }) => {
@@ -126,7 +118,7 @@ function CompanyDetailPage() {
 
   // Calculate scores
   const subScores = calculateSubScores(company)
-  const totalScore = calculateTotalScore(subScores, defaultWeights)
+  const totalScore = calculateTotalScore(subScores, DEFAULT_WEIGHTS)
   const overallGrade = mapScoreToGrade(totalScore)
 
   // Helper for boolean status badges

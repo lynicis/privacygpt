@@ -9,6 +9,7 @@ import {
   CardContent,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { DEFAULT_WEIGHTS } from "../lib/scoring"
 
 export const Route = createFileRoute("/methodology")({
   head: () => ({
@@ -299,30 +300,35 @@ function MethodologyPage() {
                     <span>Category</span>
                     <span>Default Weight</span>
                   </div>
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Default Model Training Disabled</span>
-                    <span>30%</span>
-                  </div>
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Ease of Opt-Out</span>
-                    <span>20%</span>
-                  </div>
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Data Retention Period</span>
-                    <span>15%</span>
-                  </div>
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Deletion Rights (chats & account)</span>
-                    <span>15%</span>
-                  </div>
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>No Human Review of normal chats</span>
-                    <span>10%</span>
-                  </div>
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Third Party Sharing restrictions</span>
-                    <span>10%</span>
-                  </div>
+                  {(
+                    [
+                      {
+                        key: "trainingWeight",
+                        label: "Default Model Training Disabled",
+                      },
+                      { key: "optOutWeight", label: "Ease of Opt-Out" },
+                      {
+                        key: "deletionWeight",
+                        label: "Deletion Rights (chats & account)",
+                      },
+                      {
+                        key: "humanReviewWeight",
+                        label: "No Human Review of normal chats",
+                      },
+                      {
+                        key: "sharingWeight",
+                        label: "Third Party Sharing restrictions",
+                      },
+                    ] as const
+                  ).map((row) => (
+                    <div
+                      key={row.key}
+                      className="flex justify-between text-xs text-muted-foreground"
+                    >
+                      <span>{row.label}</span>
+                      <span>{DEFAULT_WEIGHTS[row.key]}%</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 

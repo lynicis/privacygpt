@@ -3,16 +3,9 @@ import {
   calculateSubScores,
   calculateTotalScore,
   mapScoreToGrade,
+  DEFAULT_WEIGHTS,
+  parseWeights,
 } from "../scoring"
-
-const defaultWeights = {
-  trainingWeight: 30,
-  optOutWeight: 20,
-  retentionWeight: 15,
-  deletionWeight: 15,
-  sharingWeight: 10,
-  humanReviewWeight: 10,
-}
 
 describe("PrivacyGPT Scoring Logic Validation", () => {
   // Test company: private by default, easy opt-out, no retention, full deletion, secure sharing, no human review (Perfect profile)
@@ -73,6 +66,56 @@ describe("PrivacyGPT Scoring Logic Validation", () => {
       }
       const scores = calculateSubScores(safetyReviewCompany)
       expect(scores.humanReviewScore).toBe(80) // Safety restricted
+    })
+
+    it("scores opt-out 100 when training is off by default", () => {
+      const scores = calculateSubScores({
+        ...perfectCompany,
+        optOutAvailable: false,
+        optOutHow: "No opt-out needed.",
+      })
+      expect(scores.optOutScore).toBe(100)
+    })
+
+    it("scores retention from the first parsed duration", () => {
+      expect(
+        calculateSubScores({ ...perfectCompany, retentionPeriod: "7 days" })
+          .retentionScore
+      ).toBe(80)
+      expect(
+        calculateSubScores({ ...perfectCompany, retentionPeriod: "60 days" })
+          .retentionScore
+      ).toBe(50)
+      expect(
+        calculateSubScores({ ...perfectCompany, retentionPeriod: "3 years" })
+          .retentionScore
+      ).toBe(0)
+      expect(
+        calculateSubScores({
+          ...perfectCompany,
+          retentionPeriod: "No retention.",
+        }).retentionScore
+      ).toBe(100)
+    })
+  })
+
+  describe("parseWeights", () => {
+    it("falls back to defaults for null and empty objects", () => {
+      expect(parseWeights(null)).toEqual(DEFAULT_WEIGHTS)
+      expect(parseWeights("{}")).toEqual(DEFAULT_WEIGHTS)
+    })
+
+    it("ignores negative values", () => {
+      expect(parseWeights('{"trainingWeight":-5}').trainingWeight).toBe(
+        DEFAULT_WEIGHTS.trainingWeight
+      )
+    })
+
+    it("applies valid numeric overrides", () => {
+      const weights = parseWeights('{"trainingWeight":50,"optOutWeight":25}')
+      expect(weights.trainingWeight).toBe(50)
+      expect(weights.optOutWeight).toBe(25)
+      expect(weights.retentionWeight).toBe(DEFAULT_WEIGHTS.retentionWeight)
     })
   })
 

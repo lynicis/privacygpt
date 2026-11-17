@@ -10,6 +10,7 @@ import {
   calculateSubScores,
   calculateTotalScore,
   mapScoreToGrade,
+  DEFAULT_WEIGHTS,
 } from "./scoring"
 import type { Grade, SubScores, Weights } from "./scoring"
 
@@ -84,14 +85,7 @@ export async function getCompanies(
     const db = await getDb()
     const allRows = await db.select().from(companies)
 
-    const weights = data.weights || {
-      trainingWeight: 25,
-      optOutWeight: 20,
-      retentionWeight: 15,
-      deletionWeight: 15,
-      sharingWeight: 15,
-      humanReviewWeight: 10,
-    }
+    const weights = data.weights ?? DEFAULT_WEIGHTS
 
     // Overall stats from companies with valid privacy policies (for hero section)
     const monitoredCompanies = allRows.filter((c) => c.hasValidPrivacyPolicy)

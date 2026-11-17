@@ -6,6 +6,7 @@ import {
   calculateSubScores,
   calculateTotalScore,
   mapScoreToGrade,
+  DEFAULT_WEIGHTS,
 } from "@/lib/scoring"
 import { CompanySelect } from "@/components/CompanySelect"
 import { CompareScores } from "@/components/CompareScores"
@@ -20,15 +21,6 @@ import {
   RotateCcw,
   BookOpen,
 } from "lucide-react"
-
-const defaultWeights = {
-  trainingWeight: 30,
-  optOutWeight: 20,
-  retentionWeight: 15,
-  deletionWeight: 15,
-  sharingWeight: 10,
-  humanReviewWeight: 10,
-}
 
 interface CompareSearch {
   companyA?: string
@@ -138,8 +130,12 @@ function ComparePage() {
   const scoresA = companyA ? calculateSubScores(companyA) : null
   const scoresB = companyB ? calculateSubScores(companyB) : null
 
-  const totalScoreA = scoresA ? calculateTotalScore(scoresA, defaultWeights) : 0
-  const totalScoreB = scoresB ? calculateTotalScore(scoresB, defaultWeights) : 0
+  const totalScoreA = scoresA
+    ? calculateTotalScore(scoresA, DEFAULT_WEIGHTS)
+    : 0
+  const totalScoreB = scoresB
+    ? calculateTotalScore(scoresB, DEFAULT_WEIGHTS)
+    : 0
   const totalA = { letter: mapScoreToGrade(totalScoreA), points: totalScoreA }
   const totalB = { letter: mapScoreToGrade(totalScoreB), points: totalScoreB }
 

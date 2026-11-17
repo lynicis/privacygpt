@@ -43,25 +43,8 @@ import {
   SelectItem,
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { mapScoreToGrade } from "../lib/scoring"
-
-interface Weights {
-  trainingWeight: number
-  optOutWeight: number
-  retentionWeight: number
-  deletionWeight: number
-  sharingWeight: number
-  humanReviewWeight: number
-}
-
-const defaultWeights: Weights = {
-  trainingWeight: 30,
-  optOutWeight: 20,
-  retentionWeight: 15,
-  deletionWeight: 15,
-  sharingWeight: 10,
-  humanReviewWeight: 10,
-}
+import { mapScoreToGrade, DEFAULT_WEIGHTS, parseWeights } from "../lib/scoring"
+import type { Weights } from "../lib/scoring"
 
 interface DashboardSearch {
   page?: number
@@ -103,9 +86,7 @@ export const Route = createFileRoute("/")({
   }),
   loader: async ({ deps, context }) => {
     try {
-      const parsedWeights = deps.weights
-        ? JSON.parse(deps.weights)
-        : defaultWeights
+      const parsedWeights = parseWeights(deps.weights)
       const page = deps.page || 1
       const limit = 9
       const offset = (page - 1) * limit
@@ -180,16 +161,10 @@ function App() {
 
   const [isWeightsExpanded, setIsWeightsExpanded] = useState(false)
 
-  const weights: Weights = useMemo(() => {
-    if (search.weights) {
-      try {
-        return JSON.parse(search.weights)
-      } catch {
-        return defaultWeights
-      }
-    }
-    return defaultWeights
-  }, [search.weights])
+  const weights: Weights = useMemo(
+    () => parseWeights(search.weights),
+    [search.weights]
+  )
 
   const filters = useMemo(
     () => ({
@@ -237,7 +212,7 @@ function App() {
   }, [weights])
 
   const handleResetWeights = () => {
-    const newWeights = { ...defaultWeights }
+    const newWeights = { ...DEFAULT_WEIGHTS }
     navigate({
       search: (prev) => ({
         ...prev,
