@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { checkAdminAuthFn } from "../lib/api"
+import { checkAdminAuthFn } from "../lib/admin"
 import {
   useChangelogs,
   useSnapshotCounts,

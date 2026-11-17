@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest"
-import { checkAdminAuth } from "../api"
+import { checkAdminAuth } from "../admin"
 
 describe("basic authentication", () => {
   const originalEnv = { ...process.env }

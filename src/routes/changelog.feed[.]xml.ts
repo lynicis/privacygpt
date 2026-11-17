@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { getRssFeedFn } from "../lib/api"
+import { getRssFeedFn } from "../lib/feeds"
 
 export const Route = createFileRoute("/changelog/feed.xml")({
   server: {

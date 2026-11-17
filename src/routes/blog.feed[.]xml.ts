@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { getBlogPostsFn } from "../lib/api"
+import { getBlogPostsFn } from "../lib/blog"
 
 export const Route = createFileRoute("/blog/feed.xml")({
   server: {

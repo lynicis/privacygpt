@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { ArrowLeft, Calendar, Clock, User, Tag } from "lucide-react"
-import { getBlogPostBySlugFn } from "../lib/api"
+import { getBlogPostBySlugFn } from "../lib/blog"
 import { lazy, Suspense, useEffect, useMemo } from "react"
 import { getProp } from "../lib/utils"
 

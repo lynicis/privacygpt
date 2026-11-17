@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { Calendar, Clock, ArrowRight } from "lucide-react"
-import { getBlogPostsFn } from "../lib/api"
+import { getBlogPostsFn } from "../lib/blog"
 
 const APP_URL = process.env.APP_URL || "https://privacygpt.lynicis.dev"
 

@@ -1,3 +1,4 @@
+import { createServerFn } from "@tanstack/react-start"
 import slugify from "slugify"
 
 export interface BlogPostMeta {
@@ -85,3 +86,15 @@ export function getBlogPosts(): BlogPostMeta[] {
 export function getBlogPostBySlug(slug: string): BlogPostMeta | null {
   return BLOG_POSTS.find((p) => p.slug === slug) || null
 }
+
+export const getBlogPostsFn = createServerFn({ method: "GET" }).handler(
+  async () => {
+    return getBlogPosts()
+  }
+)
+
+export const getBlogPostBySlugFn = createServerFn({ method: "GET" })
+  .validator((slug: string) => slug)
+  .handler(async ({ data: slug }) => {
+    return getBlogPostBySlug(slug)
+  })
