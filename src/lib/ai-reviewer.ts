@@ -2,6 +2,8 @@ import { getDb } from "./db"
 import { companies, changelogs } from "./db/schema"
 import { eq } from "drizzle-orm"
 
+type AiEnv = Pick<Env, "AI">
+
 interface FieldChange {
   field: string
   oldValue: string
@@ -102,7 +104,7 @@ export function parseAIResponse(raw: string): AIReviewResult {
 
 export async function reviewChangelogWithAI(
   changelogId: number,
-  env: { AI: { run: (model: string, input: any) => Promise<any> } }
+  env: AiEnv
 ): Promise<{ success: boolean; isBreaking: boolean }> {
   const db = await getDb()
 

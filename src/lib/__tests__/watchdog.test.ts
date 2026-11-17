@@ -463,7 +463,9 @@ describe("watchdog utilities", () => {
         mockQueueSend.mockResolvedValue(undefined)
 
         const result = await runWatchdog({
-          WATCHDOG_QUEUE: { send: mockQueueSend },
+          WATCHDOG_QUEUE: {
+            send: mockQueueSend,
+          } as unknown as Env["WATCHDOG_QUEUE"],
         })
         expect(result).toEqual({ enqueued: 2 })
         expect(mockQueueSend).toHaveBeenCalledTimes(2)

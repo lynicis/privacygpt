@@ -3,6 +3,7 @@
   "name": "privacygpt",
   "compatibility_date": "2026-06-22",
   "compatibility_flags": ["nodejs_compat"],
+  "ai": { "binding": "AI" },
   "main": "src/entry.ts",
   "triggers": {
     "crons": ["0 0 * * SUN"],

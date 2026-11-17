@@ -159,7 +159,9 @@ describe("reviewChangelogWithAI", () => {
       }),
     })
 
-    const result = await reviewChangelogWithAI(1, { AI: { run: mockAiRun } })
+    const result = await reviewChangelogWithAI(1, {
+      AI: { run: mockAiRun } as unknown as Env["AI"],
+    })
     expect(result.isBreaking).toBe(false)
     expect(mockDb.update).toHaveBeenCalled()
   })
@@ -198,7 +200,9 @@ describe("reviewChangelogWithAI", () => {
       }),
     })
 
-    const result = await reviewChangelogWithAI(1, { AI: { run: mockAiRun } })
+    const result = await reviewChangelogWithAI(1, {
+      AI: { run: mockAiRun } as unknown as Env["AI"],
+    })
     expect(result.isBreaking).toBe(true)
   })
 
@@ -223,7 +227,9 @@ describe("reviewChangelogWithAI", () => {
 
     mockAiRun.mockResolvedValue({ response: "not valid json" })
 
-    const result = await reviewChangelogWithAI(1, { AI: { run: mockAiRun } })
+    const result = await reviewChangelogWithAI(1, {
+      AI: { run: mockAiRun } as unknown as Env["AI"],
+    })
     expect(result.isBreaking).toBe(true)
   })
 
@@ -232,7 +238,9 @@ describe("reviewChangelogWithAI", () => {
       return Promise.resolve([]).then(onfulfilled)
     })
     await expect(
-      reviewChangelogWithAI(999, { AI: { run: mockAiRun } })
+      reviewChangelogWithAI(999, {
+        AI: { run: mockAiRun } as unknown as Env["AI"],
+      })
     ).rejects.toThrow("Changelog 999 not found")
   })
 })

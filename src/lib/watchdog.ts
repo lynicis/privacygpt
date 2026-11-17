@@ -4,6 +4,9 @@ import { companies, snapshots, changelogs } from "./db/schema"
 import { eq, desc } from "drizzle-orm"
 import FirecrawlApp from "@mendable/firecrawl-js"
 
+type WatchdogEnv = Pick<Partial<Env>, "WATCHDOG_QUEUE" | "AI_REVIEW_QUEUE"> &
+  Pick<Env, "FIRECRAWL_API_KEY">
+
 export function hashText(text: string): string {
   return createHash("sha256").update(text).digest("hex")
 }
@@ -89,7 +92,7 @@ export async function fetchPolicyText(
 
 export async function checkCompany(
   companyId: number,
-  env?: any
+  env?: WatchdogEnv
 ): Promise<"baseline" | "change" | "none"> {
   const db = await getDb()
   const company = await db
@@ -173,8 +176,8 @@ export async function checkCompany(
 }
 
 export async function handleWatchdogQueueMessage(
-  body: { companyId: number } | null | undefined,
-  env?: any
+  body: { companyId?: number } | null | undefined,
+  env?: WatchdogEnv
 ): Promise<void> {
   if (typeof body?.companyId !== "number") {
     throw new Error("Invalid watchdog queue message body")
@@ -189,7 +192,7 @@ export async function handleWatchdogQueueMessage(
  * 3. Compare to the latest snapshot.
  * 4. If changed (or no baseline exists), store snapshot and changelog.
  */
-export async function runWatchdog(env?: any): Promise<{
+export async function runWatchdog(env?: WatchdogEnv): Promise<{
   checked?: number
   baselines?: number
   changes?: number
