@@ -197,7 +197,7 @@ function RootLayout() {
 
             {/* Desktop nav */}
             <nav className="hidden items-center gap-6 md:flex">
-              {navLinks.map((link) => (
+              {NAV_LINKS.map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
@@ -282,7 +282,7 @@ function RootLayout() {
           {mobileMenuOpen && (
             <nav className="border-t border-border bg-background/95 backdrop-blur-md md:hidden">
               <div className="space-y-1 px-4 py-3">
-                {navLinks.map((link) => (
+                {NAV_LINKS.map((link) => (
                   <Link
                     key={link.to}
                     to={link.to}

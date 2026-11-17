@@ -21,7 +21,7 @@ const MONTHS = [
   "Dec",
 ]
 
-export function formatDate(dateStr: string): string {
+function formatDate(dateStr: string): string {
   const d = new Date(dateStr)
   const month = MONTHS[d.getMonth()]
   const day = d.getDate()
@@ -29,7 +29,7 @@ export function formatDate(dateStr: string): string {
   return `${month} ${day}, ${year}`
 }
 
-export function formatTime(dateStr: string): string {
+function formatTime(dateStr: string): string {
   const d = new Date(dateStr)
   let hours = d.getHours()
   const minutes = d.getMinutes().toString().padStart(2, "0")

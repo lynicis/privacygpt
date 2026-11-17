@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start"
-import slugify from "slugify"
 
 export interface BlogPostMeta {
   title: string
@@ -7,7 +6,6 @@ export interface BlogPostMeta {
   description: string
   author: string
   tags: string[]
-  coverImage?: string
   publishDate: string
   canonicalUrl?: string
   type: string
@@ -17,7 +15,7 @@ export interface BlogPostMeta {
 const BLOG_POSTS: BlogPostMeta[] = [
   {
     title: "AI Privacy Rankings 2026: Which Chatbot Can You Actually Trust?",
-    slug: slugify("ai-privacy-rankings-2026", { lower: true, strict: true }),
+    slug: "ai-privacy-rankings-2026",
     description:
       "We scored ChatGPT, Claude, Gemini, and Grok on data collection, training opt-out, deletion rights, and transparency. See which AI chatbot respects your privacy.",
     author: "PrivacyGPT",
@@ -38,7 +36,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
   {
     title:
       "The Privacy Paradox: Why 81% of Americans Worry About AI Data But Can't Stop Using It",
-    slug: slugify("ai-privacy-paradox", { lower: true, strict: true }),
+    slug: "ai-privacy-paradox",
     description:
       "81% of Americans are concerned about AI data privacy, yet daily AI use keeps growing. We explore why this paradox exists and how to protect yourself.",
     author: "PrivacyGPT",
@@ -50,7 +48,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
   },
   {
     title: "How to Opt-Out of AI Training on Social Media",
-    slug: slugify("how-to-opt-out-ai-training", { lower: true, strict: true }),
+    slug: "how-to-opt-out-ai-training",
     description:
       "How to opt out of AI training on LinkedIn, Meta, Google, and other major platforms.",
     author: "PrivacyGPT",
@@ -63,7 +61,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
   },
   {
     title: "Does Delete Actually Work?",
-    slug: slugify("does-delete-actually-work", { lower: true, strict: true }),
+    slug: "does-delete-actually-work",
     description:
       "When you delete your AI conversations, what really happens to your data? We investigate the truth behind the delete button.",
     author: "PrivacyGPT",

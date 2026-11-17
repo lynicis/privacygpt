@@ -311,6 +311,10 @@ function MethodologyPage() {
                       },
                       { key: "optOutWeight", label: "Ease of Opt-Out" },
                       {
+                        key: "retentionWeight",
+                        label: "Data Retention Period",
+                      },
+                      {
                         key: "deletionWeight",
                         label: "Deletion Rights (chats & account)",
                       },

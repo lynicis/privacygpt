@@ -122,13 +122,13 @@ describe("PrivacyGPT Scoring Logic Validation", () => {
   describe("calculateTotalScore", () => {
     it("should return 100 for a perfect company", () => {
       const subScores = calculateSubScores(perfectCompany)
-      const total = calculateTotalScore(subScores, defaultWeights)
+      const total = calculateTotalScore(subScores, DEFAULT_WEIGHTS)
       expect(total).toBe(100)
     })
 
     it("should return the correct weighted score for a mixed company", () => {
       const subScores = calculateSubScores(worstCompany)
-      const total = calculateTotalScore(subScores, defaultWeights)
+      const total = calculateTotalScore(subScores, DEFAULT_WEIGHTS)
 
       // Expected math:
       // trainingScore: 0 * 30 = 0
