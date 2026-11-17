@@ -38,17 +38,12 @@ import {
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async () => {
     try {
       await checkAdminAuthFn()
       return { auth: { success: true } }
     } catch (error) {
       if (error instanceof Response) {
-        // The router exposes no public status setter; this store drives the SSR status.
-        const store = context.router as unknown as {
-          stores?: { statusCode?: { set: (status: number) => void } }
-        }
-        store.stores?.statusCode?.set(error.status)
         return { auth: { success: false } }
       }
       throw error
