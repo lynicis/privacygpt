@@ -11,8 +11,8 @@ import {
   getSnapshotCountsFn,
   getSnapshotTotalCountFn,
   getPendingReviewsCountFn,
-  reviewChangelogFn,
 } from "./api"
+import { reviewChangelogFn } from "./admin"
 
 export const queryKeys = {
   companies: {
