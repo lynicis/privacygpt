@@ -1,15 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import {
-  ArrowLeft,
-  Shield,
-  Eye,
-  Globe,
-  Clock,
-  Server,
-  Mail,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardTitle, CardDescription } from "@/components/ui/card"
+import { ArrowLeft } from "lucide-react"
 import { APP_URL } from "../lib/site"
 
 export const Route = createFileRoute("/privacy")({
@@ -31,181 +21,100 @@ export const Route = createFileRoute("/privacy")({
 
 function PrivacyPage() {
   return (
-    <>
-      <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
-        <div className="mb-8">
-          <Button
-            asChild
-            variant="ghost"
-            className="-ml-3 gap-2 text-muted-foreground hover:text-foreground"
-          >
-            <Link to="/">
-              <ArrowLeft className="h-4 w-4" /> Back to Tracker
-            </Link>
-          </Button>
-          <h1 className="mt-4 mb-2 text-4xl font-extrabold tracking-tight text-foreground">
-            Privacy Policy
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            How we handle your data — and why there's almost nothing to handle.
+    <main className="shell py-8">
+      <Link
+        to="/"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors duration-[var(--dur-micro)] hover:text-ink"
+      >
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to Tracker
+      </Link>
+
+      <header className="mx-auto mt-6 max-w-[56ch] border-b border-rule pb-10">
+        <h1>Privacy Policy</h1>
+        <p className="lead mt-4 text-ink-2">
+          How we handle your data, and why there’s almost nothing to handle.
+        </p>
+        <p className="mt-4 text-sm text-muted">
+          Effective date: <span className="measured">June 23, 2026</span>
+        </p>
+      </header>
+
+      <article className="mx-auto mt-12 max-w-[56ch]">
+        <section className="pt-0">
+          <h2>What we collect</h2>
+          <h3 className="mt-6">Nothing personal.</h3>
+          <p className="mt-3 leading-relaxed text-ink-2">
+            PrivacyGPT has no user accounts, no login system, and no analytics
+            tracking. We do not collect cookies, IP addresses, browser
+            fingerprints, or any personally identifiable information. There is
+            simply no mechanism on this site to gather or store data about you.
           </p>
-          <p className="mt-2 text-sm text-muted-foreground/60">
-            Effective date: June 23, 2026
+        </section>
+
+        <section className="mt-14 border-t border-rule pt-8">
+          <h2>Hosting and infrastructure</h2>
+          <h3 className="mt-6">Cloudflare Workers</h3>
+          <p className="mt-3 leading-relaxed text-ink-2">
+            This site is hosted on Cloudflare Workers. Cloudflare may retain
+            standard CDN-level request logs (e.g., timestamps, requested URLs)
+            for operational and security purposes. These logs are not used for
+            tracking, profiling, or advertising and are not linked to any
+            personal identity.
           </p>
-        </div>
+        </section>
 
-        <div className="space-y-12">
-          {/* What We Collect */}
-          <section>
-            <h2 className="mb-6 border-b border-border pb-2 text-2xl font-bold text-foreground">
-              What We Collect
-            </h2>
-            <Card className="flex flex-row items-start gap-4 p-6">
-              <div className="shrink-0 bg-muted p-3 text-primary">
-                <Shield className="h-6 w-6" />
-              </div>
-              <div className="space-y-1.5">
-                <CardTitle className="text-lg font-semibold text-foreground">
-                  Nothing personal.
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  PrivacyGPT has no user accounts, no login system, and no
-                  analytics tracking. We do not collect cookies, IP addresses,
-                  browser fingerprints, or any personally identifiable
-                  information. There is simply no mechanism on this site to
-                  gather or store data about you.
-                </CardDescription>
-              </div>
-            </Card>
-          </section>
+        <section className="mt-14 border-t border-rule pt-8">
+          <h2>How we source our data</h2>
+          <h3 className="mt-6">Public policies only</h3>
+          <p className="mt-3 leading-relaxed text-ink-2">
+            All company data displayed on PrivacyGPT is sourced from publicly
+            available privacy policies, terms of service, and official help
+            documentation. We use automated tools to scrape and parse these
+            public documents. No proprietary, confidential, or non-public data
+            is ever collected or stored.
+          </p>
+        </section>
 
-          {/* Hosting */}
-          <section>
-            <h2 className="mb-6 border-b border-border pb-2 text-2xl font-bold text-foreground">
-              Hosting & Infrastructure
-            </h2>
-            <Card className="flex flex-row items-start gap-4 p-6">
-              <div className="shrink-0 bg-muted p-3 text-primary">
-                <Server className="h-6 w-6" />
-              </div>
-              <div className="space-y-1.5">
-                <CardTitle className="text-lg font-semibold text-foreground">
-                  Cloudflare Workers
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  This site is hosted on Cloudflare Workers. Cloudflare may
-                  retain standard CDN-level request logs (e.g., timestamps,
-                  requested URLs) for operational and security purposes. These
-                  logs are not used for tracking, profiling, or advertising and
-                  are not linked to any personal identity.
-                </CardDescription>
-              </div>
-            </Card>
-          </section>
+        <section className="mt-14 border-t border-rule pt-8">
+          <h2>Data freshness</h2>
+          <h3 className="mt-6">Verified daily, but not in real-time</h3>
+          <p className="mt-3 leading-relaxed text-ink-2">
+            Company profiles are re-verified and re-scraped daily via an
+            automated watchdog pipeline. However, AI companies may update their
+            policies at any time. PrivacyGPT may not reflect the most recent
+            changes immediately.{" "}
+            <strong className="font-medium text-ink">
+              Always consult the company’s current privacy policy directly
+              before making decisions.
+            </strong>
+          </p>
+        </section>
 
-          {/* Data Sourcing */}
-          <section>
-            <h2 className="mb-6 border-b border-border pb-2 text-2xl font-bold text-foreground">
-              How We Source Our Data
-            </h2>
-            <Card className="flex flex-row items-start gap-4 p-6">
-              <div className="shrink-0 bg-muted p-3 text-primary">
-                <Globe className="h-6 w-6" />
-              </div>
-              <div className="space-y-1.5">
-                <CardTitle className="text-lg font-semibold text-foreground">
-                  Public policies only
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  All company data displayed on PrivacyGPT is sourced from
-                  publicly available privacy policies, terms of service, and
-                  official help documentation. We use automated tools to scrape
-                  and parse these public documents. No proprietary,
-                  confidential, or non-public data is ever collected or stored.
-                </CardDescription>
-              </div>
-            </Card>
-          </section>
+        <section className="mt-14 border-t border-rule pt-8">
+          <h2>Third-party services</h2>
+          <h3 className="mt-6">No ads. No trackers. No analytics.</h3>
+          <p className="mt-3 leading-relaxed text-ink-2">
+            PrivacyGPT does not integrate with any advertising networks,
+            analytics providers, or data brokers. The only third-party
+            infrastructure used is Cloudflare for hosting and content delivery.
+          </p>
+        </section>
 
-          {/* Data Freshness */}
-          <section>
-            <h2 className="mb-6 border-b border-border pb-2 text-2xl font-bold text-foreground">
-              Data Freshness
-            </h2>
-            <Card className="flex flex-row items-start gap-4 p-6">
-              <div className="shrink-0 bg-muted p-3 text-primary">
-                <Clock className="h-6 w-6" />
-              </div>
-              <div className="space-y-1.5">
-                <CardTitle className="text-lg font-semibold text-foreground">
-                  Verified daily, but not in real-time
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  Company profiles are re-verified and re-scraped daily via an
-                  automated watchdog pipeline. However, AI companies may update
-                  their policies at any time. PrivacyGPT may not reflect the
-                  most recent changes immediately.{" "}
-                  <strong>
-                    Always consult the company's current privacy policy directly
-                    before making decisions.
-                  </strong>
-                </CardDescription>
-              </div>
-            </Card>
-          </section>
-
-          {/* Third-Party Services */}
-          <section>
-            <h2 className="mb-6 border-b border-border pb-2 text-2xl font-bold text-foreground">
-              Third-Party Services
-            </h2>
-            <Card className="flex flex-row items-start gap-4 p-6">
-              <div className="shrink-0 bg-muted p-3 text-primary">
-                <Eye className="h-6 w-6" />
-              </div>
-              <div className="space-y-1.5">
-                <CardTitle className="text-lg font-semibold text-foreground">
-                  No ads. No trackers. No analytics.
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  PrivacyGPT does not integrate with any advertising networks,
-                  analytics providers, or data brokers. The only third-party
-                  infrastructure used is Cloudflare for hosting and content
-                  delivery.
-                </CardDescription>
-              </div>
-            </Card>
-          </section>
-
-          {/* Contact */}
-          <section>
-            <h2 className="mb-6 border-b border-border pb-2 text-2xl font-bold text-foreground">
-              Contact
-            </h2>
-            <Card className="flex flex-row items-start gap-4 p-6">
-              <div className="shrink-0 bg-muted p-3 text-primary">
-                <Mail className="h-6 w-6" />
-              </div>
-              <div className="space-y-1.5">
-                <CardTitle className="text-lg font-semibold text-foreground">
-                  Questions?
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  If you have questions about this privacy policy or how
-                  PrivacyGPT handles data, contact us at{" "}
-                  <a
-                    href="mailto:me@lynicis.dev"
-                    className="font-medium text-primary underline underline-offset-2 hover:text-primary/80"
-                  >
-                    me@lynicis.dev
-                  </a>
-                  .
-                </CardDescription>
-              </div>
-            </Card>
-          </section>
-        </div>
-      </main>
-    </>
+        <section className="mt-14 border-t border-rule pt-8">
+          <h2>Contact</h2>
+          <p className="mt-3 leading-relaxed text-ink-2">
+            If you have questions about this privacy policy or how PrivacyGPT
+            handles data, contact us at{" "}
+            <a
+              href="mailto:me@lynicis.dev"
+              className="font-medium text-signal underline underline-offset-2 hover:text-ink"
+            >
+              me@lynicis.dev
+            </a>
+            .
+          </p>
+        </section>
+      </article>
+    </main>
   )
 }

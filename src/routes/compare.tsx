@@ -12,7 +12,6 @@ import { CompanySelect } from "@/components/CompanySelect"
 import { CompareScores } from "@/components/CompareScores"
 import { CompareSection } from "@/components/CompareSection"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import {
   GitCompareArrows,
   ExternalLink,
@@ -39,7 +38,7 @@ export const Route = createFileRoute("/compare")({
   head: () => ({
     meta: [
       {
-        title: "Compare AI Privacy Policies — PrivacyGPT",
+        title: "Compare AI Privacy Policies | PrivacyGPT",
       },
       {
         name: "description",
@@ -49,7 +48,7 @@ export const Route = createFileRoute("/compare")({
       { property: "og:type", content: "website" },
       {
         property: "og:title",
-        content: "Compare AI Privacy Policies — PrivacyGPT",
+        content: "Compare AI Privacy Policies | PrivacyGPT",
       },
       {
         property: "og:description",
@@ -64,7 +63,7 @@ export const Route = createFileRoute("/compare")({
       { name: "twitter:card", content: "summary_large_image" },
       {
         name: "twitter:title",
-        content: "Compare AI Privacy Policies — PrivacyGPT",
+        content: "Compare AI Privacy Policies | PrivacyGPT",
       },
       {
         name: "twitter:description",
@@ -142,142 +141,125 @@ function ComparePage() {
 
   return (
     <>
-      {/* Hero Section */}
-      <section className="border-b-2 border-border">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-5 inline-flex items-center gap-2 border border-border bg-muted px-4 py-1.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-              <GitCompareArrows className="h-3.5 w-3.5" />
-              Side-by-side comparison
-            </div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-foreground uppercase sm:text-4xl lg:text-5xl">
-              Compare{" "}
-              <span className="text-emerald-600 dark:text-emerald-400">
-                Privacy Policies
-              </span>
+      {/* Banner: one head, one line, one reference. */}
+      <section className="border-b border-rule">
+        <div className="shell flex flex-wrap items-end justify-between gap-6 py-10 sm:py-12">
+          <div>
+            <h1 className="max-w-[20ch] text-display-s">
+              Two policies, side by side
             </h1>
-            <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
-              Select two AI platforms to compare their data handling practices
-              side-by-side, powered by verified policy data.
+            <p className="lead mt-3 max-w-[48ch] text-ink-2">
+              Pick two platforms. Every difference below is read from their
+              published terms.
             </p>
-            <div className="mt-5 flex justify-center gap-3">
-              <Button asChild variant="outline" size="sm" className="gap-2">
-                <Link to="/methodology">
-                  <BookOpen className="h-3.5 w-3.5" /> Our Methodology
-                </Link>
-              </Button>
-            </div>
           </div>
+          <Button asChild variant="outline">
+            <Link to="/methodology">
+              <BookOpen className="h-4 w-4" aria-hidden="true" /> Methodology
+            </Link>
+          </Button>
         </div>
       </section>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <main className="shell pb-20 pt-6">
         {/* Company Selection */}
-        <Card className="mb-6 overflow-hidden">
-          <CardContent className="p-5 sm:p-6">
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-start">
-              <div className="flex-1">
-                <CompanySelect
-                  companies={companies}
-                  value={selectedA}
-                  onChange={(v) => updateSearch({ companyA: v || undefined })}
-                  disabledCompany={selectedB}
-                  label="First Company"
-                />
-              </div>
-
-              <div className="flex items-center justify-center self-center lg:px-5">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9 shrink-0"
-                  onClick={handleSwap}
-                  disabled={!selectedA && !selectedB}
-                  title="Swap companies"
-                >
-                  <ArrowRightLeft className="h-4 w-4 rotate-90" />
-                </Button>
-              </div>
-
-              <div className="flex-1">
-                <CompanySelect
-                  companies={companies}
-                  value={selectedB}
-                  onChange={(v) => updateSearch({ companyB: v || undefined })}
-                  disabledCompany={selectedA}
-                  label="Second Company"
-                />
-              </div>
-
-              {(selectedA || selectedB) && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="gap-1.5 self-start text-muted-foreground"
-                  onClick={handleReset}
-                >
-                  <RotateCcw className="h-3.5 w-3.5" />
-                  Reset
-                </Button>
-              )}
+        <div className="mb-6 rounded-[10px] border border-rule bg-paper-2 p-4 sm:p-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
+            <div className="min-w-0 flex-1">
+              <CompanySelect
+                companies={companies}
+                value={selectedA}
+                onChange={(v) => updateSearch({ companyA: v || undefined })}
+                disabledCompany={selectedB}
+                label="First company"
+              />
             </div>
-          </CardContent>
-        </Card>
+
+            <div className="flex items-center justify-center self-center lg:px-3">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleSwap}
+                disabled={!selectedA && !selectedB}
+                title="Swap companies"
+                aria-label="Swap companies"
+              >
+                <ArrowRightLeft className="h-4 w-4 rotate-90" aria-hidden="true" />
+              </Button>
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <CompanySelect
+                companies={companies}
+                value={selectedB}
+                onChange={(v) => updateSearch({ companyB: v || undefined })}
+                disabledCompany={selectedA}
+                label="Second company"
+              />
+            </div>
+
+            {(selectedA || selectedB) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 self-start lg:self-end"
+                onClick={handleReset}
+              >
+                <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+                Reset
+              </Button>
+            )}
+          </div>
+        </div>
 
         {/* Empty State */}
         {!hasSelection && (
-          <Card className="p-12 text-center">
-            <CardContent>
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-                <GitCompareArrows className="h-7 w-7 text-muted-foreground" />
-              </div>
-              <h2 className="text-lg font-bold text-foreground">
-                Select Two Companies
-              </h2>
-              <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-                Choose two AI platforms from the dropdowns above to compare
-                their privacy policies, training defaults, and data handling
-                practices.
-              </p>
-            </CardContent>
-          </Card>
+          <div className="rounded-[10px] border border-dashed border-rule-2 p-12 text-center">
+            <GitCompareArrows
+              className="mx-auto mb-4 h-6 w-6 text-muted"
+              aria-hidden="true"
+            />
+            <h2 className="text-lg font-medium">Select two companies</h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+              Choose two AI platforms above to compare their privacy policies,
+              training defaults, and data handling practices.
+            </p>
+          </div>
         )}
 
         {/* Loading state for company comparison */}
         {hasSelection && (loadingA || loadingB) && (
-          <Card className="p-12 text-center">
-            <CardContent>
-              <div className="mx-auto mb-4 flex h-16 w-16 animate-pulse items-center justify-center rounded-full bg-muted" />
-              <h2 className="text-lg font-bold text-foreground">
-                Loading company data...
-              </h2>
-            </CardContent>
-          </Card>
+          <div className="rounded-[10px] border border-rule bg-paper-2 p-12 text-center">
+            <p className="measured text-muted" role="status">
+              Reading both policies…
+            </p>
+          </div>
         )}
 
         {/* Invalid selection */}
         {invalidSelection && (
-          <Card className="mb-5 border-amber-500/30 bg-amber-500/5 p-6 text-center">
-            <CardContent>
-              <h2 className="text-lg font-bold text-foreground">
-                Company not found
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Pick another company to compare.
-              </p>
-            </CardContent>
-          </Card>
+          <div className="mb-5 rounded-[10px] border border-signal/40 bg-signal-soft p-6 text-center">
+            <h2 className="text-lg font-medium text-signal">Company not found</h2>
+            <p className="mt-1 text-sm text-ink-2">
+              Pick another company to compare.
+            </p>
+          </div>
         )}
 
         {/* Comparison Content */}
         {hasSelection && companyA && companyB && (
           <>
             {/* Scores Section */}
-            <div className="mb-8">
-              <h2 className="mb-4 text-xs font-bold tracking-wide text-muted-foreground uppercase">
-                Score Breakdown
-              </h2>
+            <section className="mb-10" aria-labelledby="scores">
+              <div className="mb-4 flex items-baseline justify-between gap-4 border-b border-rule pb-3">
+                <h2 id="scores" className="text-title">
+                  Score breakdown
+                </h2>
+                <span className="measured text-sm text-muted">
+                  weighted, 0 to 100
+                </span>
+              </div>
               <CompareScores
                 scoresA={scoresA!}
                 scoresB={scoresB!}
@@ -286,51 +268,67 @@ function ComparePage() {
                 nameA={companyA.companyName}
                 nameB={companyB.companyName}
               />
-            </div>
+            </section>
 
             {/* Source Links */}
-            <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <a
                 href={companyA.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center justify-between rounded-lg border border-border bg-card p-3 transition-colors hover:bg-muted/50"
+                className="flex items-center justify-between rounded-[10px] border border-rule bg-paper-2 p-4 transition-colors duration-[var(--dur-micro)] hover:border-rule-2 hover:bg-paper-3"
               >
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground">
-                    {companyA.companyName} Source Policy
+                  <p className="text-sm font-medium text-ink">
+                    {companyA.companyName} source policy
                   </p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground/70">
-                    Last verified: {companyA.lastVerifiedDate}
+                  <p className="measured mt-1 text-xs text-muted">
+                    verified {companyA.lastVerifiedDate}
                   </p>
                 </div>
-                <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" />
+                <ExternalLink
+                  className="h-4 w-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                />
               </a>
               <a
                 href={companyB.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center justify-between rounded-lg border border-border bg-card p-3 transition-colors hover:bg-muted/50"
+                className="flex items-center justify-between rounded-[10px] border border-rule bg-paper-2 p-4 transition-colors duration-[var(--dur-micro)] hover:border-rule-2 hover:bg-paper-3"
               >
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground">
-                    {companyB.companyName} Source Policy
+                  <p className="text-sm font-medium text-ink">
+                    {companyB.companyName} source policy
                   </p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground/70">
-                    Last verified: {companyB.lastVerifiedDate}
+                  <p className="measured mt-1 text-xs text-muted">
+                    verified {companyB.lastVerifiedDate}
                   </p>
                 </div>
-                <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" />
+                <ExternalLink
+                  className="h-4 w-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                />
               </a>
             </div>
 
             {/* Policy Details */}
-            <div className="space-y-4">
-              <h2 className="text-xs font-bold tracking-wide text-muted-foreground uppercase">
-                Policy Details
-              </h2>
+            <section aria-labelledby="details">
+              <div className="mb-2 flex items-baseline justify-between gap-4 border-b border-rule pb-3">
+                <h2 id="details" className="text-title">
+                  Policy details
+                </h2>
+                <span className="measured text-sm text-muted">
+                  {companyA.companyName} / {companyB.companyName}
+                </span>
+              </div>
+              <div className="mb-2 hidden justify-between gap-3 border-b border-rule px-0 pb-2 sm:flex">
+                <span className="label">{companyA.companyName}</span>
+                <span className="label">{companyB.companyName}</span>
+              </div>
+              <div className="space-y-0">
               <CompareSection
-                label="Model Training"
+                label="Model training"
                 valueA={companyA.trainsOnDataNuance}
                 valueB={companyB.trainsOnDataNuance}
                 booleanA={companyA.trainsOnDataByDefault}
@@ -338,7 +336,7 @@ function ComparePage() {
                 booleanGood={false}
               />
               <CompareSection
-                label="Opt-Out Mechanism"
+                label="Opt-out mechanism"
                 valueA={companyA.optOutHow}
                 valueB={companyB.optOutHow}
                 booleanA={companyA.optOutAvailable}
@@ -346,7 +344,7 @@ function ComparePage() {
                 booleanGood={true}
               />
               <CompareSection
-                label="Data Retention & Deletion"
+                label="Data retention and deletion"
                 valueA={`${companyA.retentionPeriod}. Deletion: ${companyA.dataDeletedOnRequestTimeframe}`}
                 valueB={`${companyB.retentionPeriod}. Deletion: ${companyB.dataDeletedOnRequestTimeframe}`}
                 booleanA={companyA.dataDeletedOnRequest}
@@ -354,12 +352,12 @@ function ComparePage() {
                 booleanGood={true}
               />
               <CompareSection
-                label="Third-Party Sharing"
+                label="Third-party sharing"
                 valueA={companyA.thirdPartySharing}
                 valueB={companyB.thirdPartySharing}
               />
               <CompareSection
-                label="Human Review"
+                label="Human review"
                 valueA={companyA.humanReviewConditions}
                 valueB={companyB.humanReviewConditions}
                 booleanA={companyA.humanReviewOfChats}
@@ -367,24 +365,25 @@ function ComparePage() {
                 booleanGood={false}
               />
               <CompareSection
-                label="Regional Variations"
+                label="Regional variations"
                 valueA={companyA.regionalVariation}
                 valueB={companyB.regionalVariation}
               />
               <CompareSection
-                label="Children's Data Policy"
+                label="Children's data policy"
                 valueA={companyA.childrenDataPolicy}
                 valueB={companyB.childrenDataPolicy}
               />
               <CompareSection
-                label="Enterprise vs Consumer"
+                label="Enterprise vs consumer"
                 valueA={companyA.enterpriseVsConsumerSummary}
                 valueB={companyB.enterpriseVsConsumerSummary}
                 booleanA={companyA.enterpriseVsConsumerDifference}
                 booleanB={companyB.enterpriseVsConsumerDifference}
                 booleanGood={false}
               />
-            </div>
+              </div>
+            </section>
           </>
         )}
       </main>

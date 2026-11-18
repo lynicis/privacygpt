@@ -1,7 +1,5 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { Trophy, Minus } from "lucide-react"
 import { SUB_SCORE_UI } from "@/components/score-meta"
-import { getGradeBadgeStyle, getSubScoreColor } from "../lib/score-style"
+import { getSubScoreColor } from "../lib/score-style"
 import { mapScoreToGrade } from "../lib/scoring"
 import type { Grade, SubScores } from "../lib/scoring"
 
@@ -19,6 +17,45 @@ interface CompareScoresProps {
   nameB: string
 }
 
+function Side({
+  name,
+  total,
+  leading,
+}: {
+  name: string
+  total: Score
+  leading: boolean
+}) {
+  return (
+    <div className="p-6">
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="truncate text-md font-medium text-ink">{name}</span>
+        <span className="measured text-sm text-muted">
+          {leading ? "leading" : ""}
+        </span>
+      </div>
+      <div className="mt-3 flex items-end gap-4">
+        <span className="reading text-[3.4rem]">{total.points}</span>
+        <span className="pb-2">
+          <span
+            className={`inline-flex rounded-[4px] border px-2 py-0.5 ${getBadge(total.letter)}`}
+          >
+            <span className="measured text-md">{total.letter}</span>
+          </span>
+        </span>
+      </div>
+      <div className="label mt-1">of 100</div>
+    </div>
+  )
+}
+
+function getBadge(letter: string) {
+  if (letter.startsWith("A")) return "border-ok/45 bg-ok-soft text-ok"
+  if (letter.startsWith("B")) return "border-cool/45 bg-cool-soft text-cool"
+  if (letter === "C") return "border-signal/45 bg-signal-soft text-signal"
+  return "border-bad/45 bg-bad-soft text-bad"
+}
+
 export function CompareScores({
   scoresA,
   scoresB,
@@ -29,153 +66,50 @@ export function CompareScores({
 }: CompareScoresProps) {
   const winnerA = totalA.points > totalB.points
   const winnerB = totalB.points > totalA.points
-  const isTie = totalA.points === totalB.points
 
   return (
-    <div className="space-y-6">
-      {/* Total Score Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Card
-          className={`overflow-hidden border-l-2 ${winnerA ? "border-l-emerald-500" : isTie ? "border-l-sky-500" : "border-l-border"}`}
-        >
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                  {nameA}
-                </p>
-                <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-4xl font-extrabold text-foreground tabular-nums">
-                    {totalA.points}
-                  </span>
-                  <span className="text-sm text-muted-foreground">pts</span>
-                </div>
-              </div>
-              <div className="flex flex-col items-end gap-1">
-                <div
-                  className={`border px-3 py-1.5 font-mono text-lg font-bold ${getGradeBadgeStyle(totalA.letter)}`}
-                >
-                  {totalA.letter}
-                </div>
-                {winnerA && (
-                  <div className="flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                    <Trophy className="h-3 w-3" />
-                    Leading
-                  </div>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card
-          className={`overflow-hidden border-l-2 ${winnerB ? "border-l-emerald-500" : isTie ? "border-l-sky-500" : "border-l-border"}`}
-        >
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                  {nameB}
-                </p>
-                <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-4xl font-extrabold text-foreground tabular-nums">
-                    {totalB.points}
-                  </span>
-                  <span className="text-sm text-muted-foreground">pts</span>
-                </div>
-              </div>
-              <div className="flex flex-col items-end gap-1">
-                <div
-                  className={`border px-3 py-1.5 font-mono text-lg font-bold ${getGradeBadgeStyle(totalB.letter)}`}
-                >
-                  {totalB.letter}
-                </div>
-                {winnerB && (
-                  <div className="flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                    <Trophy className="h-3 w-3" />
-                    Leading
-                  </div>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+    <div className="space-y-4">
+      <div className="panels grid-cols-2">
+        <Side name={nameA} total={totalA} leading={winnerA} />
+        <Side name={nameB} total={totalB} leading={winnerB} />
       </div>
 
-      {/* Sub-scores Breakdown */}
-      <div className="space-y-3">
-        {SUB_SCORE_UI.map(({ key, longLabel, icon: Icon }) => {
-          const pointsA = scoresA[key]
-          const pointsB = scoresB[key]
-          const scoreA = { letter: mapScoreToGrade(pointsA), points: pointsA }
-          const scoreB = { letter: mapScoreToGrade(pointsB), points: pointsB }
-
-          const isABetter = scoreA.points > scoreB.points
-          const isBBetter = scoreB.points > scoreA.points
-          const isTieRow = scoreA.points === scoreB.points
-
-          return (
-            <div
-              key={key}
-              className="overflow-hidden border border-border bg-card"
-            >
-              {/* Category Header */}
-              <div className="flex items-center gap-2 border-b border-border/50 bg-muted/20 px-4 py-2">
-                <Icon className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs font-bold tracking-wide text-foreground uppercase">
-                  {longLabel}
-                </span>
+      <div className="panel overflow-hidden">
+        <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)] gap-3 border-b border-rule px-4 py-2.5">
+          <span className="label">Factor</span>
+          <span className="label truncate">{nameA}</span>
+          <span className="label truncate">{nameB}</span>
+        </div>
+        {SUB_SCORE_UI.map(({ key, label }) => (
+          <div
+            key={key}
+            className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)] items-center gap-3 border-b border-rule px-4 py-3 last:border-b-0"
+          >
+            <span className="text-sm text-muted">{label}</span>
+            <div className="flex items-center gap-2">
+              <div className="bar flex-1">
+                <span
+                  className={getSubScoreColor(scoresA[key])}
+                  style={{ width: `${scoresA[key]}%` }}
+                />
               </div>
-
-              {/* Score Bars */}
-              <div className="grid grid-cols-1 sm:grid-cols-2">
-                {/* Company A */}
-                <div className="flex items-center gap-3 border-b border-border/50 p-3 sm:border-r sm:border-b-0">
-                  <div className="w-12 shrink-0 text-right font-mono text-sm font-bold text-muted-foreground">
-                    {scoreA.letter}
-                  </div>
-                  <div className="h-2 flex-1 overflow-hidden bg-border/60">
-                    <div
-                      className={`h-full transition-all ${getSubScoreColor(scoreA.points)}`}
-                      style={{ width: `${scoreA.points}%` }}
-                    />
-                  </div>
-                  <span className="w-8 shrink-0 font-mono text-xs font-semibold text-muted-foreground tabular-nums">
-                    {scoreA.points}
-                  </span>
-                  {isABetter && (
-                    <Trophy className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
-                  )}
-                  {isTieRow && (
-                    <Minus className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
-                  )}
-                </div>
-
-                {/* Company B */}
-                <div className="flex items-center gap-3 p-3">
-                  <div className="w-12 shrink-0 text-right font-mono text-sm font-bold text-muted-foreground">
-                    {scoreB.letter}
-                  </div>
-                  <div className="h-2 flex-1 overflow-hidden bg-border/60">
-                    <div
-                      className={`h-full transition-all ${getSubScoreColor(scoreB.points)}`}
-                      style={{ width: `${scoreB.points}%` }}
-                    />
-                  </div>
-                  <span className="w-8 shrink-0 font-mono text-xs font-semibold text-muted-foreground tabular-nums">
-                    {scoreB.points}
-                  </span>
-                  {isBBetter && (
-                    <Trophy className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
-                  )}
-                  {isTieRow && (
-                    <Minus className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
-                  )}
-                </div>
-              </div>
+              <span className="measured w-10 text-right text-sm text-ink-2">
+                {mapScoreToGrade(scoresA[key])}
+              </span>
             </div>
-          )
-        })}
+            <div className="flex items-center gap-2">
+              <div className="bar flex-1">
+                <span
+                  className={getSubScoreColor(scoresB[key])}
+                  style={{ width: `${scoresB[key]}%` }}
+                />
+              </div>
+              <span className="measured w-10 text-right text-sm text-ink-2">
+                {mapScoreToGrade(scoresB[key])}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )

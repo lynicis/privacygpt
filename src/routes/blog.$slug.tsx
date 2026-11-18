@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router"
-import { ArrowLeft, Calendar, Clock, User, Tag } from "lucide-react"
+import { ArrowLeft, Clock, User } from "lucide-react"
 import { getBlogPostBySlugFn } from "../lib/blog"
 import { lazy, Suspense, useMemo } from "react"
 import type { ComponentType } from "react"
@@ -18,12 +18,12 @@ export const Route = createFileRoute("/blog/$slug")({
   head: ({ loaderData }) => {
     const post = loaderData?.post
     if (!post) {
-      return { meta: [{ title: "Post not found — PrivacyGPT" }] }
+      return { meta: [{ title: "Post not found | PrivacyGPT" }] }
     }
     const url = post.canonicalUrl || `${APP_URL}/blog/${post.slug}`
     return {
       meta: [
-        { title: `${post.title} — PrivacyGPT` },
+        { title: `${post.title} | PrivacyGPT` },
         { name: "description", content: post.description },
         { property: "og:type", content: post.type },
         { property: "og:title", content: post.title },
@@ -54,16 +54,18 @@ export const Route = createFileRoute("/blog/$slug")({
   },
   component: BlogPost,
   notFoundComponent: () => (
-    <div className="container mx-auto max-w-4xl px-4 py-12 text-center">
-      <h1 className="text-4xl font-bold">Post not found</h1>
-      <Link
-        to="/blog"
-        className="mt-4 inline-flex items-center gap-2 text-primary hover:underline"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to blog
-      </Link>
-    </div>
+    <main className="shell py-16">
+      <div className="mx-auto w-full max-w-[68ch]">
+        <h1>Post not found</h1>
+        <Link
+          to="/blog"
+          className="mt-4 inline-flex items-center gap-2 text-muted hover:text-ink"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Back to blog
+        </Link>
+      </div>
+    </main>
   ),
 })
 
@@ -79,65 +81,65 @@ function BlogPost() {
   }, [post.slug])
 
   return (
-    <article className="mx-auto max-w-[680px] px-4 py-12">
-      {/* Back link */}
-      <Link
-        to="/blog"
-        className="mb-8 inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to blog
-      </Link>
+    <main className="shell py-8">
+      <div className="mx-auto w-full max-w-[60ch]">
+        {/* Back link */}
+        <Link
+          to="/blog"
+          className="inline-flex items-center gap-2 text-sm text-muted transition-colors duration-[var(--dur-micro)] hover:text-ink"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Back to blog
+        </Link>
 
-      {/* Header */}
-      <header className="mb-12">
-        <h1 className="text-4xl leading-tight font-bold tracking-tight">
-          {post.title}
-        </h1>
-        <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <User className="h-4 w-4" />
-            {post.author}
-          </span>
-          <span className="flex items-center gap-1">
-            <Calendar className="h-4 w-4" />
-            {new Date(post.publishDate).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              timeZone: "UTC",
-            })}
-          </span>
-          <span className="flex items-center gap-1">
-            <Clock className="h-4 w-4" />
-            {post.readingTime} min read
-          </span>
-        </div>
-        {post.tags.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {post.tags.map((tag: string) => (
-              <span
-                key={tag}
-                className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs text-secondary-foreground"
-              >
-                <Tag className="h-3 w-3" />
-                {tag}
-              </span>
-            ))}
+        {/* Header */}
+        <header className="mt-6 border-b border-rule pb-8">
+          <h1 className="max-w-[24ch] text-display-s">{post.title}</h1>
+          <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted">
+            <span className="measured flex items-center gap-1.5">
+              <User className="h-4 w-4" aria-hidden="true" />
+              {post.author}
+            </span>
+            <time
+              className="measured"
+              dateTime={post.publishDate}
+            >
+              {new Date(post.publishDate).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                timeZone: "UTC",
+              })}
+            </time>
+            <span className="measured flex items-center gap-1.5">
+              <Clock className="h-4 w-4" aria-hidden="true" />
+              {post.readingTime} min read
+            </span>
           </div>
-        )}
-      </header>
+          {post.tags.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {post.tags.map((tag: string) => (
+                <span key={tag} className="chip">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </header>
 
-      {/* Content */}
-      <div className="prose mt-8 max-w-none prose-neutral dark:prose-invert">
-        {PostComponent ? (
-          <Suspense fallback={<div>Loading post...</div>}>
-            <PostComponent />
-          </Suspense>
-        ) : (
-          <p className="text-destructive">Error loading post content.</p>
-        )}
+        {/* Content */}
+        <div className="prose mt-10">
+          {PostComponent ? (
+            <Suspense
+              fallback={<p className="measured text-muted">Loading…</p>}
+            >
+              <PostComponent />
+            </Suspense>
+          ) : (
+            <p className="text-bad">Error loading post content.</p>
+          )}
+        </div>
       </div>
-    </article>
+    </main>
   )
 }

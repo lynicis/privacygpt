@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { Calendar, Clock, ArrowRight } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { getBlogPostsFn } from "../lib/blog"
 import { APP_URL } from "../lib/site"
 
@@ -52,51 +52,53 @@ function BlogIndex() {
   const { posts } = Route.useLoaderData()
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-12">
-      <div className="mb-12">
-        <h1 className="text-4xl font-bold tracking-tight">Blog</h1>
-        <p className="mt-2 text-lg text-muted-foreground">
-          Privacy insights and guides
-        </p>
-      </div>
+    <main className="shell py-10 sm:py-12">
+      <header className="head-block">
+        <h1>Blog</h1>
+        <p>Privacy insights and guides</p>
+      </header>
 
-      <div className="space-y-8">
+      <div>
         {posts.map((post) => (
           <article
             key={post.slug}
-            className="group border-b border-border pb-8 last:border-0"
+            className="grid gap-3 border-b border-rule py-8 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-10"
           >
-            <Link
-              to="/blog/$slug"
-              params={{ slug: post.slug }}
-              className="block"
-            >
-              <h2 className="text-2xl font-semibold tracking-tight transition-colors group-hover:text-primary">
-                {post.title}
+            <div className="measured flex items-baseline gap-3 text-muted sm:flex-col sm:items-start sm:gap-1">
+              <time dateTime={post.publishDate}>
+                {new Date(post.publishDate).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  timeZone: "UTC",
+                })}
+              </time>
+              <span>{post.readingTime} min read</span>
+            </div>
+
+            <div>
+              <h2 className="text-md sm:text-title">
+                <Link
+                  to="/blog/$slug"
+                  params={{ slug: post.slug }}
+                  className="hover:text-signal"
+                >
+                  {post.title}
+                </Link>
               </h2>
-              <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
-                  {new Date(post.publishDate).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    timeZone: "UTC",
-                  })}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  {post.readingTime} min read
-                </span>
-              </div>
-              <p className="mt-3 text-muted-foreground">{post.description}</p>
-              <span className="mt-4 inline-flex items-center gap-1 text-primary transition-all group-hover:gap-2">
-                Read more <ArrowRight className="h-4 w-4" />
-              </span>
-            </Link>
+              <p className="mt-3 max-w-[62ch] text-ink-2">{post.description}</p>
+              <Link
+                to="/blog/$slug"
+                params={{ slug: post.slug }}
+                className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-signal"
+              >
+                Read more
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
           </article>
         ))}
       </div>
-    </div>
+    </main>
   )
 }

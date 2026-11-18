@@ -23,15 +23,8 @@ import {
   AlertTriangle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { ConfidenceBadge } from "@/components/ConfidenceBadge"
+import { getSubScoreColor } from "../lib/score-style"
 
 export const Route = createFileRoute("/company/$companyKey")({
   loader: async ({ params }) => {
@@ -45,7 +38,7 @@ export const Route = createFileRoute("/company/$companyKey")({
       return { meta: [{ title: "Company Not Found | PrivacyGPT" }] }
     }
     const companyName = `${company.companyName} ${company.productName}`
-    const description = `Detailed privacy analysis for ${companyName}. See how they handle data training, opt-out, data retention, deletion rights, third-party sharing, and human review — verified from official policy documents.`
+    const description = `Detailed privacy analysis for ${companyName}. See how they handle data training, opt-out, data retention, deletion rights, third-party sharing, and human review, verified from official policy documents.`
     return {
       meta: [
         {
@@ -89,25 +82,17 @@ export const Route = createFileRoute("/company/$companyKey")({
     }
   },
   notFoundComponent: () => (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground">
-      <Card className="max-w-md p-8 text-center">
-        <CardHeader>
-          <div className="mx-auto mb-2 w-fit rounded-full bg-destructive/10 p-3 text-destructive">
-            <AlertTriangle className="h-6 w-6" />
-          </div>
-          <CardTitle className="text-xl font-bold">Company Not Found</CardTitle>
-          <CardDescription>
-            The requested company privacy profile could not be found or has not
-            been seeded yet.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-2">
-          <Button asChild>
-            <Link to="/">Back to Dashboard</Link>
-          </Button>
-        </CardContent>
-      </Card>
-    </div>
+    <main className="shell py-20">
+      <AlertTriangle className="mb-4 h-6 w-6 text-signal" aria-hidden="true" />
+      <h1 className="max-w-[20ch]">Company not found</h1>
+      <p className="mt-3 max-w-[48ch] text-muted-foreground">
+        The requested company privacy profile could not be found or has not
+        been seeded yet.
+      </p>
+      <Button asChild className="mt-6" variant="outline">
+        <Link to="/">Back to the register</Link>
+      </Button>
+    </main>
   ),
   component: CompanyDetailPage,
 })
@@ -115,319 +100,268 @@ export const Route = createFileRoute("/company/$companyKey")({
 function CompanyDetailPage() {
   const company = Route.useLoaderData()
 
-  // Calculate scores
   const subScores = calculateSubScores(company)
   const totalScore = calculateTotalScore(subScores, DEFAULT_WEIGHTS)
   const overallGrade = mapScoreToGrade(totalScore)
 
-  // Helper for boolean status badges
-  const renderBooleanBadge = (val: boolean, reverse = false) => {
-    const isWarning = reverse ? val : !val // True is warning for default training/human review (reverse=true)
-    if (val) {
-      return (
-        <Badge variant={isWarning ? "destructive" : "secondary"}>Yes</Badge>
-      )
-    } else {
-      return (
-        <Badge
-          variant={isWarning ? "outline" : "outline"}
-          className={isWarning ? "border-muted" : "border-border"}
-        >
-          No
-        </Badge>
-      )
-    }
-  }
+  const rows = [
+    {
+      icon: Database,
+      title: "Default model training",
+      value: company.trainsOnDataByDefault,
+      valueLabel: company.trainsOnDataByDefault ? "Trains by default" : "Off by default",
+      bad: company.trainsOnDataByDefault,
+      body: company.trainsOnDataNuance,
+    },
+    {
+      icon: ToggleLeft,
+      title: "Opt-out mechanism",
+      value: company.optOutAvailable,
+      valueLabel: company.optOutAvailable ? "Opt-out available" : "No opt-out",
+      bad: !company.optOutAvailable,
+      body: company.optOutHow,
+    },
+    {
+      icon: Eye,
+      title: "Human review of chats",
+      value: company.humanReviewOfChats,
+      valueLabel: company.humanReviewOfChats ? "Reviewed" : "Not reviewed",
+      bad: company.humanReviewOfChats,
+      body: company.humanReviewConditions,
+    },
+    {
+      icon: Share2,
+      title: "Third-party sharing",
+      value: null,
+      valueLabel: null,
+      bad: false,
+      body: company.thirdPartySharing,
+    },
+  ] as const
 
   return (
-    <>
-      {/* Main content wrapper */}
-      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-        <div className="mb-6">
-          <Button
-            asChild
-            variant="ghost"
-            className="-ml-3 gap-2 text-muted-foreground hover:text-foreground"
-          >
-            <Link to="/">
-              <ArrowLeft className="h-4 w-4" /> Back to Dashboard
-            </Link>
-          </Button>
+    <main className="shell py-8">
+      <Link
+        to="/"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors duration-[var(--dur-micro)] hover:text-ink"
+      >
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to the register
+      </Link>
+
+      {/* The record's head: identity, dates, grade, one action. */}
+      <header className="mt-6 grid gap-10 border-b border-rule pb-10 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
+        <div>
+          <h1 className="max-w-[18ch]">{company.companyName}</h1>
+          <p className="mt-3 text-lg text-ink-2">{company.productName}</p>
+
+          {company.confidence === "unverified" && (
+            <p className="mt-4 inline-flex items-center gap-2 rounded-[6px] border border-signal/40 bg-signal-soft px-3 py-1.5 text-sm text-signal">
+              <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+              Policy not verified. Data may be inaccurate.
+            </p>
+          )}
+
+          <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-3 text-sm">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-muted" aria-hidden="true" />
+              <dt className="text-muted">Verified</dt>
+              <dd className="measured text-ink-2">{company.lastVerifiedDate}</dd>
+            </div>
+            {company.lastChangedDate && (
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-muted" aria-hidden="true" />
+                <dt className="text-muted">Changed</dt>
+                <dd className="measured text-ink-2">{company.lastChangedDate}</dd>
+              </div>
+            )}
+          </dl>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            {company.optOutAvailable && company.optOutUrl && (
+              <Button asChild size="lg">
+                <a
+                  href={company.optOutUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Opt out of training
+                  <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                </a>
+              </Button>
+            )}
+            <Button asChild variant="outline" size="lg">
+              <a href={company.sourceUrl} target="_blank" rel="noopener noreferrer">
+                Read the source policy
+                <ExternalLink className="h-4 w-4" aria-hidden="true" />
+              </a>
+            </Button>
+          </div>
         </div>
 
-        {/* Company Jumbotron Card */}
-        <Card className="relative mb-6 overflow-hidden bg-muted/20">
-          <CardHeader className="p-6 sm:p-8">
-            <div className="relative flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
-              <div>
-                <div className="mb-2 flex flex-wrap items-center gap-3">
-                  <CardTitle className="text-3xl font-extrabold tracking-tight text-foreground">
-                    {company.companyName}
-                  </CardTitle>
-                  <Badge
-                    variant="outline"
-                    className="border-border bg-background px-2.5 py-0.5 text-sm"
-                  >
-                    {company.productName}
-                  </Badge>
-                </div>
-                {company.confidence === "unverified" && (
-                  <div className="mb-3 inline-flex items-center gap-1.5 border border-amber-500/20 bg-amber-500/5 px-3 py-1 text-sm font-semibold text-amber-600 dark:text-amber-400">
-                    <AlertTriangle className="h-4 w-4" />
-                    Privacy policy not verified — data may be inaccurate
+        <div className="panel p-6">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <div className="label">Overall grade</div>
+              <div className="reading mt-2 text-[5rem]">{overallGrade}</div>
+            </div>
+            <div className="pb-2 text-right">
+              <div className="measured text-2xl text-ink">{totalScore}</div>
+              <div className="label mt-1">of 100</div>
+            </div>
+          </div>
+          <div className="mt-5 flex items-center justify-between border-t border-rule pt-4">
+            <ConfidenceBadge value={company.confidence} size="md" />
+            <a
+              href={company.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors duration-[var(--dur-micro)] hover:text-ink"
+            >
+              Primary source <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <div className="grid gap-12 pt-12 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-16">
+        <div>
+          {/* Six readings in one surface. */}
+          <section aria-labelledby="breakdown">
+            <div className="head-block">
+              <h2 id="breakdown">Privacy grade breakdown</h2>
+              <p>
+                Weighted from the six policy factors below. The formula lives
+                in the methodology.
+              </p>
+            </div>
+            <div className="panels grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+              {SUB_SCORE_UI.map(({ key, longLabel }) => (
+                <div key={key} className="p-4">
+                  <div className="label min-h-10">{longLabel}</div>
+                  <div className="measured mt-3 text-xl text-ink">
+                    {mapScoreToGrade(subScores[key])}
                   </div>
-                )}
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="h-3.5 w-3.5" /> Verified:{" "}
-                    {company.lastVerifiedDate}
-                  </span>
-                  {company.lastChangedDate && (
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3.5 w-3.5" /> Changed:{" "}
-                      {company.lastChangedDate}
-                    </span>
-                  )}
+                  <div className="measured mt-1 text-sm text-muted">
+                    {subScores[key]}/100
+                  </div>
+                  <div className="bar mt-3">
+                    <span
+                      className={getSubScoreColor(subScores[key])}
+                      style={{ width: `${subScores[key]}%` }}
+                    />
+                  </div>
                 </div>
-              </div>
+              ))}
+            </div>
+          </section>
 
-              {company.optOutAvailable && company.optOutUrl && (
-                <div className="mt-3">
-                  <Button asChild className="gap-2">
-                    <a
-                      href={company.optOutUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Opt Out of Training <ExternalLink className="h-4 w-4" />
-                    </a>
-                  </Button>
-                </div>
-              )}
+          {/* The policy record, as an audit trail. */}
+          <section aria-labelledby="policy" className="mt-16">
+            <div className="head-block">
+              <h2 id="policy">Policy details</h2>
+              <p>What the company’s own documents state, with the nuance kept.</p>
+            </div>
 
-              {/* Large Grade Circle/Box */}
-              <div className="flex shrink-0 items-center gap-4 sm:self-center">
-                <div className="flex h-20 w-20 flex-col items-center justify-center border border-border bg-primary p-4 text-primary-foreground shadow-sm select-none">
-                  <span className="font-mono text-2xl font-bold">
-                    {overallGrade}
-                  </span>
-                  <span className="text-[10px] font-semibold tracking-wider uppercase opacity-90">
-                    {totalScore} Pts
-                  </span>
+            <div className="border-t border-rule">
+              {rows.map(({ icon: Icon, title, valueLabel, bad, body }) => (
+                <div
+                  key={title}
+                  className="grid gap-3 border-b border-rule py-6 md:grid-cols-[minmax(0,220px)_minmax(0,1fr)] md:gap-8"
+                >
+                  <h3 className="flex items-start gap-2 text-md font-medium">
+                    <Icon
+                      className="mt-0.5 h-4 w-4 shrink-0 text-muted"
+                      aria-hidden="true"
+                    />
+                    {title}
+                  </h3>
+                  <div>
+                    {valueLabel && (
+                      <span
+                        className={`chip mb-3 ${bad ? "chip--bad" : "chip--ok"}`}
+                      >
+                        {valueLabel}
+                      </span>
+                    )}
+                    <p className="max-w-[68ch] text-md leading-relaxed text-ink-2">
+                      {body}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <ConfidenceBadge value={company.confidence} size="md" />
-                  <a
-                    href={company.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-medium text-primary transition-colors hover:underline"
-                  >
-                    Primary Policy Source <ExternalLink className="h-3 w-3" />
-                  </a>
+              ))}
+
+              <div className="grid gap-3 border-b border-rule py-6 md:grid-cols-[minmax(0,220px)_minmax(0,1fr)] md:gap-8">
+                <h3 className="flex items-start gap-2 text-md font-medium">
+                  <Clock className="mt-0.5 h-4 w-4 shrink-0 text-muted" aria-hidden="true" />
+                  Data retention and deletion
+                </h3>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <div className="label">Retention period</div>
+                    <p className="mt-1.5 text-md leading-relaxed text-ink-2">
+                      {company.retentionPeriod}
+                    </p>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="label">Deletion on request</span>
+                      <span
+                        className={`chip ${company.dataDeletedOnRequest ? "chip--ok" : "chip--bad"}`}
+                      >
+                        {company.dataDeletedOnRequest ? "Yes" : "No"}
+                      </span>
+                    </div>
+                    <p className="mt-1.5 text-md leading-relaxed text-ink-2">
+                      {company.dataDeletedOnRequestTimeframe}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-          </CardHeader>
-        </Card>
-
-        {/* Sub-scores Grid Dashboard */}
-        <Card className="mb-8 p-6">
-          <CardHeader className="mb-4 border-b border-border p-0 pb-4">
-            <CardTitle className="text-base font-bold">
-              Privacy Grade Breakdown
-            </CardTitle>
-            <CardDescription>
-              Scores are calculated based on default weights. Visit the
-              Methodology page for the formulas.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-4 p-0 sm:grid-cols-3 lg:grid-cols-6">
-            {SUB_SCORE_UI.map(({ key, longLabel }) => (
-              <div
-                key={key}
-                className="flex flex-col justify-between border border-border bg-muted/10 p-3"
-              >
-                <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                  {longLabel}
-                </span>
-                <div className="mt-2 flex items-baseline justify-between">
-                  <span className="font-mono text-lg font-bold">
-                    {mapScoreToGrade(subScores[key])}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {subScores[key]}/100
-                  </span>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        {/* Detailed Policy Grid */}
-        <div className="grid gap-8 md:grid-cols-3">
-          {/* Main policy factors (Left / Middle Columns) */}
-          <div className="space-y-6 md:col-span-2">
-            <h2 className="mb-4 border-b border-border pb-2 text-xl font-bold text-foreground">
-              Policy Details & Nuances
-            </h2>
-
-            {/* Factor 1: Model Training */}
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between gap-4">
-                  <CardTitle className="flex items-center gap-2 font-bold">
-                    <Database className="h-5 w-5 text-muted-foreground" />{" "}
-                    Default Model Training
-                  </CardTitle>
-                  {renderBooleanBadge(company.trainsOnDataByDefault, true)}
-                </div>
-              </CardHeader>
-              <CardContent className="pt-2">
-                <p className="border border-border/40 bg-muted/40 p-3.5 text-sm text-foreground">
-                  {company.trainsOnDataNuance}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Factor 2: Opt-Out */}
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between gap-4">
-                  <CardTitle className="flex items-center gap-2 font-bold">
-                    <ToggleLeft className="h-5 w-5 text-muted-foreground" />{" "}
-                    Opt-Out Mechanism
-                  </CardTitle>
-                  {renderBooleanBadge(company.optOutAvailable)}
-                </div>
-              </CardHeader>
-              <CardContent className="pt-2">
-                <p className="border border-border/40 bg-muted/40 p-3.5 text-sm text-foreground">
-                  {company.optOutHow}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Factor 3: Retention & Deletion */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 font-bold">
-                  <Clock className="h-5 w-5 text-muted-foreground" /> Data
-                  Retention & Deletion
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-4 pt-2 sm:grid-cols-2">
-                <div className="border border-border/40 bg-muted/40 p-3.5">
-                  <h4 className="mb-1 text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                    Retention Period
-                  </h4>
-                  <p className="text-sm text-foreground">
-                    {company.retentionPeriod}
-                  </p>
-                </div>
-                <div className="border border-border/40 bg-muted/40 p-3.5">
-                  <div className="mb-1 flex items-center justify-between">
-                    <h4 className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                      Deletion on Request
-                    </h4>
-                    {renderBooleanBadge(company.dataDeletedOnRequest)}
-                  </div>
-                  <p className="text-sm text-foreground">
-                    {company.dataDeletedOnRequestTimeframe}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Factor 4: Third Party Sharing */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 font-bold">
-                  <Share2 className="h-5 w-5 text-muted-foreground" />{" "}
-                  Third-Party Data Sharing
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-2">
-                <p className="border border-border/40 bg-muted/40 p-3.5 text-sm text-foreground">
-                  {company.thirdPartySharing}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Factor 5: Human Review */}
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between gap-4">
-                  <CardTitle className="flex items-center gap-2 font-bold">
-                    <Eye className="h-5 w-5 text-muted-foreground" /> Human
-                    Review of Chats
-                  </CardTitle>
-                  {renderBooleanBadge(company.humanReviewOfChats, true)}
-                </div>
-              </CardHeader>
-              <CardContent className="pt-2">
-                <p className="border border-border/40 bg-muted/40 p-3.5 text-sm text-foreground">
-                  {company.humanReviewConditions}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar / Demographic & Enterprise Factors (Right Column) */}
-          <div className="space-y-6">
-            <h2 className="mb-4 border-b border-border pb-2 text-xl font-bold text-foreground">
-              Context & Variations
-            </h2>
-
-            {/* Regional Variation */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                  <Globe className="h-4 w-4 text-primary" /> Regional Variations
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-2">
-                <p className="text-xs leading-relaxed text-muted-foreground">
-                  {company.regionalVariation}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Children policy */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                  <UserX className="h-4 w-4 text-primary" /> Children's Data
-                  Policy
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-2">
-                <p className="text-xs leading-relaxed text-muted-foreground">
-                  {company.childrenDataPolicy}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Enterprise vs Consumer */}
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between gap-2">
-                  <CardTitle className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                    <Building2 className="h-4 w-4 text-primary" /> Enterprise
-                    vs. Consumer
-                  </CardTitle>
-                  {renderBooleanBadge(company.enterpriseVsConsumerDifference)}
-                </div>
-              </CardHeader>
-              <CardContent className="pt-2">
-                <p className="text-xs leading-relaxed text-muted-foreground">
-                  {company.enterpriseVsConsumerSummary}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+          </section>
         </div>
-      </main>
-    </>
+
+        {/* Context around the record. */}
+        <aside aria-labelledby="context" className="lg:border-l lg:border-rule lg:pl-10">
+          <h2 id="context" className="text-title">
+            Context and variations
+          </h2>
+          <div className="mt-6 space-y-8">
+            <div>
+              <h3 className="flex items-center gap-2 text-sm font-medium">
+                <Globe className="h-4 w-4 text-muted" aria-hidden="true" />
+                Regional variations
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {company.regionalVariation}
+              </p>
+            </div>
+            <div>
+              <h3 className="flex items-center gap-2 text-sm font-medium">
+                <UserX className="h-4 w-4 text-muted" aria-hidden="true" />
+                Children’s data policy
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {company.childrenDataPolicy}
+              </p>
+            </div>
+            <div>
+              <h3 className="flex items-center gap-2 text-sm font-medium">
+                <Building2 className="h-4 w-4 text-muted" aria-hidden="true" />
+                Enterprise vs consumer
+              </h3>
+              {company.enterpriseVsConsumerDifference && (
+                <span className="chip chip--signal mt-2">
+                  Different terms
+                </span>
+              )}
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {company.enterpriseVsConsumerSummary}
+              </p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
   )
 }

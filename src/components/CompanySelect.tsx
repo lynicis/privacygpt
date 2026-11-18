@@ -5,7 +5,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ShieldCheck, ShieldX } from "lucide-react"
 import { useId } from "react"
 import type { companies } from "@/lib/db/schema"
 
@@ -32,17 +31,14 @@ export function CompanySelect({
   const labelId = useId()
 
   return (
-    <div className="space-y-2.5">
-      <label
-        id={labelId}
-        className="text-xs font-bold tracking-wide text-muted-foreground uppercase"
-      >
+    <div className="space-y-2">
+      <label id={labelId} className="label block">
         {label}
       </label>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger
           aria-labelledby={labelId}
-          className={`h-11 ${!value ? "border-dashed border-destructive/50" : ""}`}
+          className="h-11 w-full border-rule-2 bg-paper-3"
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
@@ -53,32 +49,32 @@ export function CompanySelect({
               value={company.companyKey}
               disabled={company.companyKey === disabledCompany}
             >
-              <div className="flex items-center gap-2">
-                {!company.trainsOnDataByDefault ? (
-                  <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
-                ) : (
-                  <ShieldX className="h-3.5 w-3.5 shrink-0 text-amber-500" />
-                )}
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium">
-                    {company.companyName}
-                  </span>
-                  <span className="text-[11px] text-muted-foreground">
-                    {company.productName}
-                  </span>
-                </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-ink">
+                  {company.companyName}
+                </span>
+                <span className="text-sm text-muted">
+                  {company.productName}
+                </span>
               </div>
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
       {selectedCompany && (
-        <p className="pt-0.5 text-[11px] text-muted-foreground">
-          {selectedCompany.trainsOnDataByDefault
-            ? "Trains on data by default"
-            : "Does not train on data by default"}
-          {" \u00b7 "}
-          {selectedCompany.optOutAvailable ? "Opt-out available" : "No opt-out"}
+        <p className="flex flex-wrap gap-2 pt-1">
+          <span
+            className={`chip ${selectedCompany.trainsOnDataByDefault ? "chip--bad" : "chip--ok"}`}
+          >
+            {selectedCompany.trainsOnDataByDefault
+              ? "Trains by default"
+              : "Training off"}
+          </span>
+          <span
+            className={`chip ${selectedCompany.optOutAvailable ? "chip--ok" : "chip--bad"}`}
+          >
+            {selectedCompany.optOutAvailable ? "Opt-out" : "No opt-out"}
+          </span>
         </p>
       )}
     </div>

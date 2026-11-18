@@ -165,7 +165,7 @@ const NAV_LINKS = [
   { to: "/", label: "Dashboard", exact: true },
   { to: "/methodology", label: "Methodology", exact: false },
   { to: "/compare", label: "Compare", exact: false },
-  { to: "/changelog", label: "Change Log", exact: false },
+  { to: "/changelog", label: "Changelog", exact: false },
   { to: "/faq", label: "FAQ", exact: false },
   { to: "/blog", label: "Blog", exact: false },
 ] as const
@@ -175,64 +175,53 @@ function RootLayout() {
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="theme">
-      <div className="flex min-h-screen flex-col bg-background font-sans text-foreground selection:bg-accent selection:text-accent-foreground">
-        {/* Navbar */}
-        <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md transition-all duration-300">
-          <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-2">
-              <img
-                src="/logo.png"
-                alt=""
-                width={48}
-                height={48}
-                className="h-12 w-12"
-              />
+      <div className="flex min-h-screen flex-col bg-background font-sans text-foreground selection:bg-signal/25 selection:text-ink">
+        {/* Navbar: one edge-aligned bar, solid ground, no glass. */}
+        <header className="sticky top-0 z-[300] border-b border-rule bg-paper">
+          <div className="shell flex h-16 items-center justify-between gap-6">
+            <div className="flex min-w-0 items-center gap-8">
               <Link
                 to="/"
-                className="text-lg leading-none font-bold tracking-tight text-foreground"
+                aria-label="PrivacyGPT home"
+                className="flex shrink-0 items-center gap-2.5"
               >
-                PrivacyGPT
+                <img
+                  src="/logo.png"
+                  alt=""
+                  width={40}
+                  height={40}
+                  className="h-8 w-8"
+                />
+                <span className="font-display text-[17px] leading-none font-medium tracking-[-0.02em]">
+                  PrivacyGPT
+                </span>
               </Link>
+
+              {/* Desktop nav */}
+              <nav className="hidden items-center gap-5 lg:flex">
+                {NAV_LINKS.map((link) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className="text-sm text-muted-foreground transition-colors duration-[var(--dur-micro)] hover:text-ink"
+                    activeProps={{
+                      className:
+                        "text-sm text-ink underline decoration-signal decoration-2 underline-offset-8",
+                    }}
+                    activeOptions={{ exact: link.exact }}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
             </div>
 
-            {/* Desktop nav */}
-            <nav className="hidden items-center gap-6 md:flex">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  activeProps={{
-                    className:
-                      "border-b-2 border-primary pb-1 text-sm font-semibold text-primary",
-                  }}
-                  inactiveProps={{
-                    className:
-                      "text-sm font-medium text-muted-foreground transition-colors hover:text-foreground",
-                  }}
-                  activeOptions={{ exact: link.exact }}
-                >
-                  {link.label}
-                </Link>
-              ))}
+            <div className="flex shrink-0 items-center gap-2">
               <a
                 href="https://github.com/lynicis/PrivacyGPT"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                aria-label="GitHub repository"
-              >
-                <GitHubIcon className="h-5 w-5" />
-              </a>
-              <ThemeToggle />
-            </nav>
-
-            {/* Mobile controls */}
-            <div className="flex items-center gap-3 md:hidden">
-              <a
-                href="https://github.com/lynicis/PrivacyGPT"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                className="hidden h-10 w-10 items-center justify-center rounded-[6px] text-muted-foreground transition-colors duration-[var(--dur-micro)] hover:bg-paper-2 hover:text-ink sm:inline-flex"
                 aria-label="GitHub repository"
               >
                 <GitHubIcon className="h-5 w-5" />
@@ -240,13 +229,14 @@ function RootLayout() {
               <ThemeToggle />
               <button
                 type="button"
-                className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-[6px] text-muted-foreground transition-colors duration-[var(--dur-micro)] hover:bg-paper-2 hover:text-ink lg:hidden"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-expanded={mobileMenuOpen}
                 aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
               >
                 {mobileMenuOpen ? (
                   <svg
+                    aria-hidden="true"
                     className="h-5 w-5"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -261,6 +251,7 @@ function RootLayout() {
                   </svg>
                 ) : (
                   <svg
+                    aria-hidden="true"
                     className="h-5 w-5"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -280,20 +271,17 @@ function RootLayout() {
 
           {/* Mobile menu dropdown */}
           {mobileMenuOpen && (
-            <nav className="border-t border-border bg-background/95 backdrop-blur-md md:hidden">
-              <div className="space-y-1 px-4 py-3">
+            <nav className="border-t border-rule bg-paper lg:hidden">
+              <div className="shell grid gap-1 py-3">
                 {NAV_LINKS.map((link) => (
                   <Link
                     key={link.to}
                     to={link.to}
                     onClick={() => setMobileMenuOpen(false)}
+                    className="rounded-[6px] px-3 py-2.5 text-sm text-muted-foreground transition-colors duration-[var(--dur-micro)] hover:bg-paper-2 hover:text-ink"
                     activeProps={{
                       className:
-                        "block rounded-md bg-accent/50 px-3 py-2 text-sm font-semibold text-primary",
-                    }}
-                    inactiveProps={{
-                      className:
-                        "block rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground",
+                        "rounded-[6px] bg-paper-2 px-3 py-2.5 text-sm text-ink",
                     }}
                     activeOptions={{ exact: link.exact }}
                   >
@@ -310,47 +298,38 @@ function RootLayout() {
           <Outlet />
         </div>
 
-        {/* Footer */}
-        <footer className="border-t border-border bg-muted/40">
-          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-12 md:gap-8">
-              {/* Brand */}
-              <div className="sm:col-span-2 md:col-span-4">
-                <Link to="/" className="group inline-flex items-center gap-2">
-                  <img
-                    src="/logo.png"
-                    alt=""
-                    width={48}
-                    height={48}
-                    className="h-12 w-12 transition-transform duration-200 group-hover:scale-105"
-                  />
-                  <span className="text-lg leading-none font-bold tracking-tight text-foreground">
-                    PrivacyGPT
-                  </span>
-                </Link>
-                <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
-                  Monitoring how major AI companies handle your conversational
-                  data. Open, verifiable, community-driven.
-                </p>
-                <div className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground/70">
-                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  <span>
-                    Privacy-first &middot; No tracking &middot; No cookies
-                  </span>
-                </div>
-              </div>
+        {/* Footer: a mast, the wordmark over a two-column index. */}
+        <footer className="border-t border-rule bg-paper-3">
+          <div className="shell grid gap-12 py-16 md:grid-cols-[1.4fr_1fr] md:gap-16">
+            <div className="max-w-md">
+              <Link
+                to="/"
+                aria-label="PrivacyGPT home"
+                className="inline-flex items-center gap-3"
+              >
+                <img src="/logo.png" alt="" width={40} height={40} className="h-9 w-9" />
+                <span className="font-display text-2xl font-medium tracking-[-0.03em]">
+                  PrivacyGPT
+                </span>
+              </Link>
+              <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
+                Monitoring how major AI companies handle conversational data.
+                Open, verifiable, community-driven.
+              </p>
+              <p className="mt-4 text-sm text-muted-foreground">
+                Privacy-first. No tracking. No cookies.
+              </p>
+            </div>
 
-              {/* Product Links */}
-              <div className="md:col-span-3 md:col-start-6">
-                <h3 className="text-xs font-semibold tracking-widest text-muted-foreground/60 uppercase">
-                  Product
-                </h3>
-                <ul className="mt-3.5 space-y-2.5">
+            <div className="grid grid-cols-2 gap-10">
+              <div>
+                <h2 className="mb-4 text-sm font-medium text-ink">Product</h2>
+                <ul className="space-y-2.5">
                   {NAV_LINKS.map((link) => (
                     <li key={link.to}>
                       <Link
                         to={link.to}
-                        className="text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                        className="text-sm text-muted-foreground transition-colors duration-[var(--dur-micro)] hover:text-ink"
                       >
                         {link.label}
                       </Link>
@@ -358,32 +337,24 @@ function RootLayout() {
                   ))}
                 </ul>
               </div>
-
-              {/* About */}
-              <div className="md:col-span-2 md:col-start-9">
-                <h3 className="text-xs font-semibold tracking-widest text-muted-foreground/60 uppercase">
-                  About
-                </h3>
-                <ul className="mt-3.5 space-y-2.5">
+              <div>
+                <h2 className="mb-4 text-sm font-medium text-ink">About</h2>
+                <ul className="space-y-2.5 text-sm text-muted-foreground">
+                  <li>Data sourced from public privacy policies</li>
+                  <li>Not affiliated with any AI company</li>
                   <li>
-                    <span className="text-sm text-muted-foreground">
-                      Data sourced from public privacy policies
-                    </span>
-                  </li>
-                  <li>
-                    <span className="text-sm text-muted-foreground">
-                      Not affiliated with any AI company
-                    </span>
+                    <a
+                      href="https://github.com/lynicis/PrivacyGPT"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline decoration-rule-2 underline-offset-4 transition-colors duration-[var(--dur-micro)] hover:text-ink"
+                    >
+                      Source code
+                    </a>
                   </li>
                 </ul>
-              </div>
-
-              {/* Legal */}
-              <div className="md:col-span-3 md:col-start-11">
-                <h3 className="text-xs font-semibold tracking-widest text-muted-foreground/60 uppercase">
-                  Legal
-                </h3>
-                <ul className="mt-3.5 space-y-2.5">
+                <h2 className="mt-8 mb-4 text-sm font-medium text-ink">Legal</h2>
+                <ul className="space-y-2.5">
                   {[
                     { to: "/privacy", label: "Privacy Policy" },
                     { to: "/terms", label: "Terms of Usage" },
@@ -391,7 +362,7 @@ function RootLayout() {
                     <li key={link.to}>
                       <Link
                         to={link.to}
-                        className="text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                        className="text-sm text-muted-foreground transition-colors duration-[var(--dur-micro)] hover:text-ink"
                       >
                         {link.label}
                       </Link>
@@ -400,39 +371,22 @@ function RootLayout() {
                 </ul>
               </div>
             </div>
+          </div>
 
-            {/* Bottom bar */}
-            <div className="mt-10 flex flex-col items-center gap-3 border-t border-border/60 pt-6 sm:flex-row sm:justify-between">
-              <p className="text-xs text-muted-foreground/60">
-                &copy; {new Date().getFullYear()} PrivacyGPT
-              </p>
-              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground/60">
-                <span className="hidden sm:inline">
-                  Built as an open, verifiable watchdog for AI privacy
-                  <span className="mx-2 text-border/40">|</span>
-                </span>
-                <span className="sm:hidden">Open watchdog for AI privacy</span>
+          <div className="shell border-t border-rule py-6">
+            <div className="flex flex-col gap-2 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+              <p>© {new Date().getFullYear()} PrivacyGPT</p>
+              <p>
+                An open watchdog for AI privacy, built by{" "}
                 <a
-                  href="https://github.com/lynicis/PrivacyGPT"
+                  href="https://lynicis.dev"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-muted-foreground/80 underline decoration-border/40 underline-offset-2 transition-colors duration-150 hover:text-foreground"
+                  className="underline decoration-rule-2 underline-offset-4 transition-colors duration-[var(--dur-micro)] hover:text-ink"
                 >
-                  <GitHubIcon className="h-3.5 w-3.5" />
-                  Source Code
+                  lynicis
                 </a>
-                <span>
-                  Built by{" "}
-                  <a
-                    href="https://lynicis.dev"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted-foreground/80 underline decoration-border/40 underline-offset-2 transition-colors duration-150 hover:text-foreground"
-                  >
-                    lynicis
-                  </a>
-                </span>
-              </div>
+              </p>
             </div>
           </div>
         </footer>
@@ -443,7 +397,12 @@ function RootLayout() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className="overflow-x-clip"
+      style={{ overflowX: "clip" }}
+    >
       <head>
         <HeadContent />
         <script
@@ -461,7 +420,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           }}
         />
       </head>
-      <body>
+      <body className="overflow-x-clip" style={{ overflowX: "clip" }}>
         {children}
         <Scripts />
       </body>

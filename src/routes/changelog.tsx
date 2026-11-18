@@ -12,7 +12,6 @@ import { formatDateTime, positiveInt } from "../lib/utils"
 import { APP_URL } from "../lib/site"
 import {
   ArrowLeft,
-  History,
   Rss,
   FileText,
   Filter,
@@ -20,12 +19,6 @@ import {
   ChevronRight,
   ChevronDown,
 } from "lucide-react"
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -36,8 +29,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { DataTable } from "@/components/ui/data-table"
+import type { ChangelogWithCompany } from "../lib/api"
 import type {
   ColumnDef,
+  Row,
   SortingState,
   PaginationState,
   ExpandedState,
@@ -94,7 +89,7 @@ export const Route = createFileRoute("/changelog")({
   head: () => ({
     meta: [
       {
-        title: "Change Log — PrivacyGPT",
+        title: "Policy change log | PrivacyGPT",
       },
       {
         name: "description",
@@ -102,7 +97,7 @@ export const Route = createFileRoute("/changelog")({
           "Track real-time changes to AI companies' privacy policies. See exactly what changed, when it changed, and how it affects your data.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "Change Log — PrivacyGPT" },
+      { property: "og:title", content: "Policy change log | PrivacyGPT" },
       {
         property: "og:description",
         content:
@@ -117,7 +112,7 @@ export const Route = createFileRoute("/changelog")({
         content: `${APP_URL}/og-image.png`,
       },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Change Log — PrivacyGPT" },
+      { name: "twitter:title", content: "Policy change log | PrivacyGPT" },
       {
         name: "twitter:description",
         content:
@@ -228,7 +223,7 @@ function ChangelogPage() {
     }
   }
 
-  const columns = useMemo<ColumnDef<any>[]>(
+  const columns = useMemo<ColumnDef<ChangelogWithCompany>[]>(
     () => [
       {
         id: "expand",
@@ -282,8 +277,15 @@ function ChangelogPage() {
         cell: ({ row }) => {
           const isPending = row.original.status === "pending_review"
           return (
-            <Badge variant={isPending ? "outline" : "secondary"}>
-              {isPending ? "Pending Review" : "Reviewed"}
+            <Badge
+              variant="outline"
+              className={
+                isPending
+                  ? "border-signal/40 bg-signal-soft text-signal"
+                  : "border-ok/40 bg-ok-soft text-ok"
+              }
+            >
+              {isPending ? "Pending review" : "Reviewed"}
             </Badge>
           )
         },
@@ -321,7 +323,7 @@ function ChangelogPage() {
             params={{
               companyKey: row.original.companyKey || "",
             }}
-            className="font-medium text-foreground hover:underline"
+            className="font-medium text-ink hover:underline"
           >
             {row.original.companyName}
           </Link>
@@ -349,13 +351,13 @@ function ChangelogPage() {
                 })
               }}
             >
-              Detected At
+              Detected at
               <ArrowUpDown className="ml-1 h-3 w-3" />
             </Button>
           )
         },
         cell: ({ row }) => (
-          <span className="text-muted-foreground">
+          <span className="measured text-muted">
             {formatDateTime(row.original.detectedAt)}
           </span>
         ),
@@ -367,38 +369,38 @@ function ChangelogPage() {
   const pageCount = Math.ceil(totalCount / (search.pageSize ?? 20))
   const companiesTracked = trackedCompanies.length
 
-  const renderSubComponent = ({ row }: { row: any }) => {
+  const renderSubComponent = ({ row }: { row: Row<ChangelogWithCompany> }) => {
     const entry = row.original
     return (
-      <div className="space-y-3">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="overflow-hidden border border-border">
-            <div className="border-b border-border bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground">
+      <div className="space-y-4">
+        <div className="grid gap-px overflow-hidden rounded-[6px] border border-rule bg-rule md:grid-cols-2">
+          <div>
+            <div className="border-b border-rule bg-paper-3 px-3 py-2 text-sm text-muted">
               Before
             </div>
-            <div className="max-h-96 overflow-y-auto p-3 font-mono text-xs leading-relaxed whitespace-pre-wrap">
+            <div className="max-h-96 overflow-y-auto bg-paper-3 p-4 font-mono text-sm leading-relaxed whitespace-pre-wrap text-ink-2">
               {entry.beforeText}
             </div>
           </div>
-          <div className="overflow-hidden border border-border">
-            <div className="border-b border-border bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground">
+          <div>
+            <div className="border-b border-rule bg-paper-3 px-3 py-2 text-sm text-muted">
               After
             </div>
-            <div className="max-h-96 overflow-y-auto p-3 font-mono text-xs leading-relaxed whitespace-pre-wrap">
+            <div className="max-h-96 overflow-y-auto bg-paper-3 p-4 font-mono text-sm leading-relaxed whitespace-pre-wrap text-ink-2">
               {entry.afterText}
             </div>
           </div>
         </div>
 
         {entry.reviewNotes && (
-          <div className="border border-border bg-muted/30 p-3">
-            <div className="mb-1 text-xs font-medium text-muted-foreground">
-              Review Notes
-            </div>
-            <p className="text-sm">{entry.reviewNotes}</p>
+          <div className="rounded-[6px] border border-rule bg-paper-3 p-4">
+            <div className="mb-1 text-sm text-muted">Review notes</div>
+            <p className="max-w-[70ch] text-sm text-ink-2">
+              {entry.reviewNotes}
+            </p>
             {entry.reviewedAt && (
-              <p className="mt-1 text-xs text-muted-foreground">
-                Reviewed on {formatDateTime(entry.reviewedAt)}
+              <p className="measured mt-2 text-xs text-muted">
+                reviewed {formatDateTime(entry.reviewedAt)}
               </p>
             )}
           </div>
@@ -409,118 +411,92 @@ function ChangelogPage() {
 
   if (isLoading) {
     return (
-      <>
-        <section className="border-b border-border bg-muted/40 py-12">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto mb-2 h-8 w-48 animate-pulse bg-muted" />
-            <div className="mx-auto h-4 w-72 animate-pulse bg-muted" />
-          </div>
-        </section>
-        <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <div className="mb-6 h-24 animate-pulse rounded-lg bg-muted" />
-          <div className="mb-6 h-64 animate-pulse rounded-lg bg-muted" />
-        </main>
-      </>
+      <main className="shell py-12" aria-busy="true" aria-label="Loading change log">
+        <div className="h-10 w-72 animate-pulse rounded-[6px] bg-paper-2" />
+        <div className="mt-4 h-5 w-96 animate-pulse rounded-[6px] bg-paper-2" />
+        <div className="mt-8 h-24 animate-pulse rounded-[10px] border border-rule bg-paper-2" />
+        <div className="mt-4 h-80 animate-pulse rounded-[10px] border border-rule bg-paper-2" />
+      </main>
     )
   }
 
   if (isError) {
     return (
-      <>
-        <section className="border-b border-border bg-muted/40 py-12">
-          <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-extrabold tracking-tight text-foreground uppercase sm:text-4xl">
-              Failed to load changelog
-            </h1>
-            <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-              {error.message || "An unexpected error occurred."}
-            </p>
-            <div className="mt-6">
-              <Button variant="outline" onClick={() => refetch()}>
-                Retry
-              </Button>
-            </div>
-          </div>
-        </section>
-      </>
+      <main className="shell py-20">
+        <h1 className="max-w-[20ch]">Failed to load the change log</h1>
+        <p className="mt-4 max-w-[48ch] text-muted-foreground">
+          {error.message || "An unexpected error occurred."}
+        </p>
+        <Button variant="outline" className="mt-6" onClick={() => refetch()}>
+          Try again
+        </Button>
+      </main>
     )
   }
 
   return (
     <>
-      {/* Hero */}
-      <section className="border-b border-border bg-muted/40 py-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      {/* Banner: the trail's head and its four readings. */}
+      <section className="border-b border-rule">
+        <div className="shell py-10 sm:py-12">
+          <div className="flex items-center gap-2 text-sm text-muted">
             <Link
               to="/"
-              className="flex items-center gap-1 transition-colors hover:text-foreground"
+              className="flex items-center gap-1 transition-colors duration-[var(--dur-micro)] hover:text-ink"
             >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              Dashboard
+              <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+              Register
             </Link>
-            <span>/</span>
-            <span className="text-foreground">Change Log</span>
+            <span aria-hidden="true">/</span>
+            <span className="text-ink">Change log</span>
           </div>
-          <div className="mt-4 flex items-start justify-between">
+          <div className="mt-4 flex flex-wrap items-end justify-between gap-6">
             <div>
-              <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight">
-                <History className="h-8 w-8 text-primary" />
-                Policy Change Log
-              </h1>
-              <p className="mt-2 max-w-2xl text-muted-foreground">
-                Automated tracking of privacy policy changes across major AI
-                platforms. Each change is detected by our watchdog crawler,
-                logged here, and reviewed for accuracy.
+              <h1 className="max-w-[20ch] text-display-s">Policy change log</h1>
+              <p className="lead mt-3 max-w-[52ch] text-ink-2">
+                Each change is detected by the watchdog crawler, logged here,
+                and reviewed for accuracy.
               </p>
             </div>
-            <a
-              href="/changelog/feed.xml"
-              className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-              title="Subscribe to RSS Feed"
-            >
-              <Rss className="h-4 w-4" />
-              RSS Feed
-            </a>
+            <Button asChild variant="outline">
+              <a href="/changelog/feed.xml" title="Subscribe to the RSS feed">
+                <Rss className="h-4 w-4" aria-hidden="true" />
+                RSS feed
+              </a>
+            </Button>
           </div>
 
-          {/* Stats row */}
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Card className="p-4">
-              <div className="text-2xl font-bold">{companiesTracked}</div>
-              <div className="text-xs text-muted-foreground">
-                Companies Tracked
+          {/* Four readings, one instrument panel. */}
+          <div className="panels mt-8 grid-cols-2 sm:grid-cols-4">
+            <div className="p-4">
+              <div className="reading text-[2.2rem]">{companiesTracked}</div>
+              <div className="label mt-2">Companies tracked</div>
+            </div>
+            <div className="p-4">
+              <div className="reading text-[2.2rem]">{totalSnapshots}</div>
+              <div className="label mt-2">Snapshots stored</div>
+            </div>
+            <div className="p-4">
+              <div className="reading text-[2.2rem]">{totalCount}</div>
+              <div className="label mt-2">Matching changes</div>
+            </div>
+            <div className="p-4">
+              <div className="reading text-[2.2rem] text-signal">
+                {pendingReviewsCount}
               </div>
-            </Card>
-            <Card className="p-4">
-              <div className="text-2xl font-bold">{totalSnapshots}</div>
-              <div className="text-xs text-muted-foreground">
-                Snapshots Stored
-              </div>
-            </Card>
-            <Card className="p-4">
-              <div className="text-2xl font-bold">{totalCount}</div>
-              <div className="text-xs text-muted-foreground">
-                Matching Changes
-              </div>
-            </Card>
-            <Card className="p-4">
-              <div className="text-2xl font-bold">{pendingReviewsCount}</div>
-              <div className="text-xs text-muted-foreground">
-                Pending Reviews
-              </div>
-            </Card>
+              <div className="label mt-2">Pending reviews</div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="shell pb-20 pt-6">
         {/* Filters */}
-        <div className="mb-6 flex flex-wrap items-center gap-3">
+        <div className="mb-4 flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium">Filters:</span>
+            <Filter className="h-4 w-4 text-muted" aria-hidden="true" />
+            <span className="text-sm text-muted">Filters</span>
           </div>
           <Select
             value={search.companyFilter || "all"}
@@ -535,10 +511,10 @@ function ChangelogPage() {
             }}
           >
             <SelectTrigger aria-label="Filter by company" className="w-48">
-              <SelectValue placeholder="All Companies" />
+              <SelectValue placeholder="All companies" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Companies</SelectItem>
+              <SelectItem value="all">All companies</SelectItem>
               {trackedCompanies.map(([key, name]) => (
                 <SelectItem key={key} value={key || ""}>
                   {name}
@@ -559,11 +535,11 @@ function ChangelogPage() {
             }}
           >
             <SelectTrigger aria-label="Filter by status" className="w-48">
-              <SelectValue placeholder="All Statuses" />
+              <SelectValue placeholder="All statuses" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="pending_review">Pending Review</SelectItem>
+              <SelectItem value="all">All statuses</SelectItem>
+              <SelectItem value="pending_review">Pending review</SelectItem>
               <SelectItem value="reviewed">Reviewed</SelectItem>
             </SelectContent>
           </Select>
@@ -571,19 +547,16 @@ function ChangelogPage() {
 
         {/* DataTable */}
         {changelogs.length === 0 ? (
-          <Card className="p-12 text-center">
-            <CardHeader>
-              <div className="mx-auto mb-2 w-fit rounded-full bg-muted p-3 text-muted-foreground">
-                <FileText className="h-6 w-6" />
-              </div>
-              <CardTitle className="text-lg font-bold">
-                No Matching Changes
-              </CardTitle>
-              <CardDescription>
-                Try adjusting your filters to see more results.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <div className="rounded-[10px] border border-dashed border-rule-2 p-12 text-center">
+            <FileText
+              className="mx-auto mb-4 h-6 w-6 text-muted"
+              aria-hidden="true"
+            />
+            <h2 className="text-lg font-medium">No matching changes</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Try adjusting the filters to see more results.
+            </p>
+          </div>
         ) : (
           <DataTable
             columns={columns}
@@ -603,25 +576,31 @@ function ChangelogPage() {
 
         {/* Snapshot Status Section */}
         {snapshots.length > 0 && (
-          <section className="mt-12">
-            <h2 className="mb-4 text-lg font-bold tracking-tight">
-              Latest Snapshots
-            </h2>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <section className="mt-14">
+            <div className="mb-3 flex items-baseline justify-between gap-4 border-b border-rule pb-3">
+              <h2 className="text-title">Latest snapshots</h2>
+              <span className="measured text-sm text-muted">
+                {snapshots.length} shown
+              </span>
+            </div>
+            <div className="grid gap-px overflow-hidden rounded-[10px] border border-rule bg-rule sm:grid-cols-2 lg:grid-cols-3">
               {snapshots.map((snap) => (
-                <Card key={snap.companyId || snap.companyKey} className="p-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
+                <div
+                  key={snap.companyId || snap.companyKey}
+                  className="bg-paper-2 p-4"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-medium text-ink">
                       {snap.companyName}
                     </span>
-                    <Badge variant="outline" className="text-xs">
+                    <span className="measured text-xs text-muted">
                       {snap.contentHash.slice(0, 8)}…
-                    </Badge>
+                    </span>
                   </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Last fetched: {formatDateTime(snap.fetchedAt)}
+                  <p className="measured mt-1 text-xs text-muted">
+                    fetched {formatDateTime(snap.fetchedAt)}
                   </p>
-                </Card>
+                </div>
               ))}
             </div>
           </section>

@@ -1,21 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import {
-  ArrowLeft,
-  HelpCircle,
-  Shield,
-  Trash2,
-  Share2,
-  Info,
-} from "lucide-react"
+import { ArrowLeft, Shield, Trash2, Share2, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { APP_URL } from "../lib/site"
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card"
 
 const faqs = [
   {
@@ -56,7 +42,7 @@ export const Route = createFileRoute("/faq")({
   head: () => ({
     meta: [
       {
-        title: "Frequently Asked Questions — PrivacyGPT",
+        title: "Frequently Asked Questions | PrivacyGPT",
       },
       {
         name: "description",
@@ -66,7 +52,7 @@ export const Route = createFileRoute("/faq")({
       { property: "og:type", content: "website" },
       {
         property: "og:title",
-        content: "Frequently Asked Questions — PrivacyGPT",
+        content: "Frequently Asked Questions | PrivacyGPT",
       },
       {
         property: "og:description",
@@ -84,7 +70,7 @@ export const Route = createFileRoute("/faq")({
       { name: "twitter:card", content: "summary_large_image" },
       {
         name: "twitter:title",
-        content: "Frequently Asked Questions — PrivacyGPT",
+        content: "Frequently Asked Questions | PrivacyGPT",
       },
       {
         name: "twitter:description",
@@ -117,70 +103,65 @@ export const Route = createFileRoute("/faq")({
 
 function FAQPage() {
   return (
-    <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
-      <div className="mb-8">
-        <Button
-          asChild
-          variant="ghost"
-          className="-ml-3 gap-2 text-muted-foreground hover:text-foreground"
-        >
+    <main className="shell py-8">
+      <div className="mx-auto w-full max-w-3xl">
+        <Button asChild variant="ghost" size="sm" className="-ml-3 gap-2">
           <Link to="/">
-            <ArrowLeft className="h-4 w-4" /> Back to Tracker
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to Tracker
           </Link>
         </Button>
-        <div className="mt-4 flex items-center gap-3">
-          <HelpCircle className="h-8 w-8 text-primary" />
-          <div>
-            <h1 className="text-4xl font-extrabold tracking-tight text-foreground">
-              Frequently Asked Questions
-            </h1>
-            <p className="mt-1 text-lg text-muted-foreground">
-              Get answers about AI data privacy and how PrivacyGPT works.
-            </p>
-          </div>
-        </div>
-      </div>
 
-      <div className="space-y-6">
-        {faqs.map((faq, index) => {
-          const Icon = faq.icon
-          return (
-            <Card key={index}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Icon className="h-5 w-5 text-primary" />
+        {/* The document's head: one title, one line. */}
+        <header className="mt-6 border-b border-rule pb-10">
+          <h1>Frequently Asked Questions</h1>
+          <p className="mt-4 max-w-[52ch] text-lead text-ink-2">
+            Get answers about AI data privacy and how PrivacyGPT works.
+          </p>
+        </header>
+
+        {/* Questions on hairlines, one document, no cards. */}
+        <div>
+          {faqs.map((faq) => {
+            const Icon = faq.icon
+            return (
+              <section key={faq.question} className="border-b border-rule py-8">
+                <h2 className="flex items-start gap-2.5 text-title">
+                  <Icon
+                    className="mt-1 h-5 w-5 shrink-0 text-muted"
+                    aria-hidden="true"
+                  />
                   {faq.question}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <CardDescription className="text-base leading-relaxed text-muted-foreground">
-                  {faq.answer}
-                </CardDescription>
-                <Button
-                  asChild
-                  variant="link"
-                  className="h-auto p-0 text-primary"
-                >
-                  <Link to={faq.link}>{faq.linkText} →</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
+                </h2>
+                <p className="mt-3 max-w-[65ch] text-ink-2">{faq.answer}</p>
+                <div className="mt-4">
+                  <Button asChild variant="link" className="h-auto p-0 text-sm">
+                    <Link to={faq.link}>{faq.linkText}</Link>
+                  </Button>
+                </div>
+              </section>
+            )
+          })}
+        </div>
 
-      <div className="mt-12 rounded-lg border border-border bg-muted/40 p-6 text-center">
-        <p className="text-sm text-muted-foreground">
-          Have more questions? Check our{" "}
-          <Link to="/methodology" className="text-primary hover:underline">
-            methodology
-          </Link>{" "}
-          or{" "}
-          <Link to="/" className="text-primary hover:underline">
-            explore the dashboard
-          </Link>{" "}
-          to see detailed privacy data for 30+ AI platforms.
-        </p>
+        <div className="mt-16 border-t border-rule pt-6 text-sm text-muted-foreground">
+          <p>
+            Have more questions? Check our{" "}
+            <Link
+              to="/methodology"
+              className="text-ink underline decoration-rule-2 underline-offset-4 hover:decoration-signal"
+            >
+              methodology
+            </Link>{" "}
+            or{" "}
+            <Link
+              to="/"
+              className="text-ink underline decoration-rule-2 underline-offset-4 hover:decoration-signal"
+            >
+              explore the dashboard
+            </Link>{" "}
+            to see detailed privacy data for 30+ AI platforms.
+          </p>
+        </div>
       </div>
     </main>
   )

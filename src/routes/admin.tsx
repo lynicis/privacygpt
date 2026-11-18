@@ -19,14 +19,6 @@ import {
   Filter,
   Bot,
 } from "lucide-react"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Select,
@@ -102,9 +94,9 @@ function ChangelogReview({ id }: { id: number }) {
       <div className="space-y-1.5">
         <label
           htmlFor={`notes-${id}`}
-          className="text-xs font-medium text-muted-foreground"
+          className="label block"
         >
-          Review Notes / Summary of Changes
+          Review notes and summary of changes
         </label>
         <textarea
           id={`notes-${id}`}
@@ -112,30 +104,24 @@ function ChangelogReview({ id }: { id: number }) {
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="e.g. Google updated their data collection wording regarding workspace integration..."
-          className="w-full rounded-none border border-border bg-background px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:outline-none"
+          className="w-full rounded-[6px] border border-field bg-paper-3 px-3 py-2 text-md text-ink placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           required
         />
       </div>
       {reviewMutation.error && (
-        <p className="text-xs text-destructive">
+        <p className="text-sm text-bad">
           {reviewMutation.error instanceof Error
             ? reviewMutation.error.message
             : "An unexpected error occurred."}
         </p>
       )}
-      <div className="flex items-center gap-4">
-        <Button
-          type="submit"
-          disabled={reviewMutation.isPending}
-          className="h-auto rounded-none bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/95"
-        >
-          {reviewMutation.isPending
-            ? "Approving..."
-            : "Approve & Apply Updates"}
+      <div className="flex flex-wrap items-center gap-4">
+        <Button type="submit" disabled={reviewMutation.isPending}>
+          {reviewMutation.isPending ? "Approving…" : "Approve and apply"}
         </Button>
-        <span className="text-[10px] text-muted-foreground">
-          Approving will automatically apply any AI-proposed field updates to
-          the company profile.
+        <span className="max-w-[48ch] text-sm text-muted">
+          Approving applies any AI-proposed field updates to the company
+          profile.
         </span>
       </div>
     </form>
@@ -166,31 +152,23 @@ function AdminPage() {
 
   if (unauthorized) {
     return (
-      <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <Card className="border-destructive/30 bg-destructive/5 p-6 shadow-sm">
-          <CardHeader className="flex flex-col items-center">
-            <Lock className="h-12 w-12 text-destructive" />
-            <CardTitle className="mt-4 text-xl font-bold">
-              401 - Unauthorized
-            </CardTitle>
-            <CardDescription className="mt-2 text-center text-sm text-muted-foreground">
-              You must be logged in as an administrator to access the admin
-              portal.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="mt-4 flex flex-col gap-2">
-            <Button
-              onClick={() => window.location.reload()}
-              className="rounded-none bg-primary font-semibold text-primary-foreground hover:bg-primary/90"
-            >
-              Log In / Refresh Page
+      <main className="shell py-24">
+        <div className="mx-auto max-w-md rounded-[10px] border border-rule bg-paper-2 p-8">
+          <Lock className="h-6 w-6 text-signal" aria-hidden="true" />
+          <h1 className="mt-4 text-title">401, unauthorized</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            You must be logged in as an administrator to open the review queue.
+          </p>
+          <div className="mt-6 flex flex-col gap-2">
+            <Button onClick={() => window.location.reload()}>
+              Log in or refresh
             </Button>
-            <Button asChild variant="outline" className="w-full rounded-none">
-              <Link to="/">Back to Dashboard</Link>
+            <Button asChild variant="outline">
+              <Link to="/">Back to the register</Link>
             </Button>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </div>
+      </main>
     )
   }
 
@@ -224,118 +202,95 @@ function AdminPage() {
 
   if (isLoading) {
     return (
-      <>
-        <section className="border-b border-border bg-muted/40 py-12">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto mb-2 h-8 w-48 animate-pulse bg-muted" />
-            <div className="mx-auto h-4 w-72 animate-pulse bg-muted" />
-          </div>
-        </section>
-        <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <div className="mb-6 h-24 animate-pulse rounded-lg bg-muted" />
-          <div className="mb-6 h-64 animate-pulse rounded-lg bg-muted" />
-        </main>
-      </>
+      <main className="shell py-12" aria-busy="true" aria-label="Loading review queue">
+        <div className="h-10 w-64 animate-pulse rounded-[6px] bg-paper-2" />
+        <div className="mt-8 h-24 animate-pulse rounded-[10px] border border-rule bg-paper-2" />
+        <div className="mt-4 h-64 animate-pulse rounded-[10px] border border-rule bg-paper-2" />
+      </main>
     )
   }
 
   if (isError) {
     return (
-      <>
-        <section className="border-b border-border bg-muted/40 py-12">
-          <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-extrabold tracking-tight text-foreground uppercase sm:text-4xl">
-              Failed to load admin data
-            </h1>
-            <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-              {error.message || "An unexpected error occurred."}
-            </p>
-            <div className="mt-6">
-              <Button variant="outline" onClick={() => refetch()}>
-                Retry
-              </Button>
-            </div>
-          </div>
-        </section>
-      </>
+      <main className="shell py-20">
+        <h1 className="max-w-[20ch]">Failed to load the review queue</h1>
+        <p className="mt-4 max-w-[48ch] text-muted-foreground">
+          {error.message || "An unexpected error occurred."}
+        </p>
+        <Button variant="outline" className="mt-6" onClick={() => refetch()}>
+          Try again
+        </Button>
+      </main>
     )
   }
 
   return (
     <>
-      {/* Hero */}
-      <section className="border-b border-border bg-muted/40 py-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      {/* App head: the queue's four readings, then the filters. */}
+      <section className="border-b border-rule">
+        <div className="shell py-8">
+          <div className="flex items-center gap-2 text-sm text-muted">
             <Link
               to="/"
-              className="flex items-center gap-1 transition-colors hover:text-foreground"
+              className="flex items-center gap-1 transition-colors duration-[var(--dur-micro)] hover:text-ink"
             >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              Dashboard
+              <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+              Register
             </Link>
-            <span>/</span>
-            <span className="text-foreground">Admin Portal</span>
+            <span aria-hidden="true">/</span>
+            <span className="text-ink">Review queue</span>
           </div>
-          <div className="mt-4 flex items-start justify-between">
+          <div className="mt-4 flex flex-wrap items-end justify-between gap-6">
             <div>
-              <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight">
-                <Lock className="h-8 w-8 text-primary" />
-                Admin Review Portal
-              </h1>
-              <p className="mt-2 max-w-2xl text-muted-foreground">
-                Authorize, review, and approve privacy policy modifications
-                detected by the watchdog system. Approved changes will be
-                visible to public users and notify active email subscribers.
+              <h1 className="max-w-[20ch] text-display-s">Review queue</h1>
+              <p className="lead mt-3 max-w-[54ch] text-ink-2">
+                Authorize, review, and approve policy changes the watchdog
+                detected. Approved changes go live to readers.
               </p>
             </div>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/changelog">View public change log</Link>
+            </Button>
           </div>
 
-          {/* Stats row */}
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Card className="border-l-4 border-l-primary p-4">
-              <div className="text-2xl font-bold">{pendingReviews}</div>
-              <div className="text-xs text-muted-foreground">
-                Pending Review
+          <div className="panels mt-6 grid-cols-2 sm:grid-cols-4">
+            <div className="p-4">
+              <div className="reading text-[2rem] text-signal">
+                {pendingReviews}
               </div>
-            </Card>
-            <Card className="p-4">
-              <div className="text-2xl font-bold">{reviewedChanges}</div>
-              <div className="text-xs text-muted-foreground">
-                Reviewed / Approved
-              </div>
-            </Card>
-            <Card className="p-4">
-              <div className="text-2xl font-bold">{totalChanges}</div>
-              <div className="text-xs text-muted-foreground">
-                Total Detected Changes
-              </div>
-            </Card>
-            <Card className="p-4">
-              <div className="text-2xl font-bold">{totalSnapshots}</div>
-              <div className="text-xs text-muted-foreground">
-                Policy Snapshots
-              </div>
-            </Card>
+              <div className="label mt-2">Pending review</div>
+            </div>
+            <div className="p-4">
+              <div className="reading text-[2rem]">{reviewedChanges}</div>
+              <div className="label mt-2">Reviewed</div>
+            </div>
+            <div className="p-4">
+              <div className="reading text-[2rem]">{totalChanges}</div>
+              <div className="label mt-2">Detected changes</div>
+            </div>
+            <div className="p-4">
+              <div className="reading text-[2rem]">{totalSnapshots}</div>
+              <div className="label mt-2">Policy snapshots</div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="shell pb-20 pt-6">
         {/* Filters */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Filters:</span>
+              <Filter className="h-4 w-4 text-muted" aria-hidden="true" />
+              <span className="text-sm text-muted">Filters</span>
             </div>
             <Select value={companyFilter} onValueChange={setCompanyFilter}>
               <SelectTrigger aria-label="Filter by company" className="w-48">
-                <SelectValue placeholder="All Companies" />
+                <SelectValue placeholder="All companies" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Companies</SelectItem>
+                <SelectItem value="all">All companies</SelectItem>
                 {trackedCompanies.map(([key, name]) => (
                   <SelectItem key={key} value={key || ""}>
                     {name}
@@ -345,39 +300,35 @@ function AdminPage() {
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger aria-label="Filter by status" className="w-48">
-                <SelectValue placeholder="Pending Review" />
+                <SelectValue placeholder="Pending review" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="pending_review">Pending Review</SelectItem>
+                <SelectItem value="all">All statuses</SelectItem>
+                <SelectItem value="pending_review">Pending review</SelectItem>
                 <SelectItem value="reviewed">Reviewed</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <Button asChild variant="outline" size="sm" className="text-xs">
-            <Link to="/changelog">View Public Changelog</Link>
-          </Button>
         </div>
 
         {/* Timeline */}
         {filteredChangelogs.length === 0 ? (
-          <Card className="p-12 text-center">
-            <CardHeader>
-              <div className="mx-auto mb-2 w-fit rounded-full bg-muted p-3 text-muted-foreground">
-                <FileText className="h-6 w-6" />
-              </div>
-              <CardTitle className="text-lg font-bold">
-                {changelogs.length === 0
-                  ? "No Changes Logged"
-                  : "No Matching Changes"}
-              </CardTitle>
-              <CardDescription>
-                {changelogs.length === 0
-                  ? "The watchdog crawler has not detected any privacy policy changes yet."
-                  : "Try adjusting your filters to see more results."}
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <div className="rounded-[10px] border border-dashed border-rule-2 p-12 text-center">
+            <FileText
+              className="mx-auto mb-4 h-6 w-6 text-muted"
+              aria-hidden="true"
+            />
+            <h2 className="text-lg font-medium">
+              {changelogs.length === 0
+                ? "No changes logged"
+                : "No matching changes"}
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {changelogs.length === 0
+                ? "The watchdog crawler has not detected any policy changes yet."
+                : "Try adjusting the filters to see more results."}
+            </p>
+          </div>
         ) : (
           <div className="space-y-4">
             {filteredChangelogs.map((entry) => {
@@ -387,28 +338,26 @@ function AdminPage() {
               const isPending = entry.status === "pending_review"
 
               return (
-                <Card
+                <article
                   key={entry.id}
-                  className={`overflow-hidden transition-all duration-200 ${isPending ? "border-chart-1/30 bg-chart-1/5 shadow-sm" : ""}`}
+                  className={`overflow-hidden rounded-[10px] border bg-paper-2 transition-colors duration-[var(--dur-micro)] ${isPending ? "border-signal/40" : "border-rule"}`}
                 >
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between gap-4">
+                  <div className="border-b border-rule p-4">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
                       <div className="flex items-center gap-3">
-                        <div
-                          className={`rounded-full p-1.5 ${
-                            isPending
-                              ? "bg-chart-1/20 text-chart-1"
-                              : "bg-chart-5/10 text-chart-5"
-                          }`}
+                        <span
+                          className={
+                            isPending ? "text-signal" : "text-ok"
+                          }
                         >
                           {isPending ? (
-                            <AlertCircle className="h-4 w-4" />
+                            <AlertCircle className="h-4 w-4" aria-hidden="true" />
                           ) : (
-                            <CheckCircle2 className="h-4 w-4" />
+                            <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
                           )}
-                        </div>
+                        </span>
                         <div>
-                          <CardTitle className="text-base font-semibold">
+                          <h2 className="text-md font-medium">
                             <Link
                               to="/company/$companyKey"
                               params={{
@@ -418,9 +367,9 @@ function AdminPage() {
                             >
                               {entry.companyName}
                             </Link>
-                          </CardTitle>
-                          <CardDescription className="mt-0.5 flex items-center gap-1.5 text-xs">
-                            <Clock className="h-3 w-3" />
+                          </h2>
+                          <p className="measured mt-0.5 flex items-center gap-1.5 text-xs text-muted">
+                            <Clock className="h-3 w-3" aria-hidden="true" />
                             {detectedDate.toLocaleDateString("en-US", {
                               year: "numeric",
                               month: "long",
@@ -431,44 +380,44 @@ function AdminPage() {
                               hour: "2-digit",
                               minute: "2-digit",
                             })}
-                          </CardDescription>
+                          </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={isPending ? "outline" : "secondary"}>
-                          {isPending ? "Pending Review" : "Reviewed"}
-                        </Badge>
-                      </div>
+                      <span
+                        className={`chip ${isPending ? "chip--signal" : "chip--ok"}`}
+                      >
+                        {isPending ? "Pending review" : "Reviewed"}
+                      </span>
                     </div>
-                  </CardHeader>
+                  </div>
 
-                  <CardContent className="pt-0">
+                  <div className="p-4">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => toggleExpand(entry.id)}
-                      className="mb-2 text-xs"
+                      className="mb-2"
                     >
-                      {isExpanded ? "Hide" : "Show"} Diff Details
+                      {isExpanded ? "Hide" : "Show"} diff details
                     </Button>
 
                     {isExpanded && (
-                      <div className="mt-2 space-y-3">
+                      <div className="mt-2 space-y-4">
                         {/* Diff visualization */}
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="overflow-hidden border border-border">
-                            <div className="border-b border-border bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground">
+                        <div className="grid gap-px overflow-hidden rounded-[6px] border border-rule bg-rule md:grid-cols-2">
+                          <div>
+                            <div className="border-b border-rule bg-paper-3 px-3 py-2 text-sm text-muted">
                               Before
                             </div>
-                            <div className="max-h-96 overflow-y-auto p-3 font-mono text-xs leading-relaxed whitespace-pre-wrap">
+                            <div className="max-h-96 overflow-y-auto bg-paper-3 p-4 font-mono text-sm leading-relaxed whitespace-pre-wrap text-ink-2">
                               {entry.beforeText}
                             </div>
                           </div>
-                          <div className="overflow-hidden border border-border">
-                            <div className="border-b border-border bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground">
+                          <div>
+                            <div className="border-b border-rule bg-paper-3 px-3 py-2 text-sm text-muted">
                               After
                             </div>
-                            <div className="max-h-96 overflow-y-auto p-3 font-mono text-xs leading-relaxed whitespace-pre-wrap">
+                            <div className="max-h-96 overflow-y-auto bg-paper-3 p-4 font-mono text-sm leading-relaxed whitespace-pre-wrap text-ink-2">
                               {entry.afterText}
                             </div>
                           </div>
@@ -476,27 +425,29 @@ function AdminPage() {
 
                         {/* Review notes */}
                         {entry.reviewNotes && (
-                          <div className="border border-border bg-muted/30 p-3">
-                            <div className="mb-1 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                          <div className="rounded-[6px] border border-rule bg-paper-3 p-4">
+                            <div className="mb-1 flex flex-wrap items-center gap-2 text-sm text-muted">
                               {entry.reviewNotes.startsWith("AI Review") && (
-                                <Bot className="h-3.5 w-3.5 text-primary" />
+                                <Bot
+                                  className="h-3.5 w-3.5 text-cool"
+                                  aria-hidden="true"
+                                />
                               )}
                               {entry.reviewNotes.startsWith("AI Review")
-                                ? "AI Review Notes"
-                                : "Review Notes"}
+                                ? "AI review notes"
+                                : "Review notes"}
                               {entry.reviewNotes.includes("[BREAKING]") && (
-                                <Badge
-                                  variant="destructive"
-                                  className="ml-1 text-[10px]"
-                                >
-                                  Breaking Change Detected
-                                </Badge>
+                                <span className="chip chip--bad">
+                                  Breaking change
+                                </span>
                               )}
                             </div>
-                            <p className="text-sm">{entry.reviewNotes}</p>
+                            <p className="max-w-[70ch] text-sm text-ink-2">
+                              {entry.reviewNotes}
+                            </p>
                             {entry.reviewedAt && (
-                              <p className="mt-1 text-xs text-muted-foreground">
-                                Reviewed on{" "}
+                              <p className="measured mt-2 text-xs text-muted">
+                                reviewed{" "}
                                 {new Date(
                                   entry.reviewedAt
                                 ).toLocaleDateString()}
@@ -507,18 +458,21 @@ function AdminPage() {
 
                         {/* Admin review form */}
                         {isPending && (
-                          <div className="rounded-none border border-border bg-muted/20 p-4">
-                            <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                              <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-                              Admin Review Action
+                          <div className="rounded-[6px] border border-rule bg-paper-3 p-4">
+                            <div className="mb-3 flex items-center gap-1.5 text-sm text-ink-2">
+                              <ShieldCheck
+                                className="h-3.5 w-3.5 text-signal"
+                                aria-hidden="true"
+                              />
+                              Admin review action
                             </div>
                             <ChangelogReview id={entry.id} />
                           </div>
                         )}
                       </div>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </article>
               )
             })}
           </div>

@@ -1,0 +1,32 @@
+[
+ {
+  "mode": "redesign",
+  "depth": "full",
+  "scope": "site",
+  "genre": "modern-minimal",
+  "shape": "Index",
+  "theme": "Console",
+  "axes": "dark/grotesk-sans/chromatic-amber",
+  "hero": "Banner",
+  "nav": "edge-aligned bar",
+  "footer": "mast",
+  "imagery": "the product (register table, readings, diff)",
+  "photos": [],
+  "entry": "2026-11-18",
+  "fingerprint": "index-register/dark/console/measured",
+  "sections": "head and readings, weights, toolbar, register, pagination (home); banner, score diff, policy rows (compare); audit trail, snapshots (changelog)",
+  "signature": "the register: ranked rows with a grade in the measured face",
+  "waived": [
+   "44c",
+   "59",
+   "72",
+   "71",
+   "77",
+   "78",
+   "79",
+   "49b"
+  ],
+  "prompt": "redesign whole website",
+  "date": "2026-11-18"
+ }
+]
