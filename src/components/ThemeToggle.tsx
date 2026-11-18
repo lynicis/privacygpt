@@ -19,7 +19,9 @@ export function ThemeToggle() {
   }, [])
 
   if (!mounted) {
-    return <div className="h-10 w-[116px] rounded-[6px] border border-rule bg-paper-2" />
+    return (
+      <div className="h-10 w-[116px] rounded-[6px] border border-rule bg-paper-2" />
+    )
   }
 
   return (

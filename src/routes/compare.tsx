@@ -162,7 +162,7 @@ function ComparePage() {
       </section>
 
       {/* Main Content */}
-      <main className="shell pb-20 pt-6">
+      <main className="shell pt-6 pb-20">
         {/* Company Selection */}
         <div className="mb-6 rounded-[10px] border border-rule bg-paper-2 p-4 sm:p-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
@@ -185,7 +185,10 @@ function ComparePage() {
                 title="Swap companies"
                 aria-label="Swap companies"
               >
-                <ArrowRightLeft className="h-4 w-4 rotate-90" aria-hidden="true" />
+                <ArrowRightLeft
+                  className="h-4 w-4 rotate-90"
+                  aria-hidden="true"
+                />
               </Button>
             </div>
 
@@ -240,7 +243,9 @@ function ComparePage() {
         {/* Invalid selection */}
         {invalidSelection && (
           <div className="mb-5 rounded-[10px] border border-signal/40 bg-signal-soft p-6 text-center">
-            <h2 className="text-lg font-medium text-signal">Company not found</h2>
+            <h2 className="text-lg font-medium text-signal">
+              Company not found
+            </h2>
             <p className="mt-1 text-sm text-ink-2">
               Pick another company to compare.
             </p>
@@ -327,61 +332,61 @@ function ComparePage() {
                 <span className="label">{companyB.companyName}</span>
               </div>
               <div className="space-y-0">
-              <CompareSection
-                label="Model training"
-                valueA={companyA.trainsOnDataNuance}
-                valueB={companyB.trainsOnDataNuance}
-                booleanA={companyA.trainsOnDataByDefault}
-                booleanB={companyB.trainsOnDataByDefault}
-                booleanGood={false}
-              />
-              <CompareSection
-                label="Opt-out mechanism"
-                valueA={companyA.optOutHow}
-                valueB={companyB.optOutHow}
-                booleanA={companyA.optOutAvailable}
-                booleanB={companyB.optOutAvailable}
-                booleanGood={true}
-              />
-              <CompareSection
-                label="Data retention and deletion"
-                valueA={`${companyA.retentionPeriod}. Deletion: ${companyA.dataDeletedOnRequestTimeframe}`}
-                valueB={`${companyB.retentionPeriod}. Deletion: ${companyB.dataDeletedOnRequestTimeframe}`}
-                booleanA={companyA.dataDeletedOnRequest}
-                booleanB={companyB.dataDeletedOnRequest}
-                booleanGood={true}
-              />
-              <CompareSection
-                label="Third-party sharing"
-                valueA={companyA.thirdPartySharing}
-                valueB={companyB.thirdPartySharing}
-              />
-              <CompareSection
-                label="Human review"
-                valueA={companyA.humanReviewConditions}
-                valueB={companyB.humanReviewConditions}
-                booleanA={companyA.humanReviewOfChats}
-                booleanB={companyB.humanReviewOfChats}
-                booleanGood={false}
-              />
-              <CompareSection
-                label="Regional variations"
-                valueA={companyA.regionalVariation}
-                valueB={companyB.regionalVariation}
-              />
-              <CompareSection
-                label="Children's data policy"
-                valueA={companyA.childrenDataPolicy}
-                valueB={companyB.childrenDataPolicy}
-              />
-              <CompareSection
-                label="Enterprise vs consumer"
-                valueA={companyA.enterpriseVsConsumerSummary}
-                valueB={companyB.enterpriseVsConsumerSummary}
-                booleanA={companyA.enterpriseVsConsumerDifference}
-                booleanB={companyB.enterpriseVsConsumerDifference}
-                booleanGood={false}
-              />
+                <CompareSection
+                  label="Model training"
+                  valueA={companyA.trainsOnDataNuance}
+                  valueB={companyB.trainsOnDataNuance}
+                  booleanA={companyA.trainsOnDataByDefault}
+                  booleanB={companyB.trainsOnDataByDefault}
+                  booleanGood={false}
+                />
+                <CompareSection
+                  label="Opt-out mechanism"
+                  valueA={companyA.optOutHow}
+                  valueB={companyB.optOutHow}
+                  booleanA={companyA.optOutAvailable}
+                  booleanB={companyB.optOutAvailable}
+                  booleanGood={true}
+                />
+                <CompareSection
+                  label="Data retention and deletion"
+                  valueA={`${companyA.retentionPeriod}. Deletion: ${companyA.dataDeletedOnRequestTimeframe}`}
+                  valueB={`${companyB.retentionPeriod}. Deletion: ${companyB.dataDeletedOnRequestTimeframe}`}
+                  booleanA={companyA.dataDeletedOnRequest}
+                  booleanB={companyB.dataDeletedOnRequest}
+                  booleanGood={true}
+                />
+                <CompareSection
+                  label="Third-party sharing"
+                  valueA={companyA.thirdPartySharing}
+                  valueB={companyB.thirdPartySharing}
+                />
+                <CompareSection
+                  label="Human review"
+                  valueA={companyA.humanReviewConditions}
+                  valueB={companyB.humanReviewConditions}
+                  booleanA={companyA.humanReviewOfChats}
+                  booleanB={companyB.humanReviewOfChats}
+                  booleanGood={false}
+                />
+                <CompareSection
+                  label="Regional variations"
+                  valueA={companyA.regionalVariation}
+                  valueB={companyB.regionalVariation}
+                />
+                <CompareSection
+                  label="Children's data policy"
+                  valueA={companyA.childrenDataPolicy}
+                  valueB={companyB.childrenDataPolicy}
+                />
+                <CompareSection
+                  label="Enterprise vs consumer"
+                  valueA={companyA.enterpriseVsConsumerSummary}
+                  valueB={companyB.enterpriseVsConsumerSummary}
+                  booleanA={companyA.enterpriseVsConsumerDifference}
+                  booleanB={companyB.enterpriseVsConsumerDifference}
+                  booleanGood={false}
+                />
               </div>
             </section>
           </>

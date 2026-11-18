@@ -418,7 +418,11 @@ function ChangelogPage() {
 
   if (isLoading) {
     return (
-      <main className="shell py-12" aria-busy="true" aria-label="Loading change log">
+      <main
+        className="shell py-12"
+        aria-busy="true"
+        aria-label="Loading change log"
+      >
         <div className="h-10 w-72 animate-pulse rounded-[6px] bg-paper-2" />
         <div className="mt-4 h-5 w-96 animate-pulse rounded-[6px] bg-paper-2" />
         <div className="mt-8 h-24 animate-pulse rounded-[10px] border border-rule bg-paper-2" />
@@ -498,7 +502,7 @@ function ChangelogPage() {
       </section>
 
       {/* Main Content */}
-      <main className="shell pb-20 pt-6">
+      <main className="shell pt-6 pb-20">
         {/* Filters */}
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">

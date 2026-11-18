@@ -92,10 +92,7 @@ function ChangelogReview({ id }: { id: number }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <div className="space-y-1.5">
-        <label
-          htmlFor={`notes-${id}`}
-          className="label block"
-        >
+        <label htmlFor={`notes-${id}`} className="label block">
           Review notes and summary of changes
         </label>
         <textarea
@@ -202,7 +199,11 @@ function AdminPage() {
 
   if (isLoading) {
     return (
-      <main className="shell py-12" aria-busy="true" aria-label="Loading review queue">
+      <main
+        className="shell py-12"
+        aria-busy="true"
+        aria-label="Loading review queue"
+      >
         <div className="h-10 w-64 animate-pulse rounded-[6px] bg-paper-2" />
         <div className="mt-8 h-24 animate-pulse rounded-[10px] border border-rule bg-paper-2" />
         <div className="mt-4 h-64 animate-pulse rounded-[10px] border border-rule bg-paper-2" />
@@ -277,7 +278,7 @@ function AdminPage() {
       </section>
 
       {/* Main Content */}
-      <main className="shell pb-20 pt-6">
+      <main className="shell pt-6 pb-20">
         {/* Filters */}
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-3">
@@ -345,15 +346,17 @@ function AdminPage() {
                   <div className="border-b border-rule p-4">
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <div className="flex items-center gap-3">
-                        <span
-                          className={
-                            isPending ? "text-signal" : "text-ok"
-                          }
-                        >
+                        <span className={isPending ? "text-signal" : "text-ok"}>
                           {isPending ? (
-                            <AlertCircle className="h-4 w-4" aria-hidden="true" />
+                            <AlertCircle
+                              className="h-4 w-4"
+                              aria-hidden="true"
+                            />
                           ) : (
-                            <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+                            <CheckCircle2
+                              className="h-4 w-4"
+                              aria-hidden="true"
+                            />
                           )}
                         </span>
                         <div>

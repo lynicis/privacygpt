@@ -282,9 +282,7 @@ async function validateTempDb(tempClient: Client): Promise<void> {
       const present = await tableColumns(localClient, table)
       for (const col of columns) {
         if (!present.has(col)) {
-          fail(
-            "Local schema is behind prod. Apply migrations before syncing."
-          )
+          fail("Local schema is behind prod. Apply migrations before syncing.")
         }
       }
     }
@@ -372,7 +370,11 @@ async function applyLocal(
     "changelogs",
     CHANGELOG_COLUMNS
   )
-  const snapshotRows = await selectAll(tempClient, "snapshots", SNAPSHOT_COLUMNS)
+  const snapshotRows = await selectAll(
+    tempClient,
+    "snapshots",
+    SNAPSHOT_COLUMNS
+  )
 
   const client = openDb(LOCAL_DB)
   const tx = await client.transaction("write")

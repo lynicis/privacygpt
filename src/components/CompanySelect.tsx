@@ -50,7 +50,7 @@ export function CompanySelect({
               disabled={company.companyKey === disabledCompany}
             >
               <div className="flex flex-col py-0.5">
-                <span className="text-sm font-medium leading-tight text-ink">
+                <span className="text-sm leading-tight font-medium text-ink">
                   {company.companyName}
                 </span>
                 <span className="text-xs leading-tight text-muted">
@@ -61,10 +61,7 @@ export function CompanySelect({
           ))}
         </SelectContent>
       </Select>
-      <p
-        className="flex flex-wrap gap-2 pt-1"
-        aria-hidden={!selectedCompany}
-      >
+      <p className="flex flex-wrap gap-2 pt-1" aria-hidden={!selectedCompany}>
         <span
           className={`chip ${
             !selectedCompany

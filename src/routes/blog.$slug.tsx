@@ -100,10 +100,7 @@ function BlogPost() {
               <User className="h-4 w-4" aria-hidden="true" />
               {post.author}
             </span>
-            <time
-              className="measured"
-              dateTime={post.publishDate}
-            >
+            <time className="measured" dateTime={post.publishDate}>
               {new Date(post.publishDate).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",

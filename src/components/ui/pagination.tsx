@@ -24,7 +24,10 @@ export function PaginationContent({
 }: React.ComponentProps<"ul">) {
   return (
     <ul
-      className={cn("flex flex-row flex-wrap items-center justify-center gap-1", className)}
+      className={cn(
+        "flex flex-row flex-wrap items-center justify-center gap-1",
+        className
+      )}
       {...props}
     />
   )

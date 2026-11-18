@@ -86,8 +86,8 @@ export const Route = createFileRoute("/company/$companyKey")({
       <AlertTriangle className="mb-4 h-6 w-6 text-signal" aria-hidden="true" />
       <h1 className="max-w-[20ch]">Company not found</h1>
       <p className="mt-3 max-w-[48ch] text-muted-foreground">
-        The requested company privacy profile could not be found or has not
-        been seeded yet.
+        The requested company privacy profile could not be found or has not been
+        seeded yet.
       </p>
       <Button asChild className="mt-6" variant="outline">
         <Link to="/">Back to the register</Link>
@@ -109,7 +109,9 @@ function CompanyDetailPage() {
       icon: Database,
       title: "Default model training",
       value: company.trainsOnDataByDefault,
-      valueLabel: company.trainsOnDataByDefault ? "Trains by default" : "Off by default",
+      valueLabel: company.trainsOnDataByDefault
+        ? "Trains by default"
+        : "Off by default",
       bad: company.trainsOnDataByDefault,
       body: company.trainsOnDataNuance,
     },
@@ -145,7 +147,8 @@ function CompanyDetailPage() {
         to="/"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors duration-[var(--dur-micro)] hover:text-ink"
       >
-        <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to the register
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to the
+        register
       </Link>
 
       {/* The record's head: identity, dates, grade, one action. */}
@@ -165,13 +168,17 @@ function CompanyDetailPage() {
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-muted" aria-hidden="true" />
               <dt className="text-muted">Verified</dt>
-              <dd className="measured text-ink-2">{company.lastVerifiedDate}</dd>
+              <dd className="measured text-ink-2">
+                {company.lastVerifiedDate}
+              </dd>
             </div>
             {company.lastChangedDate && (
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-muted" aria-hidden="true" />
                 <dt className="text-muted">Changed</dt>
-                <dd className="measured text-ink-2">{company.lastChangedDate}</dd>
+                <dd className="measured text-ink-2">
+                  {company.lastChangedDate}
+                </dd>
               </div>
             )}
           </dl>
@@ -190,7 +197,11 @@ function CompanyDetailPage() {
               </Button>
             )}
             <Button asChild variant="outline" size="lg">
-              <a href={company.sourceUrl} target="_blank" rel="noopener noreferrer">
+              <a
+                href={company.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Read the source policy
                 <ExternalLink className="h-4 w-4" aria-hidden="true" />
               </a>
@@ -217,7 +228,8 @@ function CompanyDetailPage() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors duration-[var(--dur-micro)] hover:text-ink"
             >
-              Primary source <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+              Primary source{" "}
+              <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
             </a>
           </div>
         </div>
@@ -230,8 +242,8 @@ function CompanyDetailPage() {
             <div className="head-block">
               <h2 id="breakdown">Privacy grade breakdown</h2>
               <p>
-                Weighted from the six policy factors below. The formula lives
-                in the methodology.
+                Weighted from the six policy factors below. The formula lives in
+                the methodology.
               </p>
             </div>
             <div className="panels grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
@@ -259,7 +271,9 @@ function CompanyDetailPage() {
           <section aria-labelledby="policy" className="mt-16">
             <div className="head-block">
               <h2 id="policy">Policy details</h2>
-              <p>What the company’s own documents state, with the nuance kept.</p>
+              <p>
+                What the company’s own documents state, with the nuance kept.
+              </p>
             </div>
 
             <div className="border-t border-rule">
@@ -292,7 +306,10 @@ function CompanyDetailPage() {
 
               <div className="grid gap-3 border-b border-rule py-6 md:grid-cols-[minmax(0,220px)_minmax(0,1fr)] md:gap-8">
                 <h3 className="flex items-start gap-2 text-md font-medium">
-                  <Clock className="mt-0.5 h-4 w-4 shrink-0 text-muted" aria-hidden="true" />
+                  <Clock
+                    className="mt-0.5 h-4 w-4 shrink-0 text-muted"
+                    aria-hidden="true"
+                  />
                   Data retention and deletion
                 </h3>
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -322,7 +339,10 @@ function CompanyDetailPage() {
         </div>
 
         {/* Context around the record. */}
-        <aside aria-labelledby="context" className="lg:border-l lg:border-rule lg:pl-10">
+        <aside
+          aria-labelledby="context"
+          className="lg:border-l lg:border-rule lg:pl-10"
+        >
           <h2 id="context" className="text-title">
             Context and variations
           </h2>
@@ -351,9 +371,7 @@ function CompanyDetailPage() {
                 Enterprise vs consumer
               </h3>
               {company.enterpriseVsConsumerDifference && (
-                <span className="chip chip--signal mt-2">
-                  Different terms
-                </span>
+                <span className="chip chip--signal mt-2">Different terms</span>
               )}
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 {company.enterpriseVsConsumerSummary}

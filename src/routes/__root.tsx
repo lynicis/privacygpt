@@ -307,7 +307,13 @@ function RootLayout() {
                 aria-label="PrivacyGPT home"
                 className="inline-flex items-center gap-3"
               >
-                <img src="/logo.png" alt="" width={40} height={40} className="h-9 w-9" />
+                <img
+                  src="/logo.png"
+                  alt=""
+                  width={40}
+                  height={40}
+                  className="h-9 w-9"
+                />
                 <span className="font-display text-2xl font-medium tracking-[-0.03em]">
                   PrivacyGPT
                 </span>
@@ -353,7 +359,9 @@ function RootLayout() {
                     </a>
                   </li>
                 </ul>
-                <h2 className="mt-8 mb-4 text-sm font-medium text-ink">Legal</h2>
+                <h2 className="mt-8 mb-4 text-sm font-medium text-ink">
+                  Legal
+                </h2>
                 <ul className="space-y-2.5">
                   {[
                     { to: "/privacy", label: "Privacy Policy" },

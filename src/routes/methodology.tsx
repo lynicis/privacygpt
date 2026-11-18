@@ -60,7 +60,10 @@ const FIELDS = [
     description:
       "Does the platform use user conversations to train or fine-tune its models by default?",
     points: [
-      ["Opt-in Default:", "Data is private until user consents (highest rating)."],
+      [
+        "Opt-in Default:",
+        "Data is private until user consents (highest rating).",
+      ],
       [
         "Opt-out Default:",
         "Platform trains by default, but user can disable it.",
@@ -166,10 +169,7 @@ const RULES = [
     title: "2. Opt-Out Ease",
     points: [
       ["100 pts", "Settings toggle or already private."],
-      [
-        "40 pts",
-        "Requires manual form submission or is restricted to EU/UK.",
-      ],
+      ["40 pts", "Requires manual form submission or is restricted to EU/UK."],
       ["0 pts", "No opt-out available."],
     ],
   },
@@ -177,10 +177,7 @@ const RULES = [
     title: "3. Data Retention Period",
     points: [
       ["100 pts", "Zero retention (chats deleted immediately)."],
-      [
-        "80 pts",
-        "Short retention (under 30 days, e.g., when history is off).",
-      ],
+      ["80 pts", "Short retention (under 30 days, e.g., when history is off)."],
       ["50 pts", "Medium retention (30 days to 18 months)."],
       ["0 pts", "Long, indefinite, or 5-year research retention."],
     ],
@@ -199,10 +196,7 @@ const RULES = [
   {
     title: "5. Third-Party Sharing",
     points: [
-      [
-        "100 pts",
-        "Stored in isolated customer VPC, zero third-party sharing.",
-      ],
+      ["100 pts", "Stored in isolated customer VPC, zero third-party sharing."],
       [
         "85 pts",
         "Shared with infrastructure/model providers under strict non-training, security contracts.",
@@ -255,10 +249,7 @@ function MethodologyPage() {
         >
           <div className="grid gap-6 md:grid-cols-[minmax(0,220px)_minmax(0,1fr)] md:gap-16">
             <h2 id="pillars" className="text-title">
-              <Award
-                className="mb-3 h-5 w-5 text-muted"
-                aria-hidden="true"
-              />
+              <Award className="mb-3 h-5 w-5 text-muted" aria-hidden="true" />
               Grounded in primary evidence
             </h2>
             <p className="text-lead text-ink-2">
@@ -278,7 +269,9 @@ function MethodologyPage() {
         <section aria-labelledby="fields" className="mt-16">
           <div className="head-block">
             <h2 id="fields">Core assessment fields</h2>
-            <p>The questions every entry answers, and how each answer is graded.</p>
+            <p>
+              The questions every entry answers, and how each answer is graded.
+            </p>
           </div>
 
           <div className="border-t border-rule">

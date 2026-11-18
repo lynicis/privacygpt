@@ -47,8 +47,8 @@ function TermsPage() {
             PrivacyGPT is a comparison and awareness tool. It aggregates
             publicly available privacy policy data from AI companies to help
             users make informed decisions. Nothing on this site constitutes
-            legal advice, and no attorney-client relationship is formed by
-            using PrivacyGPT.
+            legal advice, and no attorney-client relationship is formed by using
+            PrivacyGPT.
           </p>
         </section>
 

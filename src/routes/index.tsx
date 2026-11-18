@@ -305,7 +305,11 @@ function App() {
 
   if (isLoading) {
     return (
-      <main className="shell py-14" aria-busy="true" aria-label="Loading register">
+      <main
+        className="shell py-14"
+        aria-busy="true"
+        aria-label="Loading register"
+      >
         <div className="grid gap-8 lg:grid-cols-[7fr_5fr] lg:items-end">
           <div>
             <div className="mb-4 h-12 w-2/3 animate-pulse rounded-[6px] bg-paper-2" />
@@ -349,7 +353,9 @@ function App() {
         <div className="shell pt-14 pb-10 sm:pt-20">
           <div className="grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-end">
             <div>
-              <h1 className="max-w-[16ch] text-display-s">Who trains on your chats?</h1>
+              <h1 className="max-w-[16ch] text-display-s">
+                Who trains on your chats?
+              </h1>
               <p className="lead mt-4 max-w-[48ch] text-ink-2">
                 Every major AI platform, read against its own policy: training
                 defaults, opt-out routes, retention, human review. Cited.
@@ -395,7 +401,7 @@ function App() {
       </section>
 
       {/* Main Dashboard */}
-      <main className="shell flex flex-col pb-20 pt-6">
+      <main className="shell flex flex-col pt-6 pb-20">
         {/* Scoring weights stay available, behind one disclosure. */}
         <div className="order-3 mb-4 rounded-[10px] border border-rule bg-paper-2 lg:order-1">
           <div className="flex flex-wrap items-center justify-between gap-3 p-4">
@@ -494,10 +500,7 @@ function App() {
           </div>
 
           <div className="flex items-center gap-2">
-            <ArrowUpDown
-              className="h-4 w-4 text-muted"
-              aria-hidden="true"
-            />
+            <ArrowUpDown className="h-4 w-4 text-muted" aria-hidden="true" />
             <Select
               value={search.sortBy || "score-desc"}
               onValueChange={(val) => setSortBy(val)}
@@ -510,7 +513,9 @@ function App() {
                 <SelectItem value="score-asc">Score: low to high</SelectItem>
                 <SelectItem value="name-asc">Name: A to Z</SelectItem>
                 <SelectItem value="name-desc">Name: Z to A</SelectItem>
-                <SelectItem value="training-first">No training first</SelectItem>
+                <SelectItem value="training-first">
+                  No training first
+                </SelectItem>
                 <SelectItem value="confidence-first">Verified first</SelectItem>
               </SelectContent>
             </Select>
@@ -595,9 +600,7 @@ function App() {
                     <span
                       className={`inline-flex items-baseline gap-1.5 rounded-[4px] border px-2 py-0.5 ${getGradeBadgeStyle(company.grade)}`}
                     >
-                      <span className="grade">
-                        {company.grade}
-                      </span>
+                      <span className="grade">{company.grade}</span>
                       <span className="measured text-xs opacity-80">
                         {company.totalScore}
                       </span>
@@ -642,7 +645,11 @@ function App() {
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors duration-[var(--dur-micro)] hover:text-ink"
                     >
-                      Policy <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                      Policy{" "}
+                      <ExternalLink
+                        className="h-3.5 w-3.5"
+                        aria-hidden="true"
+                      />
                     </a>
                   </td>
                 </tr>
@@ -672,9 +679,7 @@ function App() {
                   <span
                     className={`inline-flex shrink-0 items-baseline gap-1 rounded-[4px] border px-2 py-0.5 ${getGradeBadgeStyle(company.grade)}`}
                   >
-                    <span className="grade">
-                      {company.grade}
-                    </span>
+                    <span className="grade">{company.grade}</span>
                     <span className="measured text-xs opacity-80">
                       {company.totalScore}
                     </span>
@@ -684,7 +689,9 @@ function App() {
                   <span
                     className={`chip ${company.trainsOnDataByDefault ? "chip--bad" : "chip--ok"}`}
                   >
-                    {company.trainsOnDataByDefault ? "Training by default" : "Training off"}
+                    {company.trainsOnDataByDefault
+                      ? "Training by default"
+                      : "Training off"}
                   </span>
                   <span
                     className={`chip ${company.optOutAvailable ? "chip--ok" : "chip--bad"}`}
@@ -703,14 +710,16 @@ function App() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-sm text-muted-foreground"
                   >
-                    Source policy <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                    Source policy{" "}
+                    <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                   </a>
                   <Link
                     to="/company/$companyKey"
                     params={{ companyKey: company.companyKey }}
                     className="inline-flex items-center gap-1 text-sm text-ink"
                   >
-                    Full profile <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                    Full profile{" "}
+                    <ChevronRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
                 </div>
               </li>
@@ -783,10 +792,7 @@ function App() {
               }, [])
               .map((item, idx) =>
                 item === "ellipsis" ? (
-                  <span
-                    key={`ellipsis-${idx}`}
-                    className="px-1 text-muted"
-                  >
+                  <span key={`ellipsis-${idx}`} className="px-1 text-muted">
                     …
                   </span>
                 ) : (
