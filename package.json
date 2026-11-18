@@ -14,7 +14,9 @@
     "typecheck": "tsc --noEmit",
     "deploy": "bun run build && wrangler deploy",
     "generate-pwa-assets": "pwa-assets-generator",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "db:pull": "bun run scripts/sync-from-prod.ts",
+    "db:pull:apply": "bun run scripts/sync-from-prod.ts --apply"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
