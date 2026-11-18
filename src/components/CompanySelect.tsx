@@ -38,7 +38,7 @@ export function CompanySelect({
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger
           aria-labelledby={labelId}
-          className="h-11 w-full border-rule-2 bg-paper-3"
+          className="h-auto min-h-11 w-full border-rule-2 bg-paper-3 py-1.5"
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
@@ -49,11 +49,11 @@ export function CompanySelect({
               value={company.companyKey}
               disabled={company.companyKey === disabledCompany}
             >
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-ink">
+              <div className="flex flex-col py-0.5">
+                <span className="text-sm font-medium leading-tight text-ink">
                   {company.companyName}
                 </span>
-                <span className="text-sm text-muted">
+                <span className="text-xs leading-tight text-muted">
                   {company.productName}
                 </span>
               </div>
@@ -61,22 +61,35 @@ export function CompanySelect({
           ))}
         </SelectContent>
       </Select>
-      {selectedCompany && (
-        <p className="flex flex-wrap gap-2 pt-1">
-          <span
-            className={`chip ${selectedCompany.trainsOnDataByDefault ? "chip--bad" : "chip--ok"}`}
-          >
-            {selectedCompany.trainsOnDataByDefault
-              ? "Trains by default"
-              : "Training off"}
-          </span>
-          <span
-            className={`chip ${selectedCompany.optOutAvailable ? "chip--ok" : "chip--bad"}`}
-          >
-            {selectedCompany.optOutAvailable ? "Opt-out" : "No opt-out"}
-          </span>
-        </p>
-      )}
+      <p
+        className="flex flex-wrap gap-2 pt-1"
+        aria-hidden={!selectedCompany}
+      >
+        <span
+          className={`chip ${
+            !selectedCompany
+              ? "invisible"
+              : selectedCompany.trainsOnDataByDefault
+                ? "chip--bad"
+                : "chip--ok"
+          }`}
+        >
+          {selectedCompany?.trainsOnDataByDefault
+            ? "Trains by default"
+            : "Training off"}
+        </span>
+        <span
+          className={`chip ${
+            !selectedCompany
+              ? "invisible"
+              : selectedCompany.optOutAvailable
+                ? "chip--ok"
+                : "chip--bad"
+          }`}
+        >
+          {selectedCompany?.optOutAvailable ? "Opt-out" : "No opt-out"}
+        </span>
+      </p>
     </div>
   )
 }
