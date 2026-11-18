@@ -1,0 +1,206 @@
+# Production privacy-policy update review
+
+- Companies: 39
+- Changelogs: 237 (AI notes: 0; non-null proposed_changes: 0)
+- Snapshots: 402
+- `pending_review`: 182 (2026-09-20T00:00:46.649Z to 2026-11-15T00:01:06.297Z)
+- `reviewed`: 55 (2026-06-26T00:00:51.398Z to 2026-07-05T00:00:49.943Z)
+- Companies with pending entries: 35
+
+## Pending changes by company
+
+| company | pending | first | last | latest policy date (before -> after) | latest diff | last_changed_date |
+|---|---:|---|---|---|---:|---|
+| amazon | 6 | 2026-09-20 | 2026-11-15 | - -> - | 0.9308 | 2026-11-15 |
+| anthropic | 2 | 2026-09-20 | 2026-10-25 | - -> - | 0.9048 | 2026-10-25 |
+| anyscale | 5 | 2026-09-20 | 2026-11-15 | September 10, 2026 -> September 10, 2026 | 0.9740 | 2026-11-15 |
+| anysphere | 6 | 2026-09-20 | 2026-11-08 | October 11, 2026 -> November 6, 2026 | 0.9922 | 2026-11-08 |
+| bytedance | 1 | 2026-09-20 | 2026-09-20 | - -> - | 0.0000 | 2026-09-20 |
+| cerebras | 6 | 2026-09-20 | 2026-11-15 | August 27, 2024 -> August 27, 2024 | 0.9851 | 2026-11-15 |
+| cloudflare-ai | 2 | 2026-09-20 | 2026-10-25 | - -> - | 1.0000 | 2026-10-25 |
+| codeium | 4 | 2026-09-20 | 2026-11-01 | March 9, 2026 -> October 26, 2026 | 0.7814 | 2026-11-01 |
+| cognition | 4 | 2026-09-20 | 2026-11-01 | March 9, 2026 -> October 26, 2026 | 0.7814 | 2026-11-01 |
+| cohere | 8 | 2026-09-20 | 2026-11-15 | - -> - | 0.9572 | 2026-11-15 |
+| deepseek | 1 | 2026-09-20 | 2026-09-20 | Feb 10, 2026 -> Feb 10, 2026 | 0.8996 | 2026-09-20 |
+| fireworks-ai | 8 | 2026-09-20 | 2026-11-15 | - -> - | 0.9950 | 2026-11-15 |
+| google | 9 | 2026-09-20 | 2026-11-15 | October 26, 2026, October 13, 2026 -> October 26, 2026, October 13, 2026 | 1.0000 | 2026-11-15 |
+| groq | 3 | 2026-09-20 | 2026-10-11 | - -> - | 0.9968 | 2026-10-11 |
+| huggingface | 9 | 2026-09-20 | 2026-11-15 | March 28, 2023 -> March 28, 2023 | 1.0000 | 2026-11-15 |
+| kong-ai | 9 | 2026-09-20 | 2026-11-15 | - -> - | 0.9916 | 2026-11-15 |
+| litellm | 8 | 2026-09-20 | 2026-11-15 | - -> - | 0.9270 | 2026-11-15 |
+| meta | 2 | 2026-09-20 | 2026-10-11 | Jul 23, 2026, July 23, 2026 -> July 23, 2026 | 0.6650 | 2026-10-11 |
+| microsoft | 4 | 2026-09-20 | 2026-11-08 | - -> - | 0.9520 | 2026-11-08 |
+| mistral | 4 | 2026-09-20 | 2026-10-11 | - -> - | 0.1666 | 2026-10-11 |
+| nvidia-nim | 5 | 2026-09-20 | 2026-11-08 | - -> - | 1.0000 | 2026-11-08 |
+| ollama | 8 | 2026-09-20 | 2026-11-15 | March 2026 -> March 2026 | 0.9994 | 2026-11-15 |
+| openai | 9 | 2026-09-20 | 2026-11-15 | September 10, 2026 -> September 10, 2026 | 0.8842 | 2026-11-15 |
+| opencode-zen | 5 | 2026-09-20 | 2026-11-15 | Nov 6, 2026, Nov 4, 2026 -> Nov 9, 2026, Nov 8, 2026, Nov 6, 2026, Nov 4, 2026, Mar 6, 2026, Dec 16, 2025 | 0.3182 | 2026-11-15 |
+| openrouter | 8 | 2026-09-20 | 2026-11-15 | August 31, 2026 -> August 31, 2026 | 0.9836 | 2026-11-15 |
+| perplexity | 4 | 2026-09-20 | 2026-11-01 | October 23, 2026 -> October 23, 2026 | 1.0000 | 2026-11-01 |
+| portkey | 1 | 2026-09-20 | 2026-09-20 | - -> - | 0.8834 | 2026-09-20 |
+| replicate | 1 | 2026-09-20 | 2026-09-20 | April 1, 2026 -> April 1, 2026 | 0.7806 | 2026-09-20 |
+| sambanova | 3 | 2026-09-20 | 2026-11-01 | - -> - | 0.9900 | 2026-11-01 |
+| sarvam-ai | 8 | 2026-09-20 | 2026-11-15 | July 29, 2026 -> July 29, 2026 | 0.9644 | 2026-11-15 |
+| stepfun | 7 | 2026-09-20 | 2026-11-15 | August 7, 2026 -> August 7, 2026 | 0.9993 | 2026-11-15 |
+| together-ai | 6 | 2026-09-20 | 2026-11-08 | December 17, 2025 -> December 17, 2025 | 0.9610 | 2026-11-08 |
+| unsound | 5 | 2026-09-20 | 2026-11-01 | - -> - | 0.9842 | 2026-11-01 |
+| xai | 6 | 2026-09-20 | 2026-11-01 | October 11, 2026 -> October 27, 2026 | 0.9961 | 2026-11-01 |
+| zai | 5 | 2026-09-20 | 2026-11-15 | September 29, 2025 -> September 29, 2025 | 0.9988 | 2026-11-15 |
+
+## Policy-date changes
+
+### anyscale
+- id `211` 2026-09-20T00:01:11.924Z: July 1, 2025 -> September 10, 2026
+
+### anysphere
+- id `212` 2026-09-20T00:01:11.976Z: - -> October 6, 2025
+- id `254` 2026-10-04T00:01:26.262Z: October 6, 2025 -> September 29, 2026
+- id `287` 2026-10-18T00:00:54.640Z: September 29, 2026 -> October 11, 2026
+- id `348` 2026-11-08T00:00:28.175Z: October 11, 2026 -> November 6, 2026
+
+### codeium
+- id `216` 2026-09-20T00:01:13.806Z: - -> March 9, 2026
+- id `330` 2026-11-01T00:00:59.861Z: March 9, 2026 -> October 26, 2026
+
+### cognition
+- id `215` 2026-09-20T00:01:13.696Z: - -> March 9, 2026
+- id `329` 2026-11-01T00:00:59.849Z: March 9, 2026 -> October 26, 2026
+
+### cohere
+- id `206` 2026-09-20T00:01:09.727Z: May 1, 2026 -> -
+
+### google
+- id `185` 2026-09-20T00:00:52.429Z: JUNE 29, 2026, June 29, 2026 -> -
+- id `219` 2026-09-27T00:00:53.466Z: - -> September 24, 2026, June 29, 2026
+- id `237` 2026-10-04T00:01:07.484Z: September 24, 2026, June 29, 2026 -> -
+- id `256` 2026-10-11T00:00:50.244Z: - -> September 24, 2026, June 29, 2026
+- id `274` 2026-10-18T00:00:37.742Z: September 24, 2026, June 29, 2026 -> -
+- id `290` 2026-10-25T00:01:06.080Z: - -> October 23, 2026, October 13, 2026
+- id `312` 2026-11-01T00:00:40.867Z: October 23, 2026, October 13, 2026 -> -
+- id `332` 2026-11-08T00:00:09.104Z: - -> October 26, 2026, October 13, 2026
+
+### kong-ai
+- id `202` 2026-09-20T00:01:08.630Z: November 8, 2022 -> -
+
+### meta
+- id `186` 2026-09-20T00:00:55.471Z: December 16, 2025 -> Jul 23, 2026, July 23, 2026
+- id `257` 2026-10-11T00:00:52.967Z: Jul 23, 2026, July 23, 2026 -> July 23, 2026
+
+### openai
+- id `183` 2026-09-20T00:00:46.649Z: February 6, 2026 -> September 10, 2026
+
+### opencode-zen
+- id `345` 2026-11-08T00:00:26.797Z: Mar 6, 2026 -> Nov 6, 2026, Nov 4, 2026
+- id `364` 2026-11-15T00:01:06.297Z: Nov 6, 2026, Nov 4, 2026 -> Nov 9, 2026, Nov 8, 2026, Nov 6, 2026, Nov 4, 2026, Mar 6, 2026, Dec 16, 2025
+
+### openrouter
+- id `193` 2026-09-20T00:01:04.558Z: Apr 15, 2025 -> August 31, 2026
+
+### perplexity
+- id `189` 2026-09-20T00:01:00.209Z: July 2, 2026 -> July 8, 2026
+- id `291` 2026-10-25T00:01:14.084Z: July 8, 2026 -> October 23, 2026
+
+### sarvam-ai
+- id `200` 2026-09-20T00:01:08.006Z: - -> July 29, 2026
+
+### stepfun
+- id `210` 2026-09-20T00:01:11.968Z: November 28, 2025 -> August 7, 2026
+
+### xai
+- id `190` 2026-09-20T00:01:01.383Z: April 4, 2026 -> August 24, 2026
+- id `276` 2026-10-18T00:00:46.002Z: August 24, 2026 -> October 11, 2026
+- id `314` 2026-11-01T00:00:49.195Z: October 11, 2026 -> October 27, 2026
+
+
+## Companies with no policy date in either text
+
+amazon, anthropic, bytedance, cloudflare-ai, fireworks-ai, groq, litellm, microsoft, mistral, nvidia-nim, portkey, sambanova, unsound
+
+## No-date companies: latest diff excerpt
+
+### amazon (id 351, ratio 0.9308)
+    --- 
+    +++ 
+    @@ -1 +1 @@
+    -Security, privacy, and responsible AI – Amazon Bedrock – AWS Skip to main content Filter: All English Contact us AWS Marketplace Support My account re:Invent Discover AWS Products Solutions Pricing Resources Search Filter: All Sign in to console Create account Explore topics re:Invent 2026 The sess
+    +Security, privacy, and responsible AI – Amazon Bedrock – AWS Skip to main content Filter: All English Contact us AWS Marketplace Support My account re:Invent Discover AWS Products Solutions Pricing Resources Search Filter: All Sign in to console Create account Explore topics AWS re:Invent Livestrea
+
+### anthropic (id 289, ratio 0.9048)
+    --- 
+    +++ 
+    @@ -1 +1 @@
+    -Is my data used for model training? | Anthropic Privacy Center Skip to main content API Docs Release Notes Contact Support English Français Deutsch Bahasa Indonesia Italiano 日本語 한국어 Português Pусский 简体中文 Español 繁體中文 English API Docs Release Notes Contact Support English Français Deutsch Bahasa In
+    +Is my data used for model training? | Anthropic Privacy Center Skip to main content API Docs Release Notes Contact Support English Français Deutsch Bahasa Indonesia Italiano 日本語 한국어 Português Pусский 简体中文 Español 繁體中文 English API Docs Release Notes Contact Support English Français Deutsch Bahasa In
+
+### bytedance (id 217, ratio 0.0000)
+    --- 
+    +++ 
+    @@ -0,0 +1 @@
+    +Privacy Policy | TRAE - Collaborate with Intelligence -->
+
+### cloudflare-ai (id 294, whitespace-only)
+
+### fireworks-ai (id 354, ratio 0.9950)
+    --- 
+    +++ 
+    @@ -1 +1 @@
+    -Fireworks - Privacy Policy The right model for every task. Try Nexus Products Models Research Customers Resources Docs Log in Nexus Platform Get started Nexus For work and co-work Platform For systems and apps Home Privacy Notice Welcome! We are Fireworks.ai, Inc. This Privacy Notice explains how F
+    +Fireworks - Privacy Policy The right model for every task. Try Nexus Products Models Customers Research Resources Docs Log in Nexus Platform Get started Nexus For work and co-work Platform For systems and apps Home Privacy Notice Privacy Notice Welcome! We are Fireworks.ai, Inc. This Privacy Notice
+
+### groq (id 263, ratio 0.9968)
+    --- 
+    +++ 
+    @@ -1 +1 @@
+    -Privacy Policy | Groq is the premier neocloud for fast inference Platform Blog Contact Start building Platform Blog Contact Start building Groq Closes $350 million Series A, Building the World&#x27;s Leading AI Inference Cloud Read more &gt; Privacy Policy This Policy is effective on November 12, 2
+    +Privacy Policy | Groq is the premier neocloud for fast inference Platform Blog Careers Contact Start building Platform Blog Careers Contact Start building Groq Closes $350 million Series A, Building the World&#x27;s Leading AI Inference Cloud Read more &gt; Privacy Policy This Policy is effective o
+
+### litellm (id 358, ratio 0.9270)
+    --- 
+    +++ 
+    @@ -1 +1 @@
+    -Data Privacy and Security | liteLLM Skip to main content Decisions API is here. Call Jev, Clef or any decision model through one /v1/decisions endpoint. → Docs Home Home Get started with LiteLLM AI Gateway Route and control LLM traffic Auto Router Best model for each request Claude, Codex & Copilot
+    +Data Privacy and Security | liteLLM Skip to main content Decisions API is here. Call Gemini Decision 1, Jev, Clef or any decision model through one /v1/decisions endpoint. &rarr; Docs Home Home Get started with LiteLLM AI Gateway Route and control LLM traffic Auto Router Best model for each request
+
+### microsoft (id 333, ratio 0.9520)
+    --- 
+    +++ 
+    @@ -1 +1 @@
+    -Privacy FAQ for Microsoft Copilot | Microsoft Support Skip to main content Microsoft Support Support Support Home Microsoft 365 Office Products Microsoft 365 Outlook Microsoft Teams OneDrive Microsoft Copilot OneNote Windows more ... Devices Surface PC Accessories Xbox PC Gaming HoloLens Surface Hu
+    +Privacy FAQ for Microsoft Copilot | Microsoft Support Skip to main content Microsoft Support Support Support Home Microsoft 365 Office Products Microsoft 365 Outlook Microsoft Teams OneDrive Microsoft Copilot OneNote Windows more ... Devices Surface PC Accessories Xbox PC Gaming HoloLens Surface Hu
+
+### mistral (id 259, ratio 0.1666)
+    --- 
+    +++ 
+    @@ -1 +1 @@
+    -Can I opt out of my input or output data being used for training? | Mistral Help Center Copyright (c) 2023, Intercom, Inc. (legal@intercom.io) with Reserved Font Name &quot;Inter&quot;. This Font Software is licensed under the SIL Open Font License, Version 1.1. Skip to main content English Françai
+    +Can I opt out of my input or output data being used for training? | Mistral Help Center Copyright (c) 2023, Intercom, Inc. (legal@intercom.io) with Reserved Font Name &quot;Inter&quot;. This Font Software is licensed under the SIL Open Font License, Version 1.1. Skip to main content English Françai
+
+### nvidia-nim (id 338, whitespace-only)
+
+### portkey (id 203, ratio 0.8834)
+    --- 
+    +++ 
+    @@ -1 +1 @@
+    -PRIVACY POLICY PRIVACY POLICY PRIVACY POLICY Portkey is a comprehensive platform designed to streamline and enhance AI integration for developers and organizations Portkey, Inc 2261 Market Street #5205, San Francisco, CA Products AI Gateway Observability Guardrails Prompt Engineering Studio Agents 
+    +Privacy Policy | Portkey Privacy Policy Privacy Policy Privacy Policy Portkey is a comprehensive platform designed to streamline and enhance AI integration for developers and organizations Portkey, Inc 2261 Market Street #5205, San Francisco, CA Products AI Gateway Observability Guardrails Prompt E
+
+### sambanova (id 324, ratio 0.9900)
+    --- 
+    +++ 
+    @@ -1 +1 @@
+    -Privacy Policy | SambaNova --> SambaNova Completes First Close of $1B Financing at $11B Valuation --> The First Disaggregated Inference Demo for AI Agents Is Live --> SambaNova &amp; TEPCO Systems Partner to Deliver Energy-Efficient AI Infrastructure to Japan’s Power Sector Products SambaCloud Samb
+    +Privacy Policy | SambaNova --> SambaNova Completes First Close of $1B Financing at $11B Valuation --> The First Disaggregated Inference Demo for AI Agents Is Live --> SambaNova &amp; TEPCO Systems Partner to Deliver Energy-Efficient AI Infrastructure to Japan’s Power Sector Products SambaCloud Samb
+
+### unsound (id 328, ratio 0.9842)
+    --- 
+    +++ 
+    @@ -1 +1 @@
+    -隐私政策 | 文档中心 U2 Flash 全新上线！限时免费无限量调用（2026.09.30-2026.10.31）！ 立即查看 模型 Token Plan 低至5.9折 体验 文档 中 En 开发指南 API参考 模型价格 Token Plan 模型介绍 更新日志 开始使用 平台介绍 快速开始 使用指南 文本生成 语音识别 语音合成 视觉理解 Skill / CLI Skill 文档 使用云知声 CLI 接入 AI 工具 Codex WorkBuddy U2Claw OpenCode OpenClaw Claude Code Hermes Agent Cursor Trae Pi Codi
+    +隐私政策 | 文档中心 U Plan 正式上线！Free 档免费领，套餐升级限时5折，低至29.5元/月！ U2-Flash、U2-Med 超耐用，ASR、TTS、OCR 模型权益免费送！ 模型 订阅 免费领 体验 文档 中 En 开发指南 API参考 模型价格 U Plan 模型介绍 更新日志 开始使用 平台介绍 快速开始 使用指南 文本生成 语音识别 语音合成 视觉理解 Skill / CLI Skill 文档 使用云知声 CLI 接入 AI 工具 Codex WorkBuddy U2Claw OpenCode OpenClaw Claude Code Hermes Agent Curs
+
+## Notes
+
+- `last_changed_date` is set by the watchdog on any content-hash change, including navigation, marketing banners, and HTML formatting. It is not evidence of a substantive policy update.
+- `before_text`/`after_text` are capped at 5,000 characters by `src/lib/watchdog.ts`; date strings beyond the cap are not visible.
+- Google's fetched page alternates between raw markdown and rendered HTML, so date strings appear and disappear; treat missing dates as extraction variance.
+- No production writes were made.
