@@ -10,7 +10,8 @@ import { tmpdir } from "node:os"
 import path from "node:path"
 import { pathToFileURL } from "node:url"
 import { promisify } from "node:util"
-import { createClient, type Client, type Transaction } from "@libsql/client"
+import { createClient } from "@libsql/client"
+import type { Client, Transaction } from "@libsql/client"
 
 const execFile = promisify(execFileCb)
 

@@ -1,8 +1,10 @@
 import * as React from "react"
 import {
   flexRender,
-  getCoreRowModel,
-  useReactTable,
+  rowExpandingFeature,
+  rowPaginationFeature,
+  rowSortingFeature,
+  useTable,
 } from "@tanstack/react-table"
 import type {
   ColumnDef,
@@ -10,6 +12,7 @@ import type {
   PaginationState,
   ExpandedState,
   Row,
+  RowData,
   OnChangeFn,
 } from "@tanstack/react-table"
 import {
@@ -27,8 +30,8 @@ import {
   PaginationItem,
 } from "@/components/ui/pagination"
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
+interface DataTableProps<TData extends RowData> {
+  columns: ColumnDef<typeof tableFeatures, TData>[]
   data: TData[]
   pageCount: number
   pagination: PaginationState
@@ -37,12 +40,20 @@ interface DataTableProps<TData, TValue> {
   onSortingChange: (sorting: SortingState) => void
   expanded: ExpandedState
   onExpandedChange: OnChangeFn<ExpandedState>
-  getRowCanExpand?: (row: Row<TData>) => boolean
+  getRowCanExpand?: (row: Row<typeof tableFeatures, TData>) => boolean
   getRowId?: (row: TData) => string
-  renderSubComponent?: (props: { row: Row<TData> }) => React.ReactNode
+  renderSubComponent?: (props: {
+    row: Row<typeof tableFeatures, TData>
+  }) => React.ReactNode
 }
 
-export function DataTable<TData, TValue>({
+export const tableFeatures = {
+  rowSortingFeature,
+  rowPaginationFeature,
+  rowExpandingFeature,
+} as const
+
+export function DataTable<TData extends RowData>({
   columns,
   data,
   pageCount,
@@ -55,8 +66,9 @@ export function DataTable<TData, TValue>({
   getRowCanExpand,
   getRowId,
   renderSubComponent,
-}: DataTableProps<TData, TValue>) {
-  const table = useReactTable({
+}: DataTableProps<TData>) {
+  const table = useTable({
+    features: tableFeatures,
     data,
     columns,
     pageCount,
@@ -78,7 +90,6 @@ export function DataTable<TData, TValue>({
     },
     onExpandedChange: onExpandedChange,
     getRowCanExpand,
-    getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
     manualSorting: true,
   })
@@ -107,8 +118,8 @@ export function DataTable<TData, TValue>({
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <React.Fragment key={row.id}>
-                  <TableRow data-state={row.getIsSelected() && "selected"}>
-                    {row.getVisibleCells().map((cell) => (
+                  <TableRow>
+                    {row.getAllCells().map((cell) => (
                       <TableCell key={cell.id} className="px-4 py-3">
                         {flexRender(
                           cell.column.columnDef.cell,

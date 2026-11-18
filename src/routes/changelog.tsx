@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { DataTable } from "@/components/ui/data-table"
+import type { tableFeatures } from "@/components/ui/data-table"
 import type { ChangelogWithCompany } from "../lib/api"
 import type {
   ColumnDef,
@@ -223,7 +224,9 @@ function ChangelogPage() {
     }
   }
 
-  const columns = useMemo<ColumnDef<ChangelogWithCompany>[]>(
+  const columns = useMemo<
+    ColumnDef<typeof tableFeatures, ChangelogWithCompany>[]
+  >(
     () => [
       {
         id: "expand",
@@ -369,7 +372,11 @@ function ChangelogPage() {
   const pageCount = Math.ceil(totalCount / (search.pageSize ?? 20))
   const companiesTracked = trackedCompanies.length
 
-  const renderSubComponent = ({ row }: { row: Row<ChangelogWithCompany> }) => {
+  const renderSubComponent = ({
+    row,
+  }: {
+    row: Row<typeof tableFeatures, ChangelogWithCompany>
+  }) => {
     const entry = row.original
     return (
       <div className="space-y-4">

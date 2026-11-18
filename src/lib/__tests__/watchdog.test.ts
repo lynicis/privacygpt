@@ -9,7 +9,6 @@ import {
 } from "../watchdog"
 import FirecrawlApp from "@mendable/firecrawl-js"
 
-/* eslint-disable security/detect-object-injection */
 // Compatibility polyfills for Bun test runner where vi.stubGlobal / vi.mocked may be missing
 const originalGlobals: Record<string, any> = {}
 if (typeof vi.stubGlobal !== "function") {
@@ -30,7 +29,6 @@ if (typeof vi.unstubAllGlobals !== "function") {
 if (typeof vi.mocked !== "function") {
   ;(vi as any).mocked = (fn: any) => fn
 }
-/* eslint-enable security/detect-object-injection */
 
 const mockChain = {
   from: vi.fn().mockImplementation(() => mockChain),

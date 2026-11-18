@@ -12023,7 +12023,7 @@ type AIGatewayHeaders = {
   [key: string]: string | number | boolean | object
 }
 type AIGatewayUniversalRequest = {
-  provider: AIGatewayProviders | string // eslint-disable-line
+  provider: AIGatewayProviders | string  
   endpoint: string
   headers: Partial<AIGatewayHeaders>
   query: unknown
@@ -12041,7 +12041,7 @@ declare abstract class AiGateway {
       signal?: AbortSignal
     }
   ): Promise<Response>
-  getUrl(provider?: AIGatewayProviders | string): Promise<string> // eslint-disable-line
+  getUrl(provider?: AIGatewayProviders | string): Promise<string>  
 }
 /** A parameter accepted by an Analytics SQL query. */
 type AnalyticsSQLParameter = string | number | boolean | null
