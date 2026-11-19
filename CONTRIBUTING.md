@@ -26,13 +26,14 @@ This project adheres to the [Contributor Covenant](CODE_OF_CONDUCT.md). By parti
 ### Setup
 
 ```bash
-git clone https://github.com/lynicis/PrivacyGPT.git
+git clone https://github.com/lynicis/privacygpt.git
 cd privacygpt
 bun install
 cp .env.example .env
-bun run src/lib/db/seed.ts
 bun run dev
 ```
+
+The repository ships a seeded `privacy.db`, so no seeding step is needed to start. `bun run src/lib/db/seed.ts` resets local data to `seedData.json` — it overwrites rows rather than merging.
 
 ## Development Workflow
 
@@ -58,14 +59,41 @@ bun run dev
 
 ```
 src/
-├── routes/          # TanStack Start file-based routing
-├── components/      # React components (ui/ for shadcn)
-├── lib/             # Core logic, DB, scoring, watchdog
-├── content/blog/    # MDX blog posts
-└── styles.css       # Tailwind v4 + custom theme
+├── routes/                       # TanStack Start file-based routing
+│   ├── __root.tsx                # Layout, navbar, footer, theme toggle
+│   ├── index.tsx                 # Comparison dashboard
+│   ├── compare.tsx               # Side-by-side comparison
+│   ├── company.$companyKey.tsx   # Company profile
+│   ├── methodology.tsx           # Scoring rubric and FAQ
+│   ├── changelog.tsx             # Policy changelog feed
+│   ├── changelog.feed[.]xml.ts   # RSS feed
+│   ├── admin.tsx                 # Admin CRUD interface
+│   ├── blog.index.tsx            # Blog listing
+│   ├── blog.$slug.tsx            # Blog post
+│   ├── blog.feed[.]xml.ts        # Blog RSS feed
+│   ├── sitemap[.]xml.ts          # Sitemap endpoint
+│   ├── faq.tsx
+│   ├── privacy.tsx
+│   └── terms.tsx
+├── components/
+│   ├── ui/                       # shadcn/ui components
+│   └── ThemeProvider.tsx, CompanySelect.tsx, CompareScores.tsx, …
+├── lib/
+│   ├── db/                       # Drizzle schema, seed data, client
+│   ├── __tests__/                # Vitest suites
+│   ├── api.ts                    # Server functions (createServerFn)
+│   ├── ai-reviewer.ts            # AI changelog review
+│   ├── blog-data.ts
+│   ├── queries.ts                # TanStack Query hooks
+│   ├── scoring.ts                # Weighted scoring engine
+│   └── watchdog.ts               # Policy change detection
+├── content/blog/                 # MDX posts
+├── styles.css                    # Tailwind v4 + custom theme
+├── router.tsx                    # Router and SSR hydration
+└── entry.ts                      # Cloudflare Worker entry (cron + queues)
 ```
 
-See the full breakdown in [README.md](README.md#project-structure).
+`privacy.db` is committed and holds the current local dataset. `.env.example` documents every variable; `.env` is never committed.
 
 ## Coding Standards
 
@@ -113,8 +141,8 @@ See the full breakdown in [README.md](README.md#project-structure).
 When modifying `src/lib/db/schema.ts`:
 
 ```bash
-npx drizzle-kit generate
-npx drizzle-kit push
+bunx drizzle-kit generate
+bunx drizzle-kit push
 bun run test    # Verify schema/seed data compatibility
 ```
 

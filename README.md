@@ -1,244 +1,128 @@
-<div align="center">
-  <img src="./public/logo.png" alt="PrivacyGPT logo" height="80" />
+<img src="./public/logo.png" alt="PrivacyGPT logo" height="72" />
 
 # PrivacyGPT
 
-**Watch how AI companies handle your data**
+**Find out what an AI company does with your chats before you sign up — without reading its privacy policy.**
 
-[![Bun](https://img.shields.io/badge/Runtime-Bun-000?style=flat-square&logo=bun)](https://bun.sh)
-[![React](https://img.shields.io/badge/React-19-58c4dc?style=flat-square&logo=react)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-6-3178c6?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
-[![TanStack Start](https://img.shields.io/badge/TanStack-Start-ff4154?style=flat-square&logo=reactrouter)](https://tanstack.com/router/latest/docs/start/overview)
-[![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-f38020?style=flat-square&logo=cloudflare)](https://workers.cloudflare.com)
-[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind%20CSS-v4-06b6d4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com)
-[![Drizzle ORM](https://img.shields.io/badge/Drizzle-ORM-c5f74f?style=flat-square&logo=drizzle)](https://orm.drizzle.team)
-[![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
+**Status:** actively maintained, pre-1.0. One maintainer, no tagged releases, and 14 of the 39 company rows are still awaiting review.
 
-[Dashboard](#features) • [Getting started](#getting-started) • [Project structure](#project-structure)
+[![Live dashboard](https://img.shields.io/badge/live-privacygpt.lynicis.dev-2ea44f?style=flat-square)](https://privacygpt.lynicis.dev)
+[![CI](https://github.com/lynicis/privacygpt/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/lynicis/privacygpt/actions/workflows/ci-cd.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-yellow?style=flat-square)](LICENSE)
 
-</div>
+PrivacyGPT scores 39 AI companies — OpenAI, Anthropic, Google, Meta, Microsoft, Mistral, DeepSeek, and 32 more — on six questions that decide what happens to a conversation you paste in. Open [privacygpt.lynicis.dev](https://privacygpt.lynicis.dev), filter and compare companies, or reweight the categories so the score matches what you actually care about.
 
-PrivacyGPT tracks how major AI companies handle conversational data — training practices, opt-out options, data retention, deletion rights, third-party sharing, and human review policies. Each datapoint is sourced from primary-source privacy policies and verified.
+## What it answers
 
-The dashboard lets you compare companies side by side, filter by privacy stance, and get a weighted score based on what matters to you. An automated watchdog monitors policy pages for changes and surfaces them in a changelog with AI-powered review and admin workflow.
+| Question | Default weight | What is recorded per company |
+| --- | --- | --- |
+| Training data | 30% | Does it train on your conversations by default? |
+| Opt-out | 20% | Can you opt out, and how? |
+| Data retention | 15% | How long is conversational data kept? |
+| Deletion | 15% | Can you request deletion, and in what timeframe? |
+| Third-party sharing | 10% | Is data shared with third parties? |
+| Human review | 10% | Are conversations read by humans, and under what conditions? |
 
-## Features
+Scores run 0–100 and map to letter grades from A+ down to F. The weights above are defaults; the dashboard recalculates every score and grade in the browser as you move them. Each company page shows the individual answers, regional and enterprise-vs-consumer variation, and a link to the source policy.
 
-- **Comparison Dashboard** — Score cards, multi-condition filters (trains on data? opt-out available? no human review?), and search across 40+ AI companies
-- **Weighted Scoring** — Adjust the importance of six privacy categories; scores update in real-time with letter grades (A–D)
-- **Company Profiles** — Deep-dive pages with score breakdown, citation sources, verification badges, and raw privacy stance data
-- **Side-by-Side Comparison** — Select multiple companies and compare their privacy profiles directly
-- **Automated Watchdog** — Cron-scheduled pipeline fetches privacy policy URLs daily, detects changes via content hashing, and queues entries for admin review
-- **AI-Powered Review** — Cloudflare Queue-based system automatically reviews changelog entries for breaking changes and policy updates using AI
-- **Changelog with Admin Workflow** — Review pending changes, approve or reject, add notes, and notify subscribers
-- **Email Subscriptions** — Double opt-in subscription system for changelog alerts per company
-- **Methodology & Scoring Rubric** — Transparent documentation of how scores are calculated, with verification confidence ratings and FAQ
-- **Admin CRUD** — HTTP Basic Auth protected interface for managing companies and changelog entries
-- **PWA Support** — Service worker with cache-first strategies for offline access
-- **Dark Mode** — Light/dark/system theme toggle with localStorage persistence
-- **Atom & RSS Feeds** — Auto-discoverable changelog feeds
+Every row cites the policy it came from, and confidence is marked per company: **21 verified from policy text, 14 awaiting review, 4 unverified**. The dashboard is the current state; this repository is what generates it.
+
+Policy roundups go stale the week they are published. This one re-fetches every source on a weekly schedule, marks what changed, and scores with a formula you can reweight instead of a verdict someone else handed you.
+
+## What it does not do
+
+- **It is not legal advice or a compliance certification.** It reads published policies; it does not test a product's behaviour.
+- **Scores are one opinion, not a ranking to quote.** The defaults weight training and opt-out heavily. Change them and the order changes, deliberately.
+- **Coverage is 39 companies.** Missing vendors stay missing until someone adds them; there is no automated discovery of new companies.
+- **Changes are detected weekly, not instantly.** The watchdog hashes each policy URL on a Sunday cron, publishes what changed to the [changelog](https://privacygpt.lynicis.dev/changelog), and marks the entry pending until an admin reviews it. A policy edited between runs is invisible until the next one.
+- **It does not score enterprise or API terms separately.** Those differences are summarised on the company page, not folded into the grade.
+
+## Self-hosting
+
+You need [Bun](https://bun.sh) 1.0 or newer. No Cloudflare account is required for local development.
+
+```bash
+git clone https://github.com/lynicis/privacygpt.git
+cd privacygpt
+bun install
+cp .env.example .env   # sets admin credentials and APP_URL
+bun run dev            # http://localhost:3000
+```
+
+The repository ships a seeded `privacy.db` (SQLite, 39 companies), so `bun run dev` works without any seeding step. Run the seed script only to reset local data:
+
+```bash
+bun run src/lib/db/seed.ts
+```
+
+That overwrites the current rows with `src/lib/db/seedData.json`. It is a reset, not a merge — pull production data into `privacy.db` first if you want to keep it (`bun run db:pull:apply`).
+
+`.env.example` ships placeholder admin credentials. Change `ADMIN_USERNAME` and `ADMIN_PASSWORD` before exposing an instance; the admin interface refuses every request while either value is unset.
 
 ## Architecture
 
+The app runs on **Cloudflare Workers** with server-side rendering via **TanStack Start**. The client never touches the database — data comes through `createServerFn` calls. In development `getDb()` resolves to a local libsql (SQLite) file; in production it resolves to D1. A weekly cron trigger runs the watchdog: fetch each policy URL, hash the content, and queue anything that changed. A second queue sends changelog entries through AI review, with retries and a dead letter queue per stage.
+
 ```mermaid
 flowchart TD
-    Browser["Browser\n(React 19)"]
-    Worker["Cloudflare Worker\n(TanStack SSR)"]
-    D1["D1 Database\n(libsql)"]
-    Watchdog["Watchdog (Cron)\nfetches & diffs"]
-    WatchdogQueue["Watchdog Queue\n(async processing)"]
-    AIReviewQueue["AI Review Queue\n(async review)"]
-    DLQ["Dead Letter Queue\n(failed reviews)"]
+    Browser["Browser<br/>(React 19)"]
+    Worker["Cloudflare Worker<br/>(TanStack SSR)"]
+    D1["D1 Database"]
+    Watchdog["Watchdog<br/>(weekly cron)"]
+    WatchdogQueue["Watchdog Queue"]
+    AIReviewQueue["AI Review Queue"]
+    DLQ["Dead Letter Queue"]
 
     Browser --> Worker
     Worker --> D1
-
-    subgraph WorkerInternal [" "]
-        Router["Router\n(TanStack Start)"]
-        ServerFns["Server Functions\n(API)"]
-        Watchdog["Watchdog (Cron)\nfetches & hashes"]
-    end
-    Worker -.-> Router
-    Worker -.-> ServerFns
-    Worker -.-> Watchdog
-
     Worker --> WatchdogQueue
     Worker --> AIReviewQueue
     Watchdog --> D1
+    Watchdog --> WatchdogQueue
     WatchdogQueue --> D1
     WatchdogQueue -.->|failures| DLQ
     AIReviewQueue --> D1
     AIReviewQueue -.->|failures| DLQ
 ```
 
-The app runs on **Cloudflare Workers** with server-side rendering via **TanStack Start**. Data is fetched through `createServerFn` calls — no direct database access from the client. A scheduled cron trigger runs the watchdog daily, which fetches privacy policies, detects changes via content hashing, then queues results for AI-powered review and admin workflow. The AI review system processes changelog entries asynchronously via Cloudflare Queues with automatic retry and dead letter queue handling.
+## Configuration
 
-> [!NOTE]
-> In development, the database runs on a local **libsql** (SQLite) file. In production, it uses **Cloudflare D1**. The same codebase handles both transparently via `getDb()`.
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `ADMIN_USERNAME` | Yes | HTTP Basic Auth user for `/admin`; admin fails closed when unset |
+| `ADMIN_PASSWORD` | Yes | HTTP Basic Auth password for `/admin` |
+| `APP_URL` | Yes in production | Public origin used for canonical URLs, feeds, and the sitemap |
+| `FIRECRAWL_API_KEY` | No | Fallback scraper for policy pages that answer plain fetches with 401/403/timeouts |
 
-## Tech Stack
+Cloudflare queue bindings and the D1 database live in `wrangler.jsonc`. The four queues (`watchdog`, `ai-review`, and one dead letter queue each) are created by the CI workflow on deploy.
 
-| Layer         | Technology                                                                                                                                              |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Runtime**   | [Bun](https://bun.sh) (dev) / [Cloudflare Workers](https://workers.cloudflare.com) (prod)                                                               |
-| **Framework** | [TanStack Start](https://tanstack.com/router/latest/docs/start/overview) (React 19 + TypeScript 6)                                                      |
-| **UI**        | [Tailwind CSS v4](https://tailwindcss.com) + [shadcn/ui](https://ui.shadcn.com)                                                                         |
-| **Database**  | [libsql](https://github.com/tursodatabase/libsql) (dev) / [D1](https://developers.cloudflare.com/d1) (prod) via [Drizzle ORM](https://orm.drizzle.team) |
-| **Queues**    | [Cloudflare Queues](https://developers.cloudflare.com/queues) (async processing with dead letter queues)                                                |
-| **State**     | [TanStack React Query](https://tanstack.com/query/latest) (SSR with 5-min stale time)                                                                   |
-| **Routing**   | [TanStack Router](https://tanstack.com/router/latest) (file-based, SSR)                                                                                 |
-| **Testing**   | [Vitest](https://vitest.dev)                                                                                                                            |
-| **CI/CD**     | GitHub Actions → Cloudflare Workers via Wrangler                                                                                                        |
-
-## Getting Started
-
-### Prerequisites
-
-- [Bun](https://bun.sh) >= 1.0
-
-### Setup
+## Deploy and develop
 
 ```bash
-# Clone the repository
-git clone https://github.com/<your-org>/privacygpt.git
-cd privacygpt
-
-# Install dependencies
-bun install
-
-# Copy environment variables and fill them in
-cp .env.example .env
-
-# Seed the database with company privacy data
-bun run src/lib/db/seed.ts
-
-# Start the development server
-bun run dev
+bun run deploy   # builds with Vite, then deploys with Wrangler
 ```
 
-The app will be available at `http://localhost:3000`.
+`bun run deploy` is the only deployment path that works: `wrangler deploy` alone resolves neither the TanStack manifest nor the client assets. Deployment needs `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`, and `wrangler.jsonc` pins the custom domain `privacygpt.lynicis.dev` with `workers_dev: false` — a fork must change that route before it can deploy anywhere else.
 
-### Seeding the Database
-
-The file `src/lib/db/seedData.json` is an initial snapshot used to bootstrap or reset the database. Live updates to company privacy data are applied directly to the database via the admin review workflow.
-
-To manually add a new company or perform a full environment reset:
-
-1. Edit `seedData.json`
-2. Run `bun run src/lib/db/seed.ts`
-3. Run `bun run test` to verify structure
-
-### Running Tests
+Checks, all of which run in CI:
 
 ```bash
-bun run test         # Run vitest suite
-bun run lint         # Lint with ESLint
-bun run typecheck    # Verify TypeScript compilation
-bun run format       # Format with Prettier
+bun run test        # Vitest, 66 tests
+bun run lint
+bun run check       # Prettier
+bun run typecheck
 ```
 
-## Project Structure
-
-```
-src/
-├── routes/                   # TanStack Start file-based routing
-│   ├── __root.tsx            # Main layout (navbar, footer, theme toggle)
-│   ├── index.tsx             # Comparison dashboard
-│   ├── compare.tsx           # Side-by-side comparison
-│   ├── company.$companyKey.tsx       # Company profile
-│   ├── methodology.tsx       # Scoring rubric & FAQ
-│   ├── changelog.tsx         # Policy changelog feed
-│   ├── changelog.feed[.]xml.ts       # Atom/RSS XML feed
-│   ├── admin.tsx             # Admin CRUD interface
-│   ├── blog.index.tsx        # Blog listing page
-│   ├── blog.$slug.tsx        # Individual blog post
-│   ├── blog.feed[.]xml.ts    # Blog RSS feed
-│   ├── sitemap[.]xml.ts      # Sitemap XML endpoint
-│   ├── faq.tsx               # FAQ page
-│   ├── privacy.tsx           # Privacy policy page
-│   └── terms.tsx             # Terms of service page
-├── components/
-│   ├── ui/                   # shadcn/ui components
-│   ├── CompanySelect.tsx
-│   ├── CompanyLink.tsx
-│   ├── CompareScores.tsx
-│   ├── CompareSection.tsx
-│   ├── ThemeProvider.tsx
-│   └── ThemeToggle.tsx
-├── lib/
-│   ├── db/                   # Drizzle schema, seed data, client
-│   ├── __tests__/            # Vitest test suites
-│   ├── api.ts                # Server functions (createServerFn)
-│   ├── ai-reviewer.ts        # AI-powered changelog review logic
-│   ├── blog-data.ts          # Blog post metadata
-│   ├── queries.ts            # TanStack Query hooks
-│   ├── scoring.ts            # Scoring engine (6 weighted categories)
-│   ├── utils.ts              # Classnames merge helpers
-│   └── watchdog.ts           # Policy change detection pipeline
-├── content/blog/             # MDX blog posts
-├── styles.css                # Tailwind v4 + custom theme
-├── router.tsx                # Router configuration with SSR hydration
-└── entry.ts                  # Cloudflare Worker entry point
-```
-
-## Customization
-
-### Weights
-
-Users can adjust the relative importance of six scoring categories via the dashboard weights panel. Changes recalculate scores and letter grades instantly on the client side.
-
-### Scoring Rubric
-
-| Category            | Default Weight | Description                                              |
-| ------------------- | -------------- | -------------------------------------------------------- |
-| Training Data       | 30%            | Does the company train on user conversations by default? |
-| Opt-Out             | 20%            | Can users opt out of training data use?                  |
-| Data Retention      | 15%            | How long is conversational data retained?                |
-| Deletion            | 15%            | Can users request deletion of their data?                |
-| Third-Party Sharing | 10%            | Is data shared with third parties for training?          |
-| Human Review        | 10%            | Are conversations reviewed by humans?                    |
-
-## Deployment
-
-The project is designed for [Cloudflare Workers](https://workers.cloudflare.com). Deploy with:
+Schema changes go through Drizzle, then a seed-structure check:
 
 ```bash
-# Deploy main application
-npx wrangler deploy
+bunx drizzle-kit generate
+bunx drizzle-kit push
+bun run test
 ```
 
-Configuration is in `wrangler.jsonc` (main app and scheduled cron triggers).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the repository layout, naming rules, and the pull request process.
 
-### Environment Variables
+## Licence
 
-| Variable                            | Description                                        |
-| ----------------------------------- | -------------------------------------------------- |
-| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | HTTP Basic Auth for admin interface                |
-| `APP_URL`                           | Public application URL                             |
-| `FIRECRAWL_API_KEY`                 | API key for Firecrawl JS fallback scraper          |
-| `AI_REVIEW_ENABLED`                 | Enable AI-powered changelog review (default: true) |
-
-### Cloudflare Queues
-
-The application uses two Cloudflare Queues for async processing:
-
-| Queue                        | Purpose                                          |
-| ---------------------------- | ------------------------------------------------ |
-| `privacygpt-watchdog-queue`  | Processes watchdog change detection results      |
-| `privacygpt-watchdog-dlq`    | Dead letter queue for watchdog change detections |
-| `privacygpt-ai-review-queue` | AI-powered changelog entry review                |
-| `privacygpt-ai-review-dlq`   | Dead letter queue for failed AI reviews          |
-
-Queues are automatically created during CI/CD deployment.
-
-## Database Changes
-
-When modifying the Drizzle schema in `src/lib/db/schema.ts`:
-
-```bash
-# Generate SQL migrations
-npx drizzle-kit generate
-
-# Push changes to local database
-npx drizzle-kit push
-```
+[MIT](LICENSE) © 2026 Emre Sırmalı.

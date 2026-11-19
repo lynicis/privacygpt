@@ -26,7 +26,8 @@ CI (`.github/workflows/ci-cd.yml`) runs test, lint+check+typecheck, build, then 
 
 | Need | File |
 | --- | --- |
-| Architecture, setup, route map | `README.md` |
+| Architecture, setup | `README.md` |
+| Route map, coding standards | `CONTRIBUTING.md` |
 | Workflow, naming, PR process | `CONTRIBUTING.md` |
 | Locked UI/design system | `design.md`, `src/tokens.css` |
 | Security reporting | `SECURITY.md` |
