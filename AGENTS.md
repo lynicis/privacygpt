@@ -1,178 +1,43 @@
-<!-- intent-skills:start -->
-## Skill Loading
+# Agent Instructions
 
-Use the repository’s installed Intent. If it is unavailable, report the missing dependency instead of downloading a replacement.
-Before editing files for a substantial task:
-- Run `bunx --no-install --package @tanstack/intent intent list` from the workspace root to see available local skills.
-- If a listed skill matches the task, run `bunx --no-install --package @tanstack/intent intent load <package>#<skill>` before changing files.
-- Use the loaded `SKILL.md` guidance while making the change.
-- Monorepos: when working across packages, run the skill check from the workspace root and prefer the local skill for the package being changed.
-- Multiple matches: prefer the most specific local skill for the package or concern you are changing; load additional skills only when the task spans multiple packages or concerns.
-<!-- intent-skills:end -->
+PrivacyGPT: TanStack Start (React 19) on Cloudflare Workers; Drizzle over libsql (dev) / D1 (prod).
 
-# AI Coding Agent Guidelines (`AGENTS.md`)
+## Package Manager
 
-Welcome! This file provides the context, structure, commands, and rules required for AI coding agents to work effectively on the **PrivacyGPT** codebase.
+- Use **Bun**: `bun install` (`bun.lock`).
 
-**Repository**: [github.com/lynicis/PrivacyGPT](https://github.com/lynicis/PrivacyGPT)
+## Commands
 
----
+| Task | Command |
+| --- | --- |
+| Dev server | `bun run dev` (port 3000) |
+| Test one file | `bunx vitest run src/lib/__tests__/scoring.test.ts` |
+| Lint one file | `bunx eslint <path>` |
+| Typecheck | `bun run typecheck` |
+| Full CI gate | `bun run test && bun run lint && bun run check && bun run typecheck && bun run build` |
+| Seed local DB | `bun run src/lib/db/seed.ts` |
+| Migrations | `bunx drizzle-kit generate` then `bunx drizzle-kit push` |
+| Pull prod data | `bun run db:pull:apply` |
+| Deploy | `bun run deploy` |
 
-## 🛠️ Project Overview & Technology Stack
+CI (`.github/workflows/ci-cd.yml`) runs test, lint+check+typecheck, build, then deploys on `main`.
 
-The **PrivacyGPT** is a web application designed to monitor how major AI companies handle conversational data. It features a comparison dashboard, detailed company profile pages, a methodology page, a changelog feed, an AI-powered review system for changelog entries, and an SQLite database loaded with verified primary-source privacy data.
+## External References
 
-### Stack Details:
+| Need | File |
+| --- | --- |
+| Architecture, setup, route map | `README.md` |
+| Workflow, naming, PR process | `CONTRIBUTING.md` |
+| Locked UI/design system | `design.md`, `src/tokens.css` |
+| Security reporting | `SECURITY.md` |
 
-- **Runtime**: [Bun](https://bun.sh/)
-- **Frontend & Routing**: [TanStack Start](https://tanstack.com/router/latest/docs/start/overview) (React 19 + TypeScript 6)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) (using `@tailwindcss/vite` plugin, no `tailwind.config.js`)
-- **UI Components**: [shadcn/ui](https://ui.shadcn.com/) (located in `src/components/ui`)
-- **Database ORM**: [Drizzle ORM](https://orm.drizzle.team/)
-- **Database Engine**: [libsql](https://github.com/tursodatabase/libsql) (SQLite)
-- **Testing**: [Vitest](https://vitest.dev/)
-- **Deployment**: [Cloudflare Workers](https://workers.cloudflare.com/) (via Wrangler)
+## Key Conventions
 
----
-
-## 📂 Project Directory Structure
-
-Use this mapping to navigate the repository:
-
-- 📁 `src/`
-  - 📁 `routes/` (TanStack Start file-based routing)
-    - 📄 `__root.tsx` — Main application layout, navbar, and footer.
-    - 📄 `index.tsx` — Comparison dashboard with search, filters, and sorting.
-    - 📄 `compare.tsx` — Side-by-side company comparison view.
-    - 📄 `company.$companyKey.tsx` — Detailed company privacy profile.
-    - 📄 `methodology.tsx` — Scoring rubric, verification ratings, and criteria.
-    - 📄 `changelog.tsx` — Changelog feed page.
-    - 📄 `changelog.feed[.]xml.ts` — RSS/Atom XML feed endpoint.
-    - 📄 `admin.tsx` — Admin interface.
-    - 📄 `sitemap.xml.ts` — Sitemap XML endpoint.
-  - 📁 `components/`
-    - 📁 `ui/` — Native shadcn/ui components (`badge`, `button`, `card`, `input`, `select`, `switch`, `table`, `tabs`).
-    - 📄 `CompanySelect.tsx` — Company selector dropdown.
-    - 📄 `CompareScores.tsx` — Comparison score display.
-    - 📄 `CompareSection.tsx` — Comparison section layout.
-    - 📄 `ThemeProvider.tsx` — Theme context provider.
-    - 📄 `ThemeToggle.tsx` — Light/dark mode toggle.
-  - 📁 `lib/`
-    - 📁 `db/`
-      - 📄 `index.ts` — Drizzle ORM client initialization.
-      - 📄 `schema.ts` — SQLite tables: `companies`, `snapshots`, `changelogs`.
-      - 📄 `seed.ts` — Seeding pipeline database loader.
-      - 📄 `seedData.json` — **Source of Truth** for company privacy profile seed records.
-    - 📁 `__tests__/`
-      - 📄 `schema.test.ts` — Vitest schema validation and seed data validation tests.
-      - 📄 `scoring.test.ts` — Scoring logic tests.
-      - 📄 `auth.test.ts` — Authentication tests.
-      - 📄 `watchdog.test.ts` — Watchdog logic tests.
-    - 📄 `api.ts` — Server functions (`getCompaniesFn`, `getCompanyByKeyFn`) for data fetching.
-    - 📄 `scoring.ts` — Scoring calculation logic.
-    - 📄 `watchdog.ts` — Watchdog monitoring logic.
-    - 📄 `ai-reviewer.ts` — AI-powered changelog review logic (queue consumer).
-    - 📄 `utils.ts` — Classnames merge helpers.
-  - 📄 `logo.svg` — Application logo.
-  - 📄 `routeTree.gen.ts` — Automatically generated route tree.
-  - 📄 `router.tsx` — TanStack Router configuration.
-  - 📄 `styles.css` — Custom styling, keyframes, and theme variables.
-- 📁 `drizzle/` — Schema migrations output.
-- 📁 `docs/` — Documentation and assets.
-- 📄 `drizzle.config.ts` — Drizzle CLI configuration.
-- 📄 `package.json` — Dependency management and scripts.
-- 📄 `privacy.db` — Local SQLite development database.
-- 📄 `wrangler.jsonc` — Cloudflare Workers configuration (including cron triggers).
-- 📄 `worker-configuration.d.ts` — Cloudflare Worker type definitions.
-
----
-
-## ⚡ Operational Commands
-
-Please use the following commands to run, build, and test the project:
-
-### 1. Running the Development Server
-
-Starts the dev server with live route generation.
-
-```bash
-bun run dev
-```
-
-_Note: The dev server will run on port `3000` by default and auto-generate `src/routeTree.gen.ts` as routes are added or changed._
-
-### 2. Seeding the Database
-
-Seeds the local database (`privacy.db`) using the static JSON file.
-
-```bash
-bun run src/lib/db/seed.ts
-```
-
-### 3. Running Tests
-
-Executes the Vitest test suite.
-
-```bash
-bun run test
-```
-
-### 4. Code Formatting & Linting
-
-Runs Prettier checks and ESLint.
-
-```bash
-bun run format  # Formats files
-bun run lint    # Lints files
-bun run check   # Checks format without modifying
-```
-
-### 5. Type Checking
-
-Verifies TypeScript compilation without emitting output.
-
-```bash
-bun run typecheck
-```
-
-### 6. Database Migrations (Drizzle Kit)
-
-When modifying the Drizzle schema in `src/lib/db/schema.ts`, run:
-
-```bash
-# Generate SQL migrations inside drizzle/
-npx drizzle-kit generate
-
-# Push changes directly to development database (local file)
-npx drizzle-kit push
-```
-
----
-
-## 🧭 Crucial Development Guidelines
-
-To maintain code quality and compatibility, adhere to the following guidelines:
-
-### 1. Data Source of Truth & Seeding
-
-- The production database (specifically the `companies` table) is the ultimate source of truth for the current policy state.
-- The `src/lib/db/seedData.json` file serves as the initial state snapshot used to bootstrap the database or reset a development environment.
-- Policy changes are detected automatically by the AI reviewer and applied directly to the database upon admin approval.
-- When manually adding a completely new company or resetting environments, update `src/lib/db/seedData.json` and run the seed script: `bun run src/lib/db/seed.ts`.
-
-### 2. Styling Rules
-
-- We use Tailwind CSS v4. Do **not** create a `tailwind.config.js`.
-- Custom configurations, keyframes, variables, and fonts are set directly in `src/styles.css` using standard CSS rules or `@theme` overrides.
-- Use shadcn/ui components where applicable and keep layouts consistent.
-
-### 3. TanStack Start Routing
-
-- All routes are defined in `src/routes/` using file-based routing.
-- Do not manually edit `src/routeTree.gen.ts` as it is automatically updated by the TanStack Start compiler.
-- Use `createServerFn` inside `src/lib/api.ts` to query DB data securely.
-
-### 4. Integrity Checks
-
-- Keep all existing comments and docstrings intact unless they are directly related to code being refactored.
-- Ensure that the Vitest suite in `src/lib/__tests__/schema.test.ts` passes successfully after any database schema or seed data updates.
+- The UI system is locked: read `design.md` before page work. Tokens live only in `src/tokens.css`; page helpers in `src/styles.css`.
+- Tailwind CSS v4: never create `tailwind.config.js`.
+- `src/routeTree.gen.ts` is generated by the TanStack compiler; never edit it.
+- The client never touches the DB: add `createServerFn` calls in `src/lib/api.ts`. `getDb()` (`src/lib/db/index.ts`) resolves D1 first, local `privacy.db` otherwise.
+- Production DB is the live policy state; `src/lib/db/seedData.json` is the bootstrap/reset snapshot. Edit it only for new companies or resets, then reseed and run `bun run test`.
+- Schema changes flow through Drizzle migrations in `drizzle/`; keep `src/lib/__tests__/schema.test.ts` green.
+- Admin access requires `ADMIN_USERNAME` and `ADMIN_PASSWORD`; it fails closed when either is unset.
+- Tests live in `src/lib/__tests__/`; update them for schema, seed, scoring, watchdog, or AI-review changes.
