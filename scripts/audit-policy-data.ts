@@ -159,7 +159,8 @@ async function main(): Promise<void> {
               WHERE company_id = ? ORDER BY fetched_at DESC LIMIT 1`,
         args: [Number(company.id)],
       })
-      const snapshot = (snapshotResult.rows[0] as unknown as Row) ?? null
+      const snapshotRow = snapshotResult.rows[0] as unknown as Row | undefined
+      const snapshot = snapshotRow ?? null
 
       const liveFetchPath = path.join(
         dossiersDir,

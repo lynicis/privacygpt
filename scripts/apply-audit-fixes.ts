@@ -88,12 +88,12 @@ function readFixes(fixesPath: string): Fix[] {
 
 function normalizeValue(field: string, value: Fix["newValue"]): unknown {
   if (value === null) {
-    if (!URL_COLUMNS[field] && field !== "last_changed_date") {
+    if (!(field in URL_COLUMNS) && field !== "last_changed_date") {
       fail(`field ${field} is NOT NULL and cannot be set to null`)
     }
     return null
   }
-  if (BOOLEAN_COLUMNS[field]) {
+  if (field in BOOLEAN_COLUMNS) {
     if (typeof value === "boolean") return value ? 1 : 0
     if (value === 0 || value === 1) return value
     if (value === "0" || value === "1") return Number(value)
@@ -114,7 +114,7 @@ function normalizeValue(field: string, value: Fix["newValue"]): unknown {
       fail(`confidence round-trip failed: ${text}`)
     return text
   }
-  if (DATE_COLUMNS[field]) {
+  if (field in DATE_COLUMNS) {
     const text = String(value)
     if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) {
       fail(
@@ -123,7 +123,7 @@ function normalizeValue(field: string, value: Fix["newValue"]): unknown {
     }
     return text
   }
-  if (URL_COLUMNS[field]) {
+  if (field in URL_COLUMNS) {
     const text = String(value)
     if (!text.startsWith("https://")) {
       fail(
