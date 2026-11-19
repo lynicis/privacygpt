@@ -18,3 +18,6 @@ graphify-out/
 # typescript
 *.tsbuildinfo
 .worktrees
+
+# local audit working files
+.audit/
