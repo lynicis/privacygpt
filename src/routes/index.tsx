@@ -59,38 +59,53 @@ interface DashboardSearch {
   weights?: string
 }
 export const Route = createFileRoute("/")({
-  validateSearch: (search: Record<string, unknown>): DashboardSearch => ({
-    page: positiveInt(search.page, 1),
-    search: (search.search as string) || undefined,
-    noTraining:
-      search.noTraining === true || search.noTraining === "true" || undefined,
-    optOut: search.optOut === true || search.optOut === "true" || undefined,
-    noHumanReview:
-      search.noHumanReview === true ||
-      search.noHumanReview === "true" ||
-      undefined,
-    sortBy: SORT_BY.includes(search.sortBy as DashboardSort)
-      ? (search.sortBy as DashboardSort)
-      : "score-desc",
-    weights: (search.weights as string) || undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): DashboardSearch => {
+    const parsedPage = positiveInt(search.page, 1)
+    const sortBy =
+      SORT_BY.includes(search.sortBy as DashboardSort) &&
+      search.sortBy !== "score-desc"
+        ? (search.sortBy as DashboardSort)
+        : undefined
+    return {
+      page: parsedPage > 1 ? parsedPage : undefined,
+      search: (search.search as string) || undefined,
+      noTraining:
+        search.noTraining === true || search.noTraining === "true" || undefined,
+      optOut: search.optOut === true || search.optOut === "true" || undefined,
+      noHumanReview:
+        search.noHumanReview === true ||
+        search.noHumanReview === "true" ||
+        undefined,
+      sortBy,
+      weights: (search.weights as string) || undefined,
+    }
+  },
   loaderDeps: ({ search }) => ({
-    page: search.page,
+    page: search.page ?? 1,
     search: search.search,
     noTraining: search.noTraining,
     optOut: search.optOut,
     noHumanReview: search.noHumanReview,
-    sortBy: search.sortBy,
+    sortBy: search.sortBy ?? "score-desc",
     weights: search.weights,
   }),
   loader: async ({ deps, context }) => {
+    const hasFacetFilters = Boolean(
+      deps.search ||
+      deps.noTraining ||
+      deps.optOut ||
+      deps.noHumanReview ||
+      deps.sortBy !== "score-desc" ||
+      deps.weights
+    )
+    let totalTracked = 35
     try {
       const parsedWeights = parseWeights(deps.weights)
-      const page = deps.page || 1
+      const page = deps.page
       const limit = 9
       const offset = (page - 1) * limit
 
-      await context.queryClient.ensureQueryData(
+      const res = await context.queryClient.ensureQueryData(
         companiesQueryOptions({
           limit,
           offset,
@@ -102,55 +117,73 @@ export const Route = createFileRoute("/")({
           weights: parsedWeights,
         })
       )
+      totalTracked = res.overallStats.total || totalTracked
     } catch (error) {
       console.error("Failed to prefetch companies on dashboard:", error)
     }
+    return { page: deps.page, hasFacetFilters, totalTracked }
   },
-  head: () => ({
-    meta: [
-      {
-        title:
-          "AI Privacy Watchdog: Compare AI Company Data Policies | PrivacyGPT",
-      },
-      {
-        name: "description",
-        content:
-          "Compare how major AI companies handle your conversational data. PrivacyGPT tracks model training defaults, opt-out mechanisms, and retention policies from verified source documents.",
-      },
-      { property: "og:type", content: "website" },
-      {
-        property: "og:title",
-        content:
-          "AI Privacy Watchdog: Compare AI Company Data Policies | PrivacyGPT",
-      },
-      {
-        property: "og:description",
-        content:
-          "Compare how major AI companies handle your conversational data. See who trains on your chats, who deletes on request, and who shares with third parties.",
-      },
-      { property: "og:url", content: APP_URL },
-      {
-        property: "og:image",
-        content: `${APP_URL}/og-image.png`,
-      },
-      { name: "twitter:card", content: "summary_large_image" },
-      {
-        name: "twitter:title",
-        content:
-          "AI Privacy Watchdog: Compare AI Company Data Policies | PrivacyGPT",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "Compare how major AI companies handle your conversational data. See who trains on your chats, who deletes on request, and who shares with third parties.",
-      },
-      {
-        name: "twitter:image",
-        content: `${APP_URL}/og-image.png`,
-      },
-    ],
-    links: [{ rel: "canonical", href: APP_URL }],
-  }),
+  head: ({ loaderData }) => {
+    const page = loaderData?.page ?? 1
+    const hasFacetFilters = loaderData?.hasFacetFilters ?? false
+    const totalTracked = loaderData?.totalTracked ?? 35
+    const isCleanPaginated = page > 1 && !hasFacetFilters
+    const title = isCleanPaginated
+      ? `AI Privacy Policy Tracker — Page ${page} | PrivacyGPT`
+      : "Compare AI Privacy Policies & Training Defaults | PrivacyGPT"
+    const description = `Compare ${totalTracked}+ AI privacy policies side by side. See which platforms train on your chats by default, offer opt-outs, retain logs, or use human review.`
+    const canonicalUrl = isCleanPaginated ? `${APP_URL}/?page=${page}` : APP_URL
+
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        ...(hasFacetFilters
+          ? [{ name: "robots", content: "noindex, follow" }]
+          : []),
+        { property: "og:type", content: "website" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: canonicalUrl },
+        { property: "og:image", content: `${APP_URL}/og-image.png` },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: `${APP_URL}/og-image.png` },
+      ],
+      links: [{ rel: "canonical", href: canonicalUrl }],
+      scripts:
+        page === 1 && !hasFacetFilters
+          ? [
+              {
+                type: "application/ld+json",
+                children: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "Dataset",
+                  name: "PrivacyGPT AI Privacy Policy Dataset",
+                  description,
+                  url: APP_URL,
+                  license: "https://opensource.org/licenses/MIT",
+                  isAccessibleForFree: true,
+                  creator: {
+                    "@type": "Organization",
+                    name: "PrivacyGPT",
+                    url: APP_URL,
+                  },
+                  variableMeasured: [
+                    "Default model training",
+                    "Opt-out availability and ease",
+                    "Conversation data retention period",
+                    "Deletion rights on request",
+                    "Third-party data sharing",
+                    "Human review of chats",
+                  ],
+                }),
+              },
+            ]
+          : [],
+    }
+  },
   component: App,
 })
 
@@ -169,12 +202,12 @@ function App() {
   const filters = useMemo(
     () => ({
       limit: 9,
-      offset: ((search.page || 1) - 1) * 9,
+      offset: ((search.page ?? 1) - 1) * 9,
       searchQuery: search.search,
       filterNoTraining: search.noTraining,
       filterOptOut: search.optOut,
       filterNoHumanReview: search.noHumanReview,
-      sortBy: search.sortBy,
+      sortBy: search.sortBy ?? "score-desc",
       weights,
     }),
     [
@@ -212,21 +245,23 @@ function App() {
   }, [weights])
 
   const handleResetWeights = () => {
-    const newWeights = { ...DEFAULT_WEIGHTS }
     navigate({
       search: (prev) => ({
         ...prev,
-        weights: JSON.stringify(newWeights),
+        weights: undefined,
       }),
       resetScroll: false,
     })
   }
 
   const setWeights = (newWeights: Weights) => {
+    const isDefault = (
+      Object.keys(DEFAULT_WEIGHTS) as Array<keyof Weights>
+    ).every((k) => newWeights[k] === DEFAULT_WEIGHTS[k])
     navigate({
       search: (prev) => ({
         ...prev,
-        weights: JSON.stringify(newWeights),
+        weights: isDefault ? undefined : JSON.stringify(newWeights),
       }),
       resetScroll: false,
     })
@@ -237,7 +272,7 @@ function App() {
       search: (prev) => ({
         ...prev,
         search: value || undefined,
-        page: 1,
+        page: undefined,
       }),
       resetScroll: false,
     })
@@ -248,7 +283,7 @@ function App() {
       search: (prev) => ({
         ...prev,
         noTraining: value || undefined,
-        page: 1,
+        page: undefined,
       }),
       resetScroll: false,
     })
@@ -259,7 +294,7 @@ function App() {
       search: (prev) => ({
         ...prev,
         optOut: value || undefined,
-        page: 1,
+        page: undefined,
       }),
       resetScroll: false,
     })
@@ -270,7 +305,7 @@ function App() {
       search: (prev) => ({
         ...prev,
         noHumanReview: value || undefined,
-        page: 1,
+        page: undefined,
       }),
       resetScroll: false,
     })
@@ -283,22 +318,17 @@ function App() {
     navigate({
       search: (prev) => ({
         ...prev,
-        sortBy,
-        page: 1,
+        sortBy: sortBy !== "score-desc" ? sortBy : undefined,
+        page: undefined,
       }),
       resetScroll: false,
     })
   }
 
-  const setPage = (page: number) => {
-    navigate({
-      search: (prev) => ({
-        ...prev,
-        page,
-      }),
-      resetScroll: false,
-    })
-  }
+  const pageSearch = (targetPage: number): DashboardSearch => ({
+    ...search,
+    page: targetPage > 1 ? targetPage : undefined,
+  })
 
   const currentPage = search.page || 1
   const totalPages = Math.ceil(totalCount / 9)
@@ -718,7 +748,11 @@ function App() {
                     params={{ companyKey: company.companyKey }}
                     className="inline-flex items-center gap-1 text-sm text-ink"
                   >
-                    Full profile{" "}
+                    Full profile
+                    <span className="sr-only">
+                      {" "}
+                      for {company.companyName}
+                    </span>{" "}
                     <ChevronRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
                 </div>
@@ -755,27 +789,64 @@ function App() {
 
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div className="order-4 mt-6 flex flex-wrap items-center justify-center gap-1.5">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={currentPage <= 1}
-              onClick={() => setPage(1)}
-              className="h-8 gap-1 px-2"
-              aria-label="First page"
-            >
-              <ChevronsLeft className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={currentPage <= 1}
-              onClick={() => setPage(currentPage - 1)}
-              className="h-8 gap-1 px-2"
-              aria-label="Previous page"
-            >
-              <ChevronLeft className="h-3.5 w-3.5" />
-            </Button>
+          <nav
+            aria-label="Pagination"
+            className="order-4 mt-6 flex flex-wrap items-center justify-center gap-1.5"
+          >
+            {currentPage <= 1 ? (
+              <Button
+                variant="outline"
+                size="sm"
+                disabled
+                className="h-8 gap-1 px-2"
+                aria-label="First page"
+              >
+                <ChevronsLeft className="h-3.5 w-3.5" aria-hidden="true" />
+              </Button>
+            ) : (
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1 px-2"
+              >
+                <Link
+                  to="/"
+                  search={pageSearch(1)}
+                  resetScroll={false}
+                  aria-label="First page"
+                >
+                  <ChevronsLeft className="h-3.5 w-3.5" aria-hidden="true" />
+                </Link>
+              </Button>
+            )}
+            {currentPage <= 1 ? (
+              <Button
+                variant="outline"
+                size="sm"
+                disabled
+                className="h-8 gap-1 px-2"
+                aria-label="Previous page"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" aria-hidden="true" />
+              </Button>
+            ) : (
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1 px-2"
+              >
+                <Link
+                  to="/"
+                  search={pageSearch(currentPage - 1)}
+                  resetScroll={false}
+                  aria-label="Previous page"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" aria-hidden="true" />
+                </Link>
+              </Button>
+            )}
             {Array.from({ length: totalPages }, (_, i) => i + 1)
               .filter((page) => {
                 if (totalPages <= 7) return true
@@ -798,36 +869,78 @@ function App() {
                 ) : (
                   <Button
                     key={item}
+                    asChild
                     variant={item === currentPage ? "secondary" : "outline"}
                     size="sm"
-                    onClick={() => setPage(item)}
                     className="w-8 px-0"
                   >
-                    {item}
+                    <Link
+                      to="/"
+                      search={pageSearch(item)}
+                      resetScroll={false}
+                      aria-current={item === currentPage ? "page" : undefined}
+                      aria-label={`Page ${item}`}
+                    >
+                      {item}
+                    </Link>
                   </Button>
                 )
               )}
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={currentPage >= totalPages}
-              onClick={() => setPage(currentPage + 1)}
-              className="h-8 gap-1 px-2"
-              aria-label="Next page"
-            >
-              <ChevronRight className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={currentPage >= totalPages}
-              onClick={() => setPage(totalPages)}
-              className="h-8 gap-1 px-2"
-              aria-label="Last page"
-            >
-              <ChevronsRight className="h-3.5 w-3.5" />
-            </Button>
-          </div>
+            {currentPage >= totalPages ? (
+              <Button
+                variant="outline"
+                size="sm"
+                disabled
+                className="h-8 gap-1 px-2"
+                aria-label="Next page"
+              >
+                <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Button>
+            ) : (
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1 px-2"
+              >
+                <Link
+                  to="/"
+                  search={pageSearch(currentPage + 1)}
+                  resetScroll={false}
+                  aria-label="Next page"
+                >
+                  <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+                </Link>
+              </Button>
+            )}
+            {currentPage >= totalPages ? (
+              <Button
+                variant="outline"
+                size="sm"
+                disabled
+                className="h-8 gap-1 px-2"
+                aria-label="Last page"
+              >
+                <ChevronsRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Button>
+            ) : (
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1 px-2"
+              >
+                <Link
+                  to="/"
+                  search={pageSearch(totalPages)}
+                  resetScroll={false}
+                  aria-label="Last page"
+                >
+                  <ChevronsRight className="h-3.5 w-3.5" aria-hidden="true" />
+                </Link>
+              </Button>
+            )}
+          </nav>
         )}
       </main>
     </>

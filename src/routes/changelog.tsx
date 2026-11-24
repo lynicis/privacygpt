@@ -39,35 +39,67 @@ import type {
   ExpandedState,
 } from "@tanstack/react-table"
 
+const CHANGELOG_SORT_BY = ["detectedAt", "companyName", "status"] as const
+const CHANGELOG_SORT_ORDER = ["asc", "desc"] as const
+
 interface ChangelogSearch {
   page?: number
   pageSize?: number
-  sortBy?: "detectedAt" | "companyName" | "status"
-  sortOrder?: "asc" | "desc"
+  sortBy?: (typeof CHANGELOG_SORT_BY)[number]
+  sortOrder?: (typeof CHANGELOG_SORT_ORDER)[number]
   companyFilter?: string
   statusFilter?: string
 }
 
 export const Route = createFileRoute("/changelog")({
   component: ChangelogPage,
-  validateSearch: (search: Record<string, unknown>): ChangelogSearch => ({
-    page: positiveInt(search.page, 1),
-    pageSize: positiveInt(search.pageSize, 20, 1000),
-    sortBy: (search.sortBy as ChangelogSearch["sortBy"]) || "detectedAt",
-    sortOrder: (search.sortOrder as ChangelogSearch["sortOrder"]) || "desc",
-    companyFilter: (search.companyFilter as string) || "all",
-    statusFilter: (search.statusFilter as string) || "all",
-  }),
+  validateSearch: (search: Record<string, unknown>): ChangelogSearch => {
+    const parsedPage = positiveInt(search.page, 1)
+    const parsedPageSize = positiveInt(search.pageSize, 20, 1000)
+    const sortBy =
+      CHANGELOG_SORT_BY.includes(
+        search.sortBy as (typeof CHANGELOG_SORT_BY)[number]
+      ) && search.sortBy !== "detectedAt"
+        ? (search.sortBy as ChangelogSearch["sortBy"])
+        : undefined
+    const sortOrder =
+      CHANGELOG_SORT_ORDER.includes(
+        search.sortOrder as (typeof CHANGELOG_SORT_ORDER)[number]
+      ) && search.sortOrder !== "desc"
+        ? (search.sortOrder as ChangelogSearch["sortOrder"])
+        : undefined
+    const companyFilter =
+      typeof search.companyFilter === "string" &&
+      search.companyFilter &&
+      search.companyFilter !== "all"
+        ? search.companyFilter
+        : undefined
+    const statusFilter =
+      typeof search.statusFilter === "string" &&
+      search.statusFilter &&
+      search.statusFilter !== "all"
+        ? search.statusFilter
+        : undefined
+
+    return {
+      page: parsedPage > 1 ? parsedPage : undefined,
+      pageSize: parsedPageSize !== 20 ? parsedPageSize : undefined,
+      sortBy,
+      sortOrder,
+      companyFilter,
+      statusFilter,
+    }
+  },
   loaderDeps: ({ search }) => ({
-    page: search.page,
-    pageSize: search.pageSize,
-    sortBy: search.sortBy,
-    sortOrder: search.sortOrder,
-    companyFilter: search.companyFilter,
-    statusFilter: search.statusFilter,
+    page: search.page ?? 1,
+    pageSize: search.pageSize ?? 20,
+    sortBy: search.sortBy ?? ("detectedAt" as const),
+    sortOrder: search.sortOrder ?? ("desc" as const),
+    companyFilter: search.companyFilter ?? "all",
+    statusFilter: search.statusFilter ?? "all",
   }),
   loader: async ({ deps, context }) => {
-    const pageIndex = (deps.page ?? 1) - 1
+    const pageIndex = deps.page - 1
     await Promise.all([
       context.queryClient.ensureQueryData(
         changelogsQueryOptions({
@@ -86,46 +118,64 @@ export const Route = createFileRoute("/changelog")({
       context.queryClient.ensureQueryData(snapshotTotalCountQueryOptions()),
       context.queryClient.ensureQueryData(pendingReviewsCountQueryOptions()),
     ])
+    const hasFilterParams = Boolean(
+      deps.page > 1 ||
+      deps.pageSize !== 20 ||
+      deps.sortBy !== "detectedAt" ||
+      deps.sortOrder !== "desc" ||
+      deps.companyFilter !== "all" ||
+      deps.statusFilter !== "all"
+    )
+    return { hasFilterParams }
   },
-  head: () => ({
-    meta: [
-      {
-        title: "Policy change log | PrivacyGPT",
-      },
-      {
-        name: "description",
-        content:
-          "Track real-time changes to AI companies' privacy policies. See exactly what changed, when it changed, and how it affects your data.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:title", content: "Policy change log | PrivacyGPT" },
-      {
-        property: "og:description",
-        content:
-          "Track real-time changes to AI companies' privacy policies. See exactly what changed, when it changed, and how it affects your data.",
-      },
-      {
-        property: "og:url",
-        content: `${APP_URL}/changelog`,
-      },
-      {
-        property: "og:image",
-        content: `${APP_URL}/og-image.png`,
-      },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Policy change log | PrivacyGPT" },
-      {
-        name: "twitter:description",
-        content:
-          "Track real-time changes to AI companies' privacy policies. See exactly what changed, when it changed, and how it affects your data.",
-      },
-      {
-        name: "twitter:image",
-        content: `${APP_URL}/og-image.png`,
-      },
-    ],
-    links: [{ rel: "canonical", href: `${APP_URL}/changelog` }],
-  }),
+  head: ({ loaderData }) => {
+    const hasFilterParams = loaderData?.hasFilterParams ?? false
+    const title = "AI Privacy Policy Change Log | PrivacyGPT"
+    const description =
+      "Track weekly changes to AI companies' privacy policies. See what changed, when it changed, and how it affects your conversational data."
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        ...(hasFilterParams
+          ? [{ name: "robots", content: "noindex, follow" }]
+          : []),
+        { property: "og:type", content: "website" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: `${APP_URL}/changelog` },
+        { property: "og:image", content: `${APP_URL}/og-image.png` },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: `${APP_URL}/og-image.png` },
+      ],
+      links: [{ rel: "canonical", href: `${APP_URL}/changelog` }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: APP_URL,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Policy Change Log",
+                item: `${APP_URL}/changelog`,
+              },
+            ],
+          }),
+        },
+      ],
+    }
+  },
 })
 
 function ChangelogPage() {
@@ -135,11 +185,11 @@ function ChangelogPage() {
   const changelogFilters = useMemo(
     () => ({
       page: (search.page ?? 1) - 1,
-      pageSize: search.pageSize,
-      sortBy: search.sortBy,
-      sortOrder: search.sortOrder,
-      companyFilter: search.companyFilter,
-      statusFilter: search.statusFilter,
+      pageSize: search.pageSize ?? 20,
+      sortBy: search.sortBy ?? ("detectedAt" as const),
+      sortOrder: search.sortOrder ?? ("desc" as const),
+      companyFilter: search.companyFilter ?? "all",
+      statusFilter: search.statusFilter ?? "all",
     }),
     [
       search.page,
@@ -191,11 +241,12 @@ function ChangelogPage() {
   )
 
   const onPaginationChange = (nextState: PaginationState) => {
+    const nextPage = nextState.pageIndex + 1
     navigate({
       search: {
         ...search,
-        page: nextState.pageIndex + 1,
-        pageSize: nextState.pageSize,
+        page: nextPage > 1 ? nextPage : undefined,
+        pageSize: nextState.pageSize !== 20 ? nextState.pageSize : undefined,
       },
     })
   }
@@ -205,7 +256,7 @@ function ChangelogPage() {
     () => [
       {
         id: search.sortBy ?? "detectedAt",
-        desc: search.sortOrder === "desc",
+        desc: (search.sortOrder ?? "desc") === "desc",
       },
     ],
     [search.sortBy, search.sortOrder]
@@ -214,11 +265,13 @@ function ChangelogPage() {
   const onSortingChange = (nextState: SortingState) => {
     const firstSort = nextState[0] as (typeof nextState)[number] | undefined
     if (firstSort) {
+      const nextSortBy = firstSort.id as ChangelogSearch["sortBy"]
+      const nextSortOrder = firstSort.desc ? "desc" : "asc"
       navigate({
         search: {
           ...search,
-          sortBy: firstSort.id as ChangelogSearch["sortBy"],
-          sortOrder: firstSort.desc ? "desc" : "asc",
+          sortBy: nextSortBy !== "detectedAt" ? nextSortBy : undefined,
+          sortOrder: nextSortOrder !== "desc" ? nextSortOrder : undefined,
         },
       })
     }
@@ -230,7 +283,7 @@ function ChangelogPage() {
     () => [
       {
         id: "expand",
-        header: () => null,
+        header: () => <span className="sr-only">Details</span>,
         cell: ({ row }) => (
           <Button
             variant="ghost"
@@ -258,16 +311,16 @@ function ChangelogPage() {
               variant="ghost"
               size="xs"
               onClick={() => {
-                const currentOrder = search.sortOrder
+                const currentOrder = search.sortOrder ?? "desc"
                 const isStatusSort = search.sortBy === "status"
                 const nextOrder =
                   isStatusSort && currentOrder === "asc" ? "desc" : "asc"
                 navigate({
                   search: {
                     ...search,
-                    page: 1,
+                    page: undefined,
                     sortBy: "status",
-                    sortOrder: nextOrder,
+                    sortOrder: nextOrder !== "desc" ? nextOrder : undefined,
                   },
                 })
               }}
@@ -301,16 +354,16 @@ function ChangelogPage() {
               variant="ghost"
               size="xs"
               onClick={() => {
-                const currentOrder = search.sortOrder
+                const currentOrder = search.sortOrder ?? "desc"
                 const isCompanySort = search.sortBy === "companyName"
                 const nextOrder =
                   isCompanySort && currentOrder === "asc" ? "desc" : "asc"
                 navigate({
                   search: {
                     ...search,
-                    page: 1,
+                    page: undefined,
                     sortBy: "companyName",
-                    sortOrder: nextOrder,
+                    sortOrder: nextOrder !== "desc" ? nextOrder : undefined,
                   },
                 })
               }}
@@ -340,16 +393,17 @@ function ChangelogPage() {
               variant="ghost"
               size="xs"
               onClick={() => {
-                const currentOrder = search.sortOrder
-                const isDetectedSort = search.sortBy === "detectedAt"
+                const currentOrder = search.sortOrder ?? "desc"
+                const isDetectedSort =
+                  (search.sortBy ?? "detectedAt") === "detectedAt"
                 const nextOrder =
                   isDetectedSort && currentOrder === "asc" ? "desc" : "asc"
                 navigate({
                   search: {
                     ...search,
-                    page: 1,
-                    sortBy: "detectedAt",
-                    sortOrder: nextOrder,
+                    page: undefined,
+                    sortBy: undefined,
+                    sortOrder: nextOrder !== "desc" ? nextOrder : undefined,
                   },
                 })
               }}
@@ -515,8 +569,8 @@ function ChangelogPage() {
               navigate({
                 search: {
                   ...search,
-                  page: 1,
-                  companyFilter: val,
+                  page: undefined,
+                  companyFilter: val !== "all" ? val : undefined,
                 },
               })
             }}
@@ -539,8 +593,8 @@ function ChangelogPage() {
               navigate({
                 search: {
                   ...search,
-                  page: 1,
-                  statusFilter: val,
+                  page: undefined,
+                  statusFilter: val !== "all" ? val : undefined,
                 },
               })
             }}

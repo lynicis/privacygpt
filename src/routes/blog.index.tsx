@@ -4,43 +4,60 @@ import { getBlogPostsFn } from "../lib/blog"
 import { APP_URL } from "../lib/site"
 
 export const Route = createFileRoute("/blog/")({
-  head: () => ({
-    meta: [
-      { title: "Blog - PrivacyGPT" },
-      {
-        name: "description",
-        content:
-          "Privacy insights, guides, and analysis on how major AI companies handle your conversational data.",
-      },
-      { property: "og:title", content: "Blog - PrivacyGPT" },
-      {
-        property: "og:description",
-        content:
-          "Privacy insights, guides, and analysis on how major AI companies handle your conversational data.",
-      },
-      { property: "og:url", content: `${APP_URL}/blog` },
-      { name: "twitter:title", content: "Blog - PrivacyGPT" },
-      {
-        name: "twitter:description",
-        content:
-          "Privacy insights, guides, and analysis on how major AI companies handle your conversational data.",
-      },
-    ],
-    links: [{ rel: "canonical", href: `${APP_URL}/blog` }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "CollectionPage",
-          name: "Blog - PrivacyGPT",
-          url: `${APP_URL}/blog`,
-          description:
-            "Privacy insights, guides, and analysis on how major AI companies handle your conversational data.",
-        }),
-      },
-    ],
-  }),
+  head: () => {
+    const title = "AI Privacy Blog & Opt-Out Guides | PrivacyGPT"
+    const description =
+      "Privacy insights, rankings, and step-by-step opt-out guides explaining how major AI companies handle your conversational data."
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: `${APP_URL}/blog` },
+        { property: "og:image", content: `${APP_URL}/og-image.png` },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: `${APP_URL}/og-image.png` },
+      ],
+      links: [{ rel: "canonical", href: `${APP_URL}/blog` }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: title,
+            url: `${APP_URL}/blog`,
+            description,
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: APP_URL,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Blog",
+                item: `${APP_URL}/blog`,
+              },
+            ],
+          }),
+        },
+      ],
+    }
+  },
   loader: async () => {
     const posts = await getBlogPostsFn()
     return { posts }

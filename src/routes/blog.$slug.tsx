@@ -21,15 +21,23 @@ export const Route = createFileRoute("/blog/$slug")({
       return { meta: [{ title: "Post not found | PrivacyGPT" }] }
     }
     const url = post.canonicalUrl || `${APP_URL}/blog/${post.slug}`
+    const title =
+      post.title.length <= 48 ? `${post.title} | PrivacyGPT` : post.title
     return {
       meta: [
-        { title: `${post.title} | PrivacyGPT` },
+        { title },
         { name: "description", content: post.description },
-        { property: "og:type", content: post.type },
+        { property: "og:type", content: "article" },
         { property: "og:title", content: post.title },
         { property: "og:description", content: post.description },
         { property: "og:url", content: url },
         { property: "og:image", content: `${APP_URL}/og-image.png` },
+        { property: "article:published_time", content: post.publishDate },
+        { property: "article:author", content: post.author },
+        ...post.tags.map((tag) => ({
+          property: "article:tag",
+          content: tag,
+        })),
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: post.title },
         { name: "twitter:description", content: post.description },
@@ -44,9 +52,58 @@ export const Route = createFileRoute("/blog/$slug")({
             "@type": post.type,
             headline: post.title,
             description: post.description,
-            author: { "@type": "Organization", name: post.author },
+            image: `${APP_URL}/og-image.png`,
+            author: {
+              "@type": "Organization",
+              name: post.author,
+              url: APP_URL,
+            },
+            publisher: {
+              "@type": "Organization",
+              name: "PrivacyGPT",
+              url: APP_URL,
+              logo: {
+                "@type": "ImageObject",
+                url: `${APP_URL}/pwa-512x512.png`,
+                width: 512,
+                height: 512,
+              },
+            },
             datePublished: post.publishDate,
+            dateModified: post.publishDate,
+            mainEntityOfPage: {
+              "@type": "WebPage",
+              "@id": url,
+            },
+            keywords: post.tags.join(", "),
             url,
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: APP_URL,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Blog",
+                item: `${APP_URL}/blog`,
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: post.title,
+                item: url,
+              },
+            ],
           }),
         },
       ],

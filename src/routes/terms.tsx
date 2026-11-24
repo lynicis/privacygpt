@@ -3,19 +3,50 @@ import { ArrowLeft } from "lucide-react"
 import { APP_URL } from "../lib/site"
 
 export const Route = createFileRoute("/terms")({
-  head: () => ({
-    meta: [
-      {
-        title: "Terms of Usage | PrivacyGPT",
-      },
-      {
-        name: "description",
-        content:
-          "PrivacyGPT terms of usage. Informational comparison tool, not legal advice. Read our terms before using the service.",
-      },
-    ],
-    links: [{ rel: "canonical", href: `${APP_URL}/terms` }],
-  }),
+  head: () => {
+    const title = "Terms of Usage | PrivacyGPT"
+    const description =
+      "PrivacyGPT terms of usage. Informational AI privacy comparison tool, not legal advice. Read our terms before using the service."
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: `${APP_URL}/terms` },
+        { property: "og:image", content: `${APP_URL}/og-image.png` },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: `${APP_URL}/og-image.png` },
+      ],
+      links: [{ rel: "canonical", href: `${APP_URL}/terms` }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: APP_URL,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Terms of Usage",
+                item: `${APP_URL}/terms`,
+              },
+            ],
+          }),
+        },
+      ],
+    }
+  },
   component: TermsPage,
 })
 

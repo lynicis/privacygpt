@@ -27,56 +27,87 @@ interface CompareSearch {
 
 export const Route = createFileRoute("/compare")({
   validateSearch: (search: Record<string, unknown>): CompareSearch => ({
-    companyA: search.companyA as string | undefined,
-    companyB: search.companyB as string | undefined,
+    companyA: (search.companyA as string) || undefined,
+    companyB: (search.companyB as string) || undefined,
   }),
-  loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(
-      companiesQueryOptions({ limit: 1000 })
-    )
+  loaderDeps: ({ search }) => ({
+    companyA: search.companyA,
+    companyB: search.companyB,
+  }),
+  loader: async ({ deps, context }) => {
+    const [, companyA, companyB] = await Promise.all([
+      context.queryClient.ensureQueryData(
+        companiesQueryOptions({ limit: 1000 })
+      ),
+      deps.companyA
+        ? context.queryClient.ensureQueryData(
+            companyByKeyQueryOptions(deps.companyA)
+          )
+        : Promise.resolve(null),
+      deps.companyB
+        ? context.queryClient.ensureQueryData(
+            companyByKeyQueryOptions(deps.companyB)
+          )
+        : Promise.resolve(null),
+    ])
+    return {
+      companyAName: companyA?.companyName ?? null,
+      companyBName: companyB?.companyName ?? null,
+      hasParams: Boolean(deps.companyA || deps.companyB),
+    }
   },
-  head: () => ({
-    meta: [
-      {
-        title: "Compare AI Privacy Policies | PrivacyGPT",
-      },
-      {
-        name: "description",
-        content:
-          "Compare how two AI companies handle your conversational data side-by-side. Analyze training defaults, opt-out mechanisms, retention policies, and more.",
-      },
-      { property: "og:type", content: "website" },
-      {
-        property: "og:title",
-        content: "Compare AI Privacy Policies | PrivacyGPT",
-      },
-      {
-        property: "og:description",
-        content:
-          "Compare how two AI companies handle your conversational data side-by-side. Analyze training defaults, opt-out mechanisms, retention policies, and more.",
-      },
-      { property: "og:url", content: `${APP_URL}/compare` },
-      {
-        property: "og:image",
-        content: `${APP_URL}/og-image.png`,
-      },
-      { name: "twitter:card", content: "summary_large_image" },
-      {
-        name: "twitter:title",
-        content: "Compare AI Privacy Policies | PrivacyGPT",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "Compare how two AI companies handle your conversational data side-by-side. Analyze training defaults, opt-out mechanisms, retention policies, and more.",
-      },
-      {
-        name: "twitter:image",
-        content: `${APP_URL}/og-image.png`,
-      },
-    ],
-    links: [{ rel: "canonical", href: `${APP_URL}/compare` }],
-  }),
+  head: ({ loaderData }) => {
+    const nameA = loaderData?.companyAName
+    const nameB = loaderData?.companyBName
+    const hasPair = Boolean(nameA && nameB)
+    const hasParams = loaderData?.hasParams ?? false
+    const title = hasPair
+      ? `${nameA} vs ${nameB} Privacy Policy Comparison | PrivacyGPT`
+      : "Compare AI Privacy Policies Side by Side | PrivacyGPT"
+    const description = hasPair
+      ? `Compare ${nameA} and ${nameB} privacy policies side by side: training defaults, opt-out ease, data retention, deletion rights, and human review.`
+      : "Compare how two AI companies handle your conversational data side by side: training defaults, opt-out mechanisms, retention, and human review."
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        ...(hasParams ? [{ name: "robots", content: "noindex, follow" }] : []),
+        { property: "og:type", content: "website" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: `${APP_URL}/compare` },
+        { property: "og:image", content: `${APP_URL}/og-image.png` },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: `${APP_URL}/og-image.png` },
+      ],
+      links: [{ rel: "canonical", href: `${APP_URL}/compare` }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: APP_URL,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Compare",
+                item: `${APP_URL}/compare`,
+              },
+            ],
+          }),
+        },
+      ],
+    }
+  },
   component: ComparePage,
 })
 

@@ -26,7 +26,10 @@ export function ThemeToggle() {
 
   return (
     <Select value={theme} onValueChange={(val) => setTheme(val as Theme)}>
-      <SelectTrigger className="h-10 w-[116px] rounded-[6px] border-rule-2 bg-paper-2 px-2.5 text-sm">
+      <SelectTrigger
+        aria-label="Color theme"
+        className="h-10 w-[116px] rounded-[6px] border-rule-2 bg-paper-2 px-2.5 text-sm"
+      >
         <SelectValue>
           <span className="flex items-center gap-1.5 font-medium">
             {theme === "light" && <Sun className="h-3.5 w-3.5 text-signal" />}

@@ -377,12 +377,15 @@ function AdminPage() {
                               year: "numeric",
                               month: "long",
                               day: "numeric",
+                              timeZone: "UTC",
                             })}{" "}
                             at{" "}
                             {detectedDate.toLocaleTimeString("en-US", {
                               hour: "2-digit",
                               minute: "2-digit",
-                            })}
+                              timeZone: "UTC",
+                            })}{" "}
+                            UTC
                           </p>
                         </div>
                       </div>
@@ -451,9 +454,10 @@ function AdminPage() {
                             {entry.reviewedAt && (
                               <p className="measured mt-2 text-xs text-muted">
                                 reviewed{" "}
-                                {new Date(
-                                  entry.reviewedAt
-                                ).toLocaleDateString()}
+                                {new Date(entry.reviewedAt).toLocaleDateString(
+                                  "en-US",
+                                  { timeZone: "UTC" }
+                                )}
                               </p>
                             )}
                           </div>

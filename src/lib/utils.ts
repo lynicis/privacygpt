@@ -23,19 +23,19 @@ const MONTHS = [
 
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr)
-  const month = MONTHS[d.getMonth()]
-  const day = d.getDate()
-  const year = d.getFullYear()
+  const month = MONTHS[d.getUTCMonth()]
+  const day = d.getUTCDate()
+  const year = d.getUTCFullYear()
   return `${month} ${day}, ${year}`
 }
 
 function formatTime(dateStr: string): string {
   const d = new Date(dateStr)
-  let hours = d.getHours()
-  const minutes = d.getMinutes().toString().padStart(2, "0")
+  let hours = d.getUTCHours()
+  const minutes = d.getUTCMinutes().toString().padStart(2, "0")
   const ampm = hours >= 12 ? "PM" : "AM"
   hours = hours % 12 || 12
-  return `${hours}:${minutes} ${ampm}`
+  return `${hours}:${minutes} ${ampm} UTC`
 }
 
 export function formatDateTime(dateStr: string): string {

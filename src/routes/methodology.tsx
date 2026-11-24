@@ -5,51 +5,50 @@ import { DEFAULT_WEIGHTS } from "../lib/scoring"
 import { APP_URL } from "../lib/site"
 
 export const Route = createFileRoute("/methodology")({
-  head: () => ({
-    meta: [
-      {
-        title: "AI Privacy Scoring Methodology & Rubric | PrivacyGPT",
-      },
-      {
-        name: "description",
-        content:
-          "Understand how PrivacyGPT scores AI companies on data privacy. Our rubric covers model training, opt-out ease, retention, deletion rights, third-party sharing, and human review, all cited to primary sources.",
-      },
-      { property: "og:type", content: "website" },
-      {
-        property: "og:title",
-        content: "AI Privacy Scoring Methodology & Rubric | PrivacyGPT",
-      },
-      {
-        property: "og:description",
-        content:
-          "Understand how PrivacyGPT scores AI companies on data privacy. Our rubric covers model training, opt-out ease, retention, deletion rights, third-party sharing, and human review.",
-      },
-      {
-        property: "og:url",
-        content: `${APP_URL}/methodology`,
-      },
-      {
-        property: "og:image",
-        content: `${APP_URL}/og-image.png`,
-      },
-      { name: "twitter:card", content: "summary_large_image" },
-      {
-        name: "twitter:title",
-        content: "AI Privacy Scoring Methodology & Rubric | PrivacyGPT",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "Understand how PrivacyGPT scores AI companies on data privacy. Our rubric covers model training, opt-out ease, retention, deletion rights, third-party sharing, and human review.",
-      },
-      {
-        name: "twitter:image",
-        content: `${APP_URL}/og-image.png`,
-      },
-    ],
-    links: [{ rel: "canonical", href: `${APP_URL}/methodology` }],
-  }),
+  head: () => {
+    const title = "AI Privacy Scoring Methodology | PrivacyGPT"
+    const description =
+      "How PrivacyGPT scores AI companies across six criteria: training defaults, opt-out ease, retention, deletion rights, third-party sharing, and human review."
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: `${APP_URL}/methodology` },
+        { property: "og:image", content: `${APP_URL}/og-image.png` },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: `${APP_URL}/og-image.png` },
+      ],
+      links: [{ rel: "canonical", href: `${APP_URL}/methodology` }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: APP_URL,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Methodology",
+                item: `${APP_URL}/methodology`,
+              },
+            ],
+          }),
+        },
+      ],
+    }
+  },
   component: MethodologyPage,
 })
 

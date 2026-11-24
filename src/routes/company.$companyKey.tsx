@@ -21,6 +21,7 @@ import {
   Building2,
   Calendar,
   AlertTriangle,
+  GitCompareArrows,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ConfidenceBadge } from "@/components/ConfidenceBadge"
@@ -37,46 +38,79 @@ export const Route = createFileRoute("/company/$companyKey")({
     if (!company) {
       return { meta: [{ title: "Company Not Found | PrivacyGPT" }] }
     }
-    const companyName = `${company.companyName} ${company.productName}`
-    const description = `Detailed privacy analysis for ${companyName}. See how they handle data training, opt-out, data retention, deletion rights, third-party sharing, and human review, verified from official policy documents.`
+    const subScores = calculateSubScores(company)
+    const totalScore = calculateTotalScore(subScores, DEFAULT_WEIGHTS)
+    const grade = mapScoreToGrade(totalScore)
+    const url = `${APP_URL}/company/${company.companyKey}`
+
+    const baseTitle = `${company.companyName} Privacy Policy & Grade (${grade}) | PrivacyGPT`
+    const fullTitle = `${company.companyName} ${company.productName} Privacy (${grade}) | PrivacyGPT`
+    const title = fullTitle.length <= 60 ? fullTitle : baseTitle
+
+    const trainsSummary = company.trainsOnDataByDefault
+      ? "Trains on chats by default"
+      : "Does not train by default"
+    const optOutSummary = company.optOutAvailable
+      ? "opt-out available"
+      : "no opt-out"
+    const rawDescription = `${company.companyName} (${company.productName}) privacy grade: ${grade} (${totalScore}/100). ${trainsSummary}, ${optOutSummary}. Verified against official policy.`
+    const description =
+      rawDescription.length > 158
+        ? `${rawDescription.slice(0, 155).trimEnd()}…`
+        : rawDescription
+
     return {
       meta: [
-        {
-          title: `${companyName} Privacy Policy Analysis | PrivacyGPT`,
-        },
-        {
-          name: "description",
-          content: description,
-        },
-        { property: "og:type", content: "website" },
-        {
-          property: "og:title",
-          content: `${companyName} Privacy Policy Analysis | PrivacyGPT`,
-        },
+        { title },
+        { name: "description", content: description },
+        { property: "og:type", content: "article" },
+        { property: "og:title", content: title },
         { property: "og:description", content: description },
-        {
-          property: "og:url",
-          content: `${APP_URL}/company/${company.companyKey}`,
-        },
-        {
-          property: "og:image",
-          content: `${APP_URL}/og-image.png`,
-        },
+        { property: "og:url", content: url },
+        { property: "og:image", content: `${APP_URL}/og-image.png` },
         { name: "twitter:card", content: "summary_large_image" },
-        {
-          name: "twitter:title",
-          content: `${companyName} Privacy Policy Analysis | PrivacyGPT`,
-        },
+        { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
-        {
-          name: "twitter:image",
-          content: `${APP_URL}/og-image.png`,
-        },
+        { name: "twitter:image", content: `${APP_URL}/og-image.png` },
       ],
-      links: [
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
         {
-          rel: "canonical",
-          href: `${APP_URL}/company/${company.companyKey}`,
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: APP_URL,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: company.companyName,
+                item: url,
+              },
+            ],
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            name: title,
+            description,
+            url,
+            dateModified: company.lastVerifiedDate,
+            about: {
+              "@type": "Organization",
+              name: company.companyName,
+            },
+            citation: company.sourceUrl,
+          }),
         },
       ],
     }
@@ -205,6 +239,12 @@ function CompanyDetailPage() {
                 Read the source policy
                 <ExternalLink className="h-4 w-4" aria-hidden="true" />
               </a>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link to="/compare" search={{ companyA: company.companyKey }}>
+                <GitCompareArrows className="h-4 w-4" aria-hidden="true" />
+                Compare {company.companyName}
+              </Link>
             </Button>
           </div>
         </div>

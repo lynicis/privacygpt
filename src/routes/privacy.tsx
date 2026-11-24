@@ -3,19 +3,50 @@ import { ArrowLeft } from "lucide-react"
 import { APP_URL } from "../lib/site"
 
 export const Route = createFileRoute("/privacy")({
-  head: () => ({
-    meta: [
-      {
-        title: "Privacy Policy | PrivacyGPT",
-      },
-      {
-        name: "description",
-        content:
-          "PrivacyGPT's privacy policy. We collect no cookies, no analytics, no personally identifiable information. Open, transparent, privacy-first.",
-      },
-    ],
-    links: [{ rel: "canonical", href: `${APP_URL}/privacy` }],
-  }),
+  head: () => {
+    const title = "Privacy Policy | PrivacyGPT"
+    const description =
+      "PrivacyGPT's privacy policy. We collect no cookies, no analytics, and no personally identifiable information. Open, transparent, privacy-first."
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: `${APP_URL}/privacy` },
+        { property: "og:image", content: `${APP_URL}/og-image.png` },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: `${APP_URL}/og-image.png` },
+      ],
+      links: [{ rel: "canonical", href: `${APP_URL}/privacy` }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: APP_URL,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Privacy Policy",
+                item: `${APP_URL}/privacy`,
+              },
+            ],
+          }),
+        },
+      ],
+    }
+  },
   component: PrivacyPage,
 })
 

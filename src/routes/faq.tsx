@@ -96,6 +96,27 @@ export const Route = createFileRoute("/faq")({
           })),
         }),
       },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Home",
+              item: APP_URL,
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: "FAQ",
+              item: `${APP_URL}/faq`,
+            },
+          ],
+        }),
+      },
     ],
   }),
   component: FAQPage,

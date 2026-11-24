@@ -86,6 +86,10 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         content: "630",
       },
       {
+        property: "og:image:alt",
+        content: "PrivacyGPT — AI Privacy Watchdog",
+      },
+      {
         property: "og:url",
         content: APP_URL,
       },
@@ -118,6 +122,18 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         href: "/manifest.json",
       },
       {
+        rel: "alternate",
+        type: "application/rss+xml",
+        title: "PrivacyGPT Blog RSS Feed",
+        href: `${APP_URL}/blog/feed.xml`,
+      },
+      {
+        rel: "alternate",
+        type: "application/rss+xml",
+        title: "PrivacyGPT Policy Changelog RSS Feed",
+        href: `${APP_URL}/changelog/feed.xml`,
+      },
+      {
         rel: "stylesheet",
         href: appCss,
       },
@@ -146,7 +162,13 @@ export const Route = createRootRouteWithContext<RouterContext>()({
           "@type": "Organization",
           name: "PrivacyGPT",
           url: APP_URL,
-          logo: `${APP_URL}/og-image.png`,
+          logo: {
+            "@type": "ImageObject",
+            url: `${APP_URL}/pwa-512x512.png`,
+            width: 512,
+            height: 512,
+          },
+          sameAs: ["https://github.com/lynicis/PrivacyGPT"],
         }),
       },
     ],
@@ -186,10 +208,11 @@ function RootLayout() {
                 className="flex shrink-0 items-center gap-2.5"
               >
                 <img
-                  src="/logo.png"
+                  src="/logo.webp"
                   alt=""
-                  width={40}
-                  height={40}
+                  width={32}
+                  height={32}
+                  decoding="async"
                   className="h-8 w-8"
                 />
                 <span className="font-display text-[17px] leading-none font-medium tracking-[-0.02em]">
@@ -198,7 +221,10 @@ function RootLayout() {
               </Link>
 
               {/* Desktop nav */}
-              <nav className="hidden items-center gap-5 lg:flex">
+              <nav
+                aria-label="Main navigation"
+                className="hidden items-center gap-5 lg:flex"
+              >
                 {NAV_LINKS.map((link) => (
                   <Link
                     key={link.to}
@@ -271,7 +297,10 @@ function RootLayout() {
 
           {/* Mobile menu dropdown */}
           {mobileMenuOpen && (
-            <nav className="border-t border-rule bg-paper lg:hidden">
+            <nav
+              aria-label="Mobile navigation"
+              className="border-t border-rule bg-paper lg:hidden"
+            >
               <div className="shell grid gap-1 py-3">
                 {NAV_LINKS.map((link) => (
                   <Link
@@ -308,10 +337,12 @@ function RootLayout() {
                 className="inline-flex items-center gap-3"
               >
                 <img
-                  src="/logo.png"
+                  src="/logo.webp"
                   alt=""
-                  width={40}
-                  height={40}
+                  width={36}
+                  height={36}
+                  loading="lazy"
+                  decoding="async"
                   className="h-9 w-9"
                 />
                 <span className="font-display text-2xl font-medium tracking-[-0.03em]">
@@ -383,7 +414,7 @@ function RootLayout() {
 
           <div className="shell border-t border-rule py-6">
             <div className="flex flex-col gap-2 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-              <p>© {new Date().getFullYear()} PrivacyGPT</p>
+              <p>© {new Date().getUTCFullYear()} PrivacyGPT</p>
               <p>
                 An open watchdog for AI privacy, built by{" "}
                 <a

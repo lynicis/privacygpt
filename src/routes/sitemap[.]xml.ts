@@ -1,8 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { getDb, companies } from "../lib/db"
+import { desc, eq } from "drizzle-orm"
+import { getDb, companies, changelogs } from "../lib/db"
 import { getBlogPosts } from "../lib/blog"
 import { escapeXml } from "../lib/feeds"
 import { APP_URL } from "../lib/site"
+
+interface SitemapEntry {
+  loc: string
+  lastmod?: string
+}
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
@@ -10,68 +16,51 @@ export const Route = createFileRoute("/sitemap.xml")({
       GET: async () => {
         try {
           const db = await getDb()
-          const [rows, blogPosts] = await Promise.all([
+          const [rows, latestChangelog, blogPosts] = await Promise.all([
             db
               .select({
                 companyKey: companies.companyKey,
                 lastVerifiedDate: companies.lastVerifiedDate,
               })
-              .from(companies),
+              .from(companies)
+              .where(eq(companies.hasValidPrivacyPolicy, true)),
+            db
+              .select({ detectedAt: changelogs.detectedAt })
+              .from(changelogs)
+              .orderBy(desc(changelogs.detectedAt))
+              .limit(1),
             getBlogPosts(),
           ])
 
-          const now = new Date().toISOString()
+          const latestCompanyDate = rows
+            .map((r) => r.lastVerifiedDate)
+            .filter(Boolean)
+            .sort()
+            .at(-1)
+          const latestChangelogDate =
+            latestChangelog[0]?.detectedAt || latestCompanyDate
+          const latestBlogDate = blogPosts
+            .map((p) => p.publishDate)
+            .filter(Boolean)
+            .sort()
+            .at(-1)
 
-          const urls = [
-            {
-              loc: APP_URL,
-              lastmod: now,
-              changefreq: "weekly",
-              priority: "1.0",
-            },
-            {
-              loc: `${APP_URL}/methodology`,
-              lastmod: now,
-              changefreq: "monthly",
-              priority: "0.8",
-            },
-            {
-              loc: `${APP_URL}/compare`,
-              lastmod: now,
-              changefreq: "monthly",
-              priority: "0.8",
-            },
-            {
-              loc: `${APP_URL}/changelog`,
-              lastmod: now,
-              changefreq: "daily",
-              priority: "0.7",
-            },
-            {
-              loc: `${APP_URL}/faq`,
-              lastmod: now,
-              changefreq: "monthly",
-              priority: "0.8",
-            },
-            {
-              loc: `${APP_URL}/blog`,
-              lastmod: now,
-              changefreq: "weekly",
-              priority: "0.8",
-            },
+          const urls: SitemapEntry[] = [
+            { loc: APP_URL, lastmod: latestCompanyDate },
+            { loc: `${APP_URL}/methodology` },
+            { loc: `${APP_URL}/compare` },
+            { loc: `${APP_URL}/changelog`, lastmod: latestChangelogDate },
+            { loc: `${APP_URL}/faq` },
+            { loc: `${APP_URL}/blog`, lastmod: latestBlogDate },
+            { loc: `${APP_URL}/privacy`, lastmod: "2026-06-23" },
+            { loc: `${APP_URL}/terms`, lastmod: "2026-06-23" },
             ...rows.map((row) => ({
               loc: `${APP_URL}/company/${row.companyKey}`,
-              lastmod: row.lastVerifiedDate || now,
-              changefreq: "weekly" as const,
-              priority: "0.9",
+              lastmod: row.lastVerifiedDate || undefined,
             })),
             ...blogPosts.map((post) => ({
               loc: `${APP_URL}/blog/${post.slug}`,
-              lastmod: post.publishDate
-                ? new Date(post.publishDate).toISOString()
-                : now,
-              changefreq: "monthly" as const,
-              priority: "0.7",
+              lastmod: post.publishDate || undefined,
             })),
           ]
 
@@ -79,12 +68,10 @@ export const Route = createFileRoute("/sitemap.xml")({
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls
   .map(
-    (u) => `  <url>
-    <loc>${escapeXml(u.loc)}</loc>
-    <lastmod>${escapeXml(u.lastmod)}</lastmod>
-    <changefreq>${escapeXml(u.changefreq)}</changefreq>
-    <priority>${escapeXml(u.priority)}</priority>
-  </url>`
+    (u) =>
+      `  <url>\n    <loc>${escapeXml(u.loc)}</loc>${
+        u.lastmod ? `\n    <lastmod>${escapeXml(u.lastmod)}</lastmod>` : ""
+      }\n  </url>`
   )
   .join("\n")}
 </urlset>`
@@ -92,7 +79,7 @@ ${urls
           return new Response(xml, {
             status: 200,
             headers: {
-              "Content-Type": "application/xml",
+              "Content-Type": "application/xml; charset=utf-8",
               "Cache-Control": "public, max-age=3600, s-maxage=3600",
             },
           })

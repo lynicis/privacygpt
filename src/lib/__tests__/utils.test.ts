@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest"
-import { positiveInt } from "../utils"
+import { formatDateTime, positiveInt } from "../utils"
+
+describe("formatDateTime", () => {
+  it("formats ISO timestamps deterministically in UTC", () => {
+    expect(formatDateTime("2026-06-23T14:05:00.000Z")).toBe(
+      "Jun 23, 2026 at 2:05 PM UTC"
+    )
+    expect(formatDateTime("2026-01-01T00:00:00.000Z")).toBe(
+      "Jan 1, 2026 at 12:00 AM UTC"
+    )
+  })
+})
 
 describe("positiveInt", () => {
   it("falls back for non-numeric input", () => {
